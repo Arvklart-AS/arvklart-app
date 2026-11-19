@@ -25,6 +25,9 @@ const CATEGORIES = ['Møbler', 'Kunst og bilder', 'Smykker og ur', 'Elektronikk'
 // FINNs tilstandsskala → appens tilstand
 const CONDITION = { 'Helt ny': 'excellent', 'Som ny': 'excellent', 'Pent brukt': 'good', 'Godt brukt': 'fair', 'Må fikses': 'poor' }
 const conditionOf = t => CONDITION[Object.keys(CONDITION).find(k => (t || '').startsWith(k))] ?? null
+// Kategorigruppen i testsettet → boets kategori, slik familien ville valgt den (tom når ingen passer)
+const CATEGORY_OF = { 'Møbler': 'Møbler', 'Kunst': 'Kunst og bilder', 'Smykker': 'Smykker og ur', 'Klokker': 'Smykker og ur', 'Elektronikk': 'Elektronikk',
+  'Sølv': 'Kjøkken og porselen', 'Porselen': 'Kjøkken og porselen', 'Glass': 'Kjøkken og porselen', 'Brukskunst': 'Kjøkken og porselen' }
 const known = v => v && !/^ukjent\b/i.test(v.trim()) && !/ikke oppgitt/i.test(v)
 
 const args = process.argv.slice(2)
@@ -41,8 +44,10 @@ if (!KEY) { console.error('Mangler ANTHROPIC_API_KEY'); process.exit(2) }
 
 const set = JSON.parse(fs.readFileSync(path.join(dir, 'testsett.json'), 'utf8'))
 let items = set.items
+const only = flag('--nr', null)
+if (only) items = items.filter(i => only.split(',').map(Number).includes(i.nr))
 if (args.includes('--prøv')) items = items.slice(0, 2)
-else if (!args.includes('--bekreft')) {
+else if (!only && !args.includes('--bekreft')) {
   // Målt i prod: ca. 0,0014 USD per bildeanalyse og 0,0003 per verdianslag (Haiku 5.5); 4.5 koster ca. 10 ganger mer
   const per = (MODEL === 'claude-haiku-5-5' ? 1 : 10) * (0.0014 + 3 * 0.0003)
   console.log(`${items.length} gjenstander × ${ROUNDS} runde(r), modell ${MODEL}, innsats ${EFFORT}: anslått ${(per * items.length * ROUNDS).toFixed(2)} USD. Kjør med --bekreft.`)
@@ -145,7 +150,7 @@ function familyBody(item, analysis) {
   return {
     title,
     description: known(item.modell_detaljer) ? item.modell_detaljer : '',
-    category: analysis?.suggestion.category || '',
+    category: analysis?.suggestion.category || CATEGORY_OF[item.kategorigruppe] || '',
     condition: conditionOf(item.tilstand),
   }
 }
@@ -170,7 +175,8 @@ async function runItem(item, round) {
     nr: item.nr, round, price: item.pris_nok, group: item.kategorigruppe, type: item.type, merke: item.merke, tilstand: item.tilstand,
     analysis: analysis ? {
       title: analysis.suggestion.title, category: analysis.suggestion.category, category_key: analysis.suggestion.category_key, confidence: analysis.suggestion.confidence,
-      brands: brandOf(analysis), model: analysis.identification.model?.value || null, condition: analysis.condition_suggestion, condition_confidence: analysis.condition_confidence,
+      brands: brandOf(analysis), model: analysis.identification.model?.value || null, material: analysis.identification.material || null,
+      designer: analysis.identification.designer_or_artist || null, marks: analysis.marks, condition: analysis.condition_suggestion, condition_confidence: analysis.condition_confidence,
       multiple: analysis.multiple_items.detected, meta: a.meta,
     } : { error: a.error, meta: a.meta },
     scenarios,
