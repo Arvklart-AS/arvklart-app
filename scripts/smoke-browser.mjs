@@ -3,7 +3,7 @@
 //  - Offentlige sider og innlogging vises; feil passord gir feilmelding (et mislykket innloggingsforsøk med en
 //    adresse som ikke finnes, ...@example.invalid).
 //  - Passordtilbakestilling og invitasjonslenker uten innlogging havner der de skal.
-//  - Demoen: «Test ut demo nå» åpner demo-boet, og navigering i boet (gjenstand, sveip, arvinger, løsninger,
+//  - Demoen: «Prøv demo» åpner demo-boet, og navigering i boet (gjenstand, sveip, arvinger, løsninger,
 //    fordeling, status) virker, også sidene som lastes ved behov. demo-login nullstiller demo-boet, som ved
 //    hvert demobesøk.
 //  - Ingen JavaScript-feil, React-feil eller brudd på innholdsreglene (CSP).
@@ -53,11 +53,27 @@ async function check(name, fn, opts) {
 const assert = (c, m) => { if (!c) throw new Error(m) }
 const notBroken = async page => assert(await page.getByText('Siden kunne ikke lastes').count() === 0, '«Siden kunne ikke lastes» vises')
 
+// «Prøv demo» er en lenke til /#demo som starter demoen med JavaScript (src/site/useDemo.js),
+// ikke en knapp. Den i toppmenyen er alltid synlig, også på smale skjermer.
+const demoKnapp = page => page.locator('.hdr a.btn')
+
 await check('Forsiden «/»: overskrift, demo-knapp og lenker', async page => {
   await page.goto(`${BASE}/`)
   await page.getByRole('heading', { level: 1 }).waitFor()
-  await page.getByRole('button', { name: /Test ut demo/ }).waitFor()
-  for (const href of ['/veiviser', '/kontakt', '/personvern', '/logg-inn']) assert(await page.locator(`a[href="${href}"]`).count() > 0, `lenken til ${href} mangler`)
+  await demoKnapp(page).waitFor()
+  for (const href of ['/slik-fungerer-det', '/om-oss', '/veiviser', '/kontakt', '/personvern', '/logg-inn'])
+    assert(await page.locator(`a[href="${href}"]`).count() > 0, `lenken til ${href} mangler`)
+})
+
+await check('De nye undersidene: overskrift, brødsmule og demo-knapp', async page => {
+  for (const [path, h1] of [['/slik-fungerer-det', 'Slik fordeler dere innbo med Arvklart'], ['/om-oss', 'Teamet bak Arvklart'], ['/kontakt', 'Hva kan vi hjelpe deg med?']]) {
+    await page.goto(BASE + path)
+    const navn = (await page.locator('h1').ariaSnapshot()).match(/heading "([^"]+)"/)?.[1]
+    assert(navn === h1, `${path}: overskriften er «${navn}»`)
+    await page.locator('nav.crumb').waitFor()
+    await demoKnapp(page).waitFor()
+    await notBroken(page)
+  }
 })
 
 await check('Uten innlogging: /home, /app og app-sider ender på forsiden «/»', async page => {
@@ -114,7 +130,7 @@ await check('Veiviseren (i siden, uten iframe) virker, og personvern vises', asy
 
 await check('Demo: åpner demo-boet, og navigering i boet virker', async page => {
   await page.goto(`${BASE}/`)
-  await page.getByRole('button', { name: /Test ut demo/ }).first().click()
+  await demoKnapp(page).click()
   await page.waitForURL(/\/estate\/[0-9a-f-]{36}$/, { timeout: 30000 })
   await page.getByText(/Du ser på en/).waitFor()
   const estate = new URL(page.url()).pathname
@@ -143,7 +159,7 @@ await check('Demo: åpner demo-boet, og navigering i boet virker', async page =>
 const DEMO_EST = 'deed0001-0000-0000-0000-000000000001'
 const openDemo = async page => {
   await page.goto(`${BASE}/`)
-  await page.getByRole('button', { name: /Test ut demo/ }).first().click()
+  await demoKnapp(page).click()
   await page.waitForURL(/\/estate\/[0-9a-f-]{36}$/, { timeout: 30000 })
   await page.getByRole('heading', { name: 'Fam. Hansen sitt bo' }).first().waitFor({ timeout: 20000 })
 }
@@ -283,7 +299,7 @@ await check('Statistikk: demoen fra forsiden med samtykke laster siden på nytt 
   await page.goto(`${BASE}/`)
   await region(page).getByRole('button', { name: 'Godta' }).click({ timeout: 15000 })
   await page.waitForResponse(r => r.url().startsWith('https://www.googletagmanager.com/gtm.js'), { timeout: 15000 })
-  await page.getByRole('button', { name: /Test ut demo/ }).first().click()
+  await demoKnapp(page).click()
   await page.waitForURL(/\/estate\/[0-9a-f-]{36}$/, { timeout: 30000 })
   await page.getByText(/Du ser på en/).waitFor()
   const estate = new URL(page.url()).pathname

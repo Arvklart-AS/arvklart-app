@@ -135,7 +135,7 @@ export default function App({ prerendered = false }) {
           .select('estate_id').eq('user_id', user.id).limit(1).maybeSingle()
         if (cancelled) return
         setDemoEstateId(membership?.estate_id || null)
-        // Rett fra «Test ut demo» på forsiden og inn i demo-boet
+        // Rett fra «Prøv demo» på forsiden og inn i demo-boet
         if (membership?.estate_id && [HOME, APP_HOME].includes(window.location.pathname)) navigate(`/estate/${membership.estate_id}`)
         return
       }
