@@ -76,13 +76,18 @@ describe('demoinnholdet', () => {
     }
   })
 
-  test('banneret sier hvem den besøkende er, og forsiden viser utgangspunktet, ikke en ferdig fordeling', () => {
+  test('banneret sier hvem den besøkende er, og de offentlige sidene viser utgangspunktet, ikke en ferdig fordeling', () => {
     assert.match(read('src/App.jsx'), /Du er Mona, en av tre arvinger og administrator; Kari og Lars har allerede svart\./)
-    const landing = read('src/pages/LandingPage.jsx')
-    const at = landing.indexOf('className="demo-mockup"')
-    const mock = landing.slice(at, landing.indexOf('</section>', at))
-    assert.match(mock, /10 gjenstander · 3 arvinger/)
-    assert.doesNotMatch(mock, /Tildelt|ble enige|Avklart|eiketresbord|Erik/, 'illustrasjonen viser noe nullstillingen fjerner eller som ikke finnes i demoen')
+    // Tallene om eksempelboet står to steder på de offentlige sidene og må stemme med demoen
+    assert.match(read('src/pages/HowItWorksPage.jsx'), /3 arvinger og 10 gjenstander/)
+    assert.match(read('src/pages/ContactPage.jsx'), /tre arvinger og ti gjenstander/)
+    // Forsiden og produktreisen illustrerer demoen med skjermbilder. Teksten rundt dem skal ikke
+    // påstå en ferdig fordeling, og ikke nevne noe nullstillingen fjerner eller som ikke finnes.
+    for (const f of ['src/pages/LandingPage.jsx', 'src/site/Journey.jsx']) {
+      assert.doesNotMatch(read(f), /Tildelt|ble enige|eiketresbord|Erik/, `${f}: viser noe nullstillingen fjerner eller som ikke finnes i demoen`)
+    }
+    // Hvert produktutsnitt er merket som skjermbilde (redelighetskravet i integrasjonspakken)
+    assert.match(read('src/site/Shot.jsx'), /Skjermbilde fra Arvklart.*Skjermbilde fra demoen/s)
   })
 
   test('seed og nullstilling har de samme ønsketekstene', () => {

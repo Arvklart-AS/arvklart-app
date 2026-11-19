@@ -1,0 +1,1971 @@
+/* ============================================================
+   ARVKLART — DE OFFENTLIGE NETTSIDENE
+   Designfasit: integrasjonspakken av 19. november 2026.
+   
+   Alt her er avgrenset til «.ak», rotklassen i src/site/SiteLayout.jsx.
+   Appen, demoen og innloggingen bruker ingen av disse reglene, og de
+   har ingen regler som treffer inn hit. Byttes rotklassen, må denne
+   filen byttes i samme slengen.
+   
+   Flatene (.g-natt / .g-papir / .g-jord) setter --ink, --muted, --rule,
+   --accent, --btn-bg og --focus videre. Det er dette som gjør at samme
+   komponent virker på både lys og mørk bakgrunn. Behold mønsteret.
+   
+   «.ak-js» settes av useHydrated() først når React har tatt over, så
+   HTML-en fra forhåndsrenderingen er den ferdige versjonen uten
+   JavaScript. Se src/site/useHydrated.js.
+   ============================================================ */
+
+/* ---- overskriftsfonten, selvhostet (SIL OFL 1.1, public/fonter/) ---- */
+/* Karla kommer fortsatt fra Google Fonts, som i appen: en lokal @font-face
+   med samme familienavn ville overstyrt appens egne vekter (300/500/600).
+   Se docs/ny-offentlig-nettside.md. */
+@font-face{
+  font-family:'Bodoni Moda';
+  font-style:normal;
+  font-weight:400 700;
+  font-display:swap;
+  src:url('/fonter/bodoni-moda-400-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2122,U+2212;
+}
+@font-face{
+  font-family:'Bodoni Moda';
+  font-style:italic;
+  font-weight:400 700;
+  font-display:swap;
+  src:url('/fonter/bodoni-moda-400-italic-latin.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2122,U+2212;
+}
+
+/* ---- reservefonter med målte bredder: ingen hopp ved fontbytte ---- */
+@font-face{
+  font-family:'Bodoni reserve';
+  src:local('Times New Roman'),local('Liberation Serif'),local('Nimbus Roman'),local('Tinos');
+  size-adjust:100%;
+}
+@font-face{
+  font-family:'Karla reserve';
+  src:local('Arial'),local('Helvetica'),local('Liberation Sans'),local('Arimo');
+  size-adjust:89.5%;
+}
+.ak{
+  --natt:#1F221E; --jord:#3A3129; --lin:#F2EEE6; --lin-dempet:#B9B4A8;
+  --mose:#9DAA8C; --messing-lys:#C79A6B;
+  --papir:#F5F2EB; --kalk:#EAE5DA; --blekk:#1F2326; --skifer:#575B5E;
+  --granskog:#2F4A43; --messing:#8A5A34; --strek:#CFC8BA; --rust:#9A3B2E;
+  
+  --ground:var(--natt); --ink:var(--lin); --muted:var(--lin-dempet);
+  --rule:rgba(242,238,230,.14); --accent:var(--mose); --link:var(--lin);
+  --btn-bg:var(--lin); --btn-ink:var(--natt); --focus:var(--mose);
+  
+  --serif:'Bodoni Moda','Bodoni reserve','Times New Roman',serif;
+  --sans:'Karla','Karla reserve',Arial,sans-serif;
+  
+  --logo:url(/nettsted/logo-maske.png);
+  --maxw:1320px;
+  --gut:clamp(20px,5vw,72px);
+  --pad:max(var(--gut), calc((100% - var(--maxw)) / 2));
+  
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --t-s:240ms; --t-m:420ms; --t-l:820ms;
+
+  /* driver — sluttilstand som standard (uten JS / redusert bevegelse) */
+  --lift:1;
+  --glow:0;
+}
+.ak *,.ak *::before,.ak *::after{
+  box-sizing:border-box
+}
+.ak{
+  background:var(--natt);color:var(--lin);
+  font-family:var(--sans);font-weight:400;
+  font-size:clamp(1rem,.97rem + .17vw,1.1rem);line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  /* .ak er en div, ikke <body>. overflow-x:hidden ville gjort den til en rulleflate og flyttet
+     den klebrige headeren inn i den; clip klipper uten å lage rulleflate. */
+  overflow-x:clip;
+  /* Et enkelt langt ord (f.eks. «Brukeropplevelse» i en smal teamkolonne, eller «eksempelboet»
+     i den faste demoknappen) skal brekke i stedet for å renne ut av spalten. Slår bare inn når
+     ordet ikke får plass, så vanlig ombrekking er uendret. Testet med 135 % tekst på 360 px. */
+  overflow-wrap:break-word;
+}
+.ak img{
+  max-width:100%;display:block;height:auto
+}
+/* opsz-aksen i Bodoni Moda gjør store A-er til hårstreker. Låst. */
+.ak h1,.ak h2,.ak h3,.ak .row__t,.ak .team__n,.ak .foot__t,.ak .cap i,.ak .phero,.ak .kort__t,.ak .lane__t,.ak .big,.ak .fase__t,.ak .steg__t,.ak .def__t{
+  font-optical-sizing:none
+}
+.ak h1,.ak h2,.ak h3{
+  margin:0;font-family:var(--serif);font-weight:400;font-synthesis:none
+}
+.ak h1 em,.ak h2 em,.ak h3 em{
+  font-style:italic;font-weight:400
+}
+.ak p{
+  margin:0
+}
+.ak ol,.ak ul{
+  margin:0;padding:0;list-style:none
+}
+/* ---- flater ---- */
+.ak .ground{
+  position:relative;isolation:isolate;background:var(--ground)
+}
+.ak .g-natt{
+  --ground:var(--natt);--ink:var(--lin);--muted:var(--lin-dempet);
+  --rule:rgba(242,238,230,.14);--accent:var(--mose);--link:var(--lin);
+  --btn-bg:var(--lin);--btn-ink:var(--natt);--focus:var(--mose);color:var(--lin)
+}
+.ak .g-papir{
+  --ground:var(--papir);--ink:var(--blekk);--muted:var(--skifer);
+  --rule:var(--strek);--accent:var(--granskog);--link:var(--messing);
+  --btn-bg:var(--granskog);--btn-ink:var(--papir);--focus:var(--granskog);color:var(--blekk)
+}
+.ak .g-jord{
+  --ground:var(--jord);--ink:var(--lin);--muted:var(--lin-dempet);
+  --rule:rgba(242,238,230,.16);--accent:var(--mose);--link:var(--lin);
+  --btn-bg:var(--lin);--btn-ink:var(--jord);--focus:var(--mose);color:var(--lin)
+}
+.ak .wrap{
+  padding-inline:var(--pad);position:relative;z-index:2
+}
+.ak .sec{
+  padding-block:clamp(60px,7vw,112px)
+}
+.ak .sec--tight{
+  padding-top:clamp(36px,4.2vw,66px)
+}
+.ak .rules{
+  position:absolute;inset:0;z-index:0;pointer-events:none
+}
+.ak .rules::before,.ak .rules::after{
+  content:'';position:absolute;top:0;bottom:0;width:1px;background:var(--rule)
+}
+.ak .rules::before{
+  left:calc(var(--pad) - clamp(9px,1.25vw,20px))
+}
+.ak .rules::after{
+  right:calc(var(--pad) - clamp(9px,1.25vw,20px))
+}
+.ak .rules i{
+  position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--rule);opacity:.6
+}
+@media (max-width:860px){
+  .ak .rules i{
+    display:none
+  }
+}
+/* ---- typografi ---- */
+.ak h1{
+  font-size:clamp(2.15rem,1.1rem + 4.6vw,5.1rem);line-height:1.03;letter-spacing:-.025em
+}
+.ak h2{
+  font-size:clamp(1.85rem,1.1rem + 3vw,3.6rem);line-height:1.08;letter-spacing:-.02em
+}
+.ak h3{
+  font-size:clamp(1.4rem,1.05rem + 1.4vw,2.1rem);line-height:1.15;letter-spacing:-.015em
+}
+.ak .lead{
+  font-size:clamp(1.06rem,.98rem + .42vw,1.35rem);line-height:1.55;color:var(--muted)
+}
+.ak .body{
+  color:var(--muted);max-width:60ch
+}
+.ak .micro{
+  font-size:1rem;color:var(--muted)
+}
+.ak .big{
+  font-family:var(--serif);font-size:clamp(1.25rem,1rem + 1.1vw,1.9rem);
+  line-height:1.3;letter-spacing:-.012em;color:var(--ink);max-width:26ch
+}
+.ak .overline{
+  display:flex;align-items:center;gap:.9em;margin:0;
+  font-family:var(--sans);font-size:.78rem;font-weight:600;line-height:1.4;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--messing-lys)
+}
+.ak .g-papir .overline{
+  color:var(--messing)
+}
+.ak .overline::before{
+  content:'';flex:0 0 clamp(32px,4vw,58px);height:1px;background:currentColor;opacity:.85
+}
+.ak .overline--c{
+  justify-content:center
+}
+.ak .label{
+  display:block;font-family:var(--sans);font-size:.76rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--accent)
+}
+/* ---- knapper og lenker ---- */
+.ak .btn{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  min-height:52px;padding:.85em 2.1em;border-radius:999px;border:1px solid transparent;
+  background:var(--btn-bg);color:var(--btn-ink);
+  font-family:var(--sans);font-size:1.02rem;font-weight:600;letter-spacing:.005em;
+  text-decoration:none;overflow:hidden;isolation:isolate;
+  transition:transform var(--t-s) var(--ease), box-shadow var(--t-m) var(--ease), filter var(--t-s) var(--ease);
+}
+.ak .btn::after{
+  content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;
+  background:radial-gradient(120% 180% at 50% 120%, rgba(255,255,255,.55), transparent 62%);
+  opacity:0;transition:opacity var(--t-m) var(--ease)
+}
+.ak .g-natt .btn::after,.ak .g-jord .btn::after{
+  background:radial-gradient(120% 180% at 50% 120%, rgba(157,170,140,.75), transparent 64%)
+}
+.ak .btn:hover{
+  transform:translateY(-3px);box-shadow:0 10px 30px -12px rgba(0,0,0,.55)
+}
+.ak .btn:hover::after{
+  opacity:1
+}
+.ak .btn:active{
+  transform:translateY(-1px)
+}
+.ak .btn--sek{
+  background:transparent;color:var(--ink);border-color:var(--rule)
+}
+.ak .g-papir .btn--sek{
+  border-color:var(--strek)
+}
+.ak .btn--sek:hover{
+  border-color:var(--accent)
+}
+.ak .ul{
+  color:var(--link);text-decoration:none;font-weight:500;
+  background-image:linear-gradient(currentColor,currentColor);
+  background-size:100% 1px;background-repeat:no-repeat;
+  background-position:0 calc(100% - .62em);
+  padding-block:.62em .8em;
+  transition:background-size var(--t-m) var(--ease), color var(--t-s) var(--ease), transform var(--t-s) var(--ease);
+  display:inline-block;
+}
+.ak .ul:hover{
+  background-size:100% 2px;transform:translateY(-2px)
+}
+.ak .g-natt .ul:hover,.ak .g-jord .ul:hover{
+  color:#fff
+}
+.ak .g-papir .ul:hover{
+  color:var(--blekk)
+}
+.ak .ul--sub{
+  color:var(--muted);font-weight:400
+}
+.ak .arrowlink{
+  display:inline;color:var(--link);font-weight:500;text-decoration:none;
+  padding-block:.85em 1em;transition:color var(--t-s) var(--ease)
+}
+.ak .arrowlink__end{
+  white-space:nowrap
+}
+.ak .arrowlink svg{
+  display:inline-block;vertical-align:-1px;margin-left:.2em;
+  transition:transform var(--t-m) var(--ease)
+}
+.ak .arrowlink>span{
+  background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;
+  background-repeat:no-repeat;background-position:0 calc(100% - .18em);
+  transition:background-size var(--t-m) var(--ease)
+}
+.ak .arrowlink:hover>span{
+  background-size:100% 1px
+}
+.ak .arrowlink:hover svg{
+  transform:translateX(6px)
+}
+.ak .arrowlink:hover{
+  color:var(--accent)
+}
+.ak :focus-visible{
+  outline:2px solid var(--focus);outline-offset:3px;border-radius:2px
+}
+.ak .skip{
+  position:absolute;left:12px;top:-200px;z-index:999;padding:14px 20px;border-radius:2px;
+  background:var(--lin);color:var(--natt);font-weight:600;text-decoration:none;
+  transition:top var(--t-s) var(--ease)
+}
+.ak .skip:focus{
+  top:12px
+}
+/* ============================================================
+   HEADER
+   ============================================================ */
+.ak .hdr{
+  position:sticky;top:0;z-index:50;background:var(--natt);
+  border-bottom:1px solid rgba(242,238,230,.1)
+}
+.ak .hdr__in{
+  display:flex;align-items:center;gap:clamp(16px,3vw,44px);
+  min-height:74px;padding-inline:var(--pad)
+}
+.ak .brand{
+  display:inline-flex;align-items:center;min-height:44px;
+  color:var(--lin);text-decoration:none;
+  transition:transform var(--t-s) var(--ease),color var(--t-s) var(--ease)
+}
+.ak .brand__mark{
+  display:block;width:clamp(124px,12vw,158px);aspect-ratio:460/122;
+  background:currentColor;
+  -webkit-mask:var(--logo) no-repeat center/contain;
+  mask:var(--logo) no-repeat center/contain
+}
+.ak .brand:hover{
+  color:var(--mose);transform:translateY(-2px)
+}
+@media (max-width:420px){
+  .ak .brand__mark{
+    width:108px
+  }
+}
+.ak .nav{
+  display:flex;align-items:center;gap:clamp(14px,2vw,30px);margin-left:auto
+}
+.ak .nav a{
+  font-size:.9rem;color:var(--lin-dempet);text-decoration:none;
+  min-height:44px;display:inline-flex;align-items:center;
+  background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;
+  background-repeat:no-repeat;background-position:0 calc(50% + .85em);
+  transition:background-size var(--t-m) var(--ease),color var(--t-s) var(--ease)
+}
+.ak .nav a:hover{
+  color:var(--lin);background-size:100% 1px
+}
+/* Siden man står på skal være merket, ikke bare en lenke til seg selv. */
+.ak .nav a[aria-current="page"]{
+  color:var(--lin);background-size:100% 1px
+}
+.ak .hdr .btn{
+  min-height:46px;padding:.6em 1.5em;font-size:.95rem
+}
+.ak .menu{
+  display:none
+}
+@media (max-width:980px){
+  .ak .hdr__in{
+    min-height:62px;gap:10px;position:relative
+  }
+  .ak .nav{
+    display:none
+  }
+  .ak .menu{
+    display:block;margin-left:auto
+  }
+  .ak .menu>summary{
+    list-style:none;display:inline-flex;align-items:center;gap:.5em;
+    min-height:46px;padding:.5em 1.1em;border:1px solid rgba(242,238,230,.32);border-radius:999px;
+    color:var(--lin);font-size:.92rem;font-weight:500;cursor:pointer;
+    transition:border-color var(--t-s) var(--ease),transform var(--t-s) var(--ease)
+  }
+  .ak .menu>summary::-webkit-details-marker{
+    display:none
+  }
+  .ak .menu>summary:hover{
+    border-color:var(--mose);transform:translateY(-2px)
+  }
+  .ak .menu__panel{
+    position:absolute;left:0;right:0;top:100%;background:var(--natt);
+    border-bottom:1px solid rgba(242,238,230,.14);padding:8px var(--pad) 22px
+  }
+  .ak .menu__panel a{
+    display:flex;align-items:center;min-height:56px;
+    color:var(--lin);text-decoration:none;font-size:1.05rem;
+    border-bottom:1px solid rgba(242,238,230,.1)
+  }
+  .ak .menu__panel a:hover{
+    color:var(--mose)
+  }
+  .ak .menu__panel a[aria-current="page"]{
+    color:var(--mose)
+  }
+  .ak .hdr .btn{
+    order:3;min-height:44px;padding:.55em 1.25em;font-size:.92rem
+  }
+}
+@media (max-width:380px){
+  .ak .hdr .btn{
+    padding:.55em 1rem;font-size:.88rem
+  }
+  .ak .menu>summary{
+    padding:.5em .9em
+  }
+}
+/* ============================================================
+   SIDETOPP PÅ UNDERSIDENE
+   Ikke forsidens hero. Lavere, venstrestilt, med brødsmule, så
+   besøkende ser med én gang at de står et annet sted enn forsiden.
+   ============================================================ */
+.ak .phero{
+  padding-block:clamp(44px,6vw,92px) clamp(36px,4.6vw,70px);position:relative;overflow:hidden
+}
+.ak .phero__in{
+  display:grid;gap:clamp(16px,2vw,26px);max-width:24ch
+}
+.ak .phero h1{
+  max-width:15ch
+}
+.ak .phero .lead{
+  max-width:52ch
+}
+.ak .phero__in{
+  max-width:none
+}
+.ak .crumb{
+  display:flex;align-items:center;gap:.6em;font-size:.88rem;color:var(--muted);flex-wrap:wrap
+}
+.ak .crumb a{
+  color:var(--muted);text-decoration:none;min-height:32px;display:inline-flex;align-items:center;
+  background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;
+  background-repeat:no-repeat;background-position:0 calc(50% + .72em);
+  transition:background-size var(--t-m) var(--ease),color var(--t-s) var(--ease)
+}
+.ak .crumb a:hover{
+  color:var(--lin);background-size:100% 1px
+}
+/* Bare skilletegnet dempes. Sidens eget navn er en opplysning og
+må holde kontrastkravet. */
+.ak .crumb span[aria-hidden]{
+  opacity:.5
+}
+.ak .crumb span[aria-current]{
+  color:var(--lin)
+}
+.ak .phero__cta{
+  display:flex;align-items:center;gap:clamp(16px,2.6vw,32px);flex-wrap:wrap;
+  margin-top:clamp(6px,1vw,14px)
+}
+@media (max-width:460px){
+  .ak .phero .btn{
+    flex:1 1 100%
+  }
+}
+/* ============================================================
+   DELTE BYGGEKLOSSER
+   ============================================================ */
+/* nummererte rader med hårstreker */
+.ak .rows{
+  display:grid
+}
+.ak .rows>li{
+  border-top:1px solid var(--rule)
+}
+.ak .rows>li:last-child{
+  border-bottom:1px solid var(--rule)
+}
+.ak .row{
+  display:grid;grid-template-columns:auto 1fr;gap:.4em clamp(18px,2.4vw,34px);
+  align-items:start;padding:clamp(20px,2.4vw,30px) 0;position:relative;
+  transition:transform var(--t-m) var(--ease)
+}
+.ak .row::before{
+  content:'';position:absolute;left:0;top:0;height:1px;width:0;background:var(--accent);
+  transition:width var(--t-l) var(--ease)
+}
+.ak .row__n{
+  grid-row:1/3;font-family:var(--serif);font-size:1.05rem;color:var(--accent);
+  padding-top:.35em;min-width:2.2ch;transition:opacity var(--t-s) var(--ease)
+}
+.ak .row__t{
+  font-family:var(--serif);font-size:clamp(1.15rem,.95rem + .85vw,1.65rem);
+  line-height:1.2;letter-spacing:-.01em;color:var(--ink)
+}
+.ak .row__d{
+  color:var(--muted);max-width:52ch;font-size:1rem
+}
+/* bildetekst */
+.ak .cap{
+  display:grid;gap:.45em;max-width:46ch
+}
+.ak .cap .label{
+  color:var(--accent)
+}
+.ak .cap i{
+  font-family:var(--serif);font-style:italic;font-size:1.02rem;line-height:1.45;color:var(--muted)
+}
+/* rammer rundt produktutsnitt */
+.ak .shotfig{
+  margin:0;display:grid;gap:14px;align-content:start;justify-items:start
+}
+.ak .phoneframe{
+  border:1px solid rgba(242,238,230,.26);border-radius:22px;padding:5px;background:rgba(0,0,0,.18);
+  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+}
+.ak .phoneframe img{
+  border-radius:17px;height:var(--ph,none);object-fit:cover;object-position:top center;
+  -webkit-mask:linear-gradient(to bottom,#000 86%,transparent);
+  mask:linear-gradient(to bottom,#000 86%,transparent)
+}
+.ak .g-papir .phoneframe{
+  border-color:var(--strek);background:var(--kalk)
+}
+.ak .shotfig:hover .phoneframe{
+  transform:translateY(-5px);border-color:var(--accent)
+}
+.ak .deskframe{
+  border:1px solid var(--rule);border-radius:2px;padding:8px;background:rgba(242,238,230,.05);
+  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+}
+.ak .g-papir .deskframe{
+  background:var(--kalk);border-color:var(--strek)
+}
+.ak .shotfig:hover .deskframe{
+  transform:translateY(-5px);border-color:var(--accent)
+}
+/* sitat / merknad med strek i margen */
+.ak .note{
+  border-left:1px solid var(--accent);padding:.1em 0 .1em 1.3em;color:var(--muted);
+  max-width:56ch;font-size:1rem
+}
+/* liten etikett som sier hvem som gjør noe */
+.ak .who{
+  display:inline-flex;align-items:center;gap:.5em;
+  font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  padding:.42em .9em;border-radius:999px;border:1px solid currentColor;line-height:1
+}
+.ak .who--koord{
+  color:var(--messing-lys)
+}
+.ak .g-papir .who--koord{
+  color:var(--messing)
+}
+.ak .who--arv{
+  color:var(--mose)
+}
+.ak .g-papir .who--arv{
+  color:var(--granskog)
+}
+.ak .who--alle{
+  color:var(--muted)
+}
+/* ============================================================
+   AVSLUTNING OG BUNNTEKST
+   ============================================================ */
+.ak .end{
+  display:grid;justify-items:center;text-align:center;gap:clamp(18px,2.4vw,30px)
+}
+.ak .end h2{
+  max-width:20ch
+}
+.ak .end .body{
+  max-width:48ch
+}
+.ak .end__cta{
+  display:flex;align-items:center;gap:clamp(16px,2.6vw,32px);flex-wrap:wrap;justify-content:center
+}
+.ak .foot{
+  border-top:1px solid rgba(242,238,230,.12);padding-block:clamp(40px,5vw,66px)
+}
+.ak .foot__in{
+  display:grid;gap:clamp(22px,3vw,34px)
+}
+.ak .foot__t{
+  font-family:var(--serif);font-size:clamp(1.1rem,.95rem + .6vw,1.45rem);
+  line-height:1.4;color:var(--lin);max-width:44ch
+}
+.ak .foot__links{
+  display:flex;flex-wrap:wrap;gap:.2em clamp(16px,2vw,28px);align-items:center
+}
+.ak .foot__links a{
+  color:var(--lin-dempet);text-decoration:none;font-size:.95rem;
+  min-height:44px;display:inline-flex;align-items:center;flex:none;white-space:nowrap;
+  transition:color var(--t-s) var(--ease)
+}
+.ak .foot__links a:hover{
+  color:var(--lin)
+}
+.ak .foot__links a[aria-current="page"]{
+  color:var(--lin)
+}
+.ak .foot__note{
+  color:rgba(185,180,168,.72);font-size:.85rem;max-width:68ch
+}
+.ak .g-papir .utkast{
+  color:var(--messing);border-color:rgba(138,90,52,.45)
+}
+@media (prefers-reduced-motion: reduce){
+  .ak *,.ak *::before,.ak *::after{
+    animation:none !important;transition-duration:1ms !important
+  }
+  .ak .btn:hover,.ak .row:hover,.ak .ul:hover,.ak .brand:hover,.ak .menu>summary:hover,.ak .shotfig:hover .phoneframe,.ak .shotfig:hover .deskframe{
+    transform:none
+  }
+}
+/* selskapsopplysninger i bunnteksten */
+.ak .foot__org{
+  color:var(--lin-dempet);font-size:.9rem;letter-spacing:.01em
+}
+/* ============================================================
+   SIDEEGEN KOMPOSISJON
+   En kontaktside har én oppgave: å gjøre adressen umulig å
+   overse. Derfor er e-postadressen selve overskriftsmaterialet,
+   ikke en linje nederst.
+   ============================================================ */
+/* ---- adressen som hovedelement ---- */
+.ak .adr{
+  display:grid;gap:clamp(10px,1.4vw,16px);margin-top:clamp(20px,2.6vw,34px);
+  border-top:1px solid var(--rule);padding-top:clamp(18px,2.2vw,28px)
+}
+.ak .adr__e{
+  font-family:var(--serif);font-optical-sizing:none;
+  font-size:clamp(1.45rem,1rem + 2.3vw,3rem);line-height:1.1;letter-spacing:-.02em;
+  color:var(--lin);text-decoration:none;display:inline-block;word-break:break-word;
+  background-image:linear-gradient(currentColor,currentColor);
+  background-size:100% 1px;background-repeat:no-repeat;
+  background-position:0 calc(100% - .16em);padding-bottom:.2em;
+  transition:background-size var(--t-m) var(--ease),color var(--t-s) var(--ease),
+  transform var(--t-s) var(--ease)
+}
+.ak .adr__e:hover{
+  background-size:100% 2px;color:#fff;transform:translateY(-2px)
+}
+.ak .adr__m{
+  color:var(--lin-dempet);font-size:.98rem;max-width:46ch
+}
+/* ---- to veier inn, samme innboks ---- */
+.ak .veier{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin-top:clamp(32px,4vw,56px)
+}
+.ak .vei{
+  background:var(--papir);padding:clamp(24px,2.8vw,40px);
+  display:grid;gap:clamp(12px,1.5vw,18px);align-content:start
+}
+.ak .vei h3{
+  max-width:15ch
+}
+.ak .vei__d{
+  color:var(--muted);font-size:1rem;line-height:1.55;max-width:42ch
+}
+.ak .vei ul{
+  display:grid;gap:.55em;margin-top:.2em
+}
+.ak .vei li{
+  display:grid;grid-template-columns:auto 1fr;gap:.75em;align-items:baseline;
+  color:var(--muted);font-size:.98rem;line-height:1.5
+}
+.ak .vei li::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--accent);transform:translateY(-2px)
+}
+.ak .vei__cta{
+  margin-top:clamp(8px,1.2vw,14px)
+}
+.ak .vei__emne{
+  font-size:.86rem;color:var(--muted);margin-top:.6em
+}
+.ak .vei__emne b{
+  color:var(--ink);font-weight:600
+}
+@media (max-width:820px){
+  .ak .veier{
+    grid-template-columns:1fr
+  }
+}
+/* ---- før du skriver ---- */
+/* Kontakt er sekundært til demo. Denne delen prøver å svare på
+det folk ellers ville sendt en e-post om. */
+.ak .foer{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(20px,2.6vw,42px);margin-top:clamp(28px,3.4vw,48px)
+}
+.ak .foer li{
+  border-top:1px solid var(--rule);padding-top:clamp(14px,1.6vw,20px)
+}
+.ak .foer b{
+  display:block;font-family:var(--serif);font-weight:400;font-size:1.2rem;
+  color:var(--ink);margin-bottom:.4em;font-optical-sizing:none
+}
+.ak .foer p{
+  color:var(--muted);font-size:1rem;line-height:1.55;margin-bottom:.6em
+}
+@media (max-width:820px){
+  .ak .foer{
+    grid-template-columns:1fr;gap:0
+  }
+  .ak .foer li{
+    padding-block:clamp(16px,1.8vw,22px)
+  }
+}
+/* ============================================================
+   §1 HERO
+   ============================================================ */
+.ak .hero{
+  min-height:calc(86svh - 74px);display:grid;align-items:center;
+  padding-block:clamp(48px,7vw,90px) clamp(26px,4vw,40px);overflow:hidden
+}
+/* Lampa skrus opp én gang når siden åpnes, og blir så stående. Siden faller
+til ro etter under to sekunder. Livet ligger i overgangen og i det som
+svarer når man peker — ikke i en dekorativ puls som aldri stopper. */
+.ak .hero__glow{
+  position:absolute;z-index:0;left:50%;top:44%;width:min(150vw,1600px);aspect-ratio:1.45;
+  background:radial-gradient(ellipse at center, rgba(199,154,107,.22), rgba(157,170,140,.11) 36%, transparent 66%);
+  pointer-events:none;will-change:transform,opacity;
+  animation:ak-lampe 1200ms var(--ease) both
+}
+@keyframes ak-lampe{
+  from{transform:translate(-50%,-50%) translateY(26px) scale(.9);opacity:0}
+  to  {transform:translate(-50%,-50%) translateY(0) scale(1);opacity:1}
+}
+.ak .hero__in{
+  display:grid;justify-items:center;text-align:center;gap:clamp(18px,2.4vw,30px);
+  max-width:min(100%,900px);margin-inline:auto
+}
+/* Overskriften fyller spalten i stedet for å være så bred som sitt lengste ord.
+Uten det ville sporet med uttrykkene måttet brekke, siden bredden til
+overskriften og bredden til sporet ellers avhenger av hverandre. */
+.ak .hero h1{
+  width:100%;max-width:none
+}
+.ak .hero .lead{
+  max-width:48ch
+}
+/* ============================================================
+   ORDSKIFTET I OVERSKRIFTEN
+   Ett uttrykk skyves ut mot venstre mens det neste kommer inn
+   fra høyre, slik det gjøres i Julies videoforslag. Resten av
+   overskriften står helt stille.
+   
+   Tre ting er bevisst:
+   1. Uten JavaScript er .ordslot en helt vanlig tekstbit, og
+   overskriften leser «Fordel arvegjenstandene med én felles
+   oversikt». Ingenting er skjult mens siden starter.
+   2. Med JavaScript blir sporet et inline-grid der alle tre
+   uttrykkene ligger i samme rute. Ruten blir like bred som
+   det lengste uttrykket, så ingenting i heroen flytter seg
+   når ordet skifter.
+   3. Ved redusert bevegelse faller alt tilbake til punkt 1.
+   ============================================================ */
+.ak .h1__r1,.ak .h1__r2{
+  display:block
+}
+/* Uttrykket er en egen linje, ikke et innskudd i den første. */
+.ak .ordslot{
+  display:block
+}
+.ak .visuelt-skjult{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0
+}
+/* uten JavaScript: bare det første uttrykket, ingen reservert plass */
+.ak .ordslot__i{
+  display:none
+}
+.ak .ordslot__i:first-child{
+  display:block
+}
+.ak.ak-js .ordslot{
+  display:grid;text-align:inherit;
+  /* Loddrett luft så clip-path ikke kutter over- og underlengder: med
+  line-height 1.03 er linjeboksen lavere enn bokstavene. Den negative
+  margen tar igjen det samme, så linjeavstanden i overskriften er
+  nøyaktig som før. */
+  padding-block:.26em;margin-block:-.26em;
+  /* Vannrett beskjæring i stedet for overflow:hidden, som ville laget en egen
+  rulleflate og endret hvordan boksen stiller seg i linjen. clip-path maler
+  bare, og rører ikke layout. */
+  clip-path:inset(0 0 0 0);
+}
+/* Uttrykket får sin egen farge, så det er tydelig hvilken del av overskriften
+som skifter. Ren messing ble for mørk ved siden av de hvite linjene og laget
+et hull midt i overskriften. Dette er den samme messingen trukket mot linet,
+altså en blanding av to farger som allerede står i paletten. Den holder
+overskriften lys og peker mot den varme lyskjeglen bak. */
+.ak .hero{
+  --ordfarge:color-mix(in srgb, var(--messing-lys) 62%, var(--lin))
+}
+.ak .ordslot__i{
+  color:var(--ordfarge)
+}
+.ak.ak-js .ordslot__i{
+  display:block;grid-area:1/1;
+  /* hvileplassen til neste uttrykk: utenfor høyre kant */
+  opacity:0;transform:translateX(104%);
+  transition:transform 560ms var(--ease), opacity 400ms var(--ease);
+}
+.ak.ak-js .ordslot__i.ut{
+  opacity:0;transform:translateX(-104%)
+}
+.ak.ak-js .ordslot__i.aktiv{
+  opacity:1;transform:none
+}
+@media (prefers-reduced-motion: reduce){
+  .ak.ak-js .ordslot{
+    display:block;padding-block:0;clip-path:none
+  }
+  .ak.ak-js .ordslot__i{
+    display:none;transform:none;opacity:1;transition:none
+  }
+  .ak.ak-js .ordslot__i:first-child{
+    display:block
+  }
+}
+.ak .hero__cta{
+  display:flex;align-items:center;gap:clamp(18px,3vw,36px);flex-wrap:wrap;justify-content:center
+}
+.ak .hero__micro{
+  display:inline-flex;align-items:center;gap:.6em;color:var(--lin-dempet);
+  font-size:1rem;text-align:left
+}
+.ak .hero__micro svg{
+  flex:0 0 auto;color:var(--mose)
+}
+@media (max-width:980px){
+  .ak .hero{
+    min-height:0;padding-block:clamp(34px,7vw,56px) clamp(18px,4vw,30px)
+  }
+  .ak .hero__in{
+    gap:18px;text-align:left;justify-items:start;max-width:none
+  }
+  .ak .overline--c{
+    justify-content:flex-start
+  }
+  /* var 14ch. Med uttrykket på egen linje må overskriften få hele spalten,
+  ellers brekker «pappas platesamling» i to og reserverer en tom linje
+  under de korte uttrykkene. */
+  .ak .hero h1{
+    max-width:none
+  }
+  .ak .hero__cta{
+    justify-content:flex-start;gap:20px;width:100%
+  }
+  .ak .hero .btn{
+    flex:1 1 auto;min-width:min(100%,220px)
+  }
+  .ak .hero__glow{
+    top:30%
+  }
+}
+@media (max-width:420px){
+  .ak .hero__cta{
+    gap:16px
+  }
+  .ak .hero .btn{
+    flex:1 1 100%
+  }
+}
+/* ============================================================
+   SIGNATUR — overgangen fra mørke til lys
+   ============================================================ */
+/* Signaturen kjører på én variabel, --lift, satt på .cross av én rAF-løkke.
+Alt som beveger seg er transform eller opacity, slik at nettleseren slipper
+å regne ut layout eller male om flater per bilde. Mørket er en egen heldekkende
+flate som skyves opp; bildetekstens lysgrense er den samme flaten inne i rammen. */
+.ak .cross{
+  position:relative;
+  --edgeY:calc(68svh - var(--lift) * 64svh);
+  --frameTop:4svh; --frameH:62svh; --fpad:clamp(6px,.7vw,10px);
+  /* toppen av selve skjermbildet, rammelinje og luft medregnet, slik at
+  lysgrensen inne i rammen ligger på nøyaktig samme linje som ute på siden */
+  --winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 1px + var(--fpad));
+  height:86svh;
+  /* bildeteksten lander alltid i lyset */
+  --ink:var(--blekk); --muted:var(--skifer); --accent:var(--granskog);
+  --rule:rgba(128,126,116,.3);
+}
+.ak .cross__bg{
+  position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--papir)
+}
+.ak .cross__dark{
+  position:absolute;left:0;right:0;top:0;height:300svh;background:var(--natt);
+  transform:translateY(calc(var(--edgeY) - 300svh));will-change:transform
+}
+.ak .cross__line{
+  position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(157,170,140,.75) 14%,rgba(157,170,140,.75) 86%,transparent);
+  transform:translateY(var(--edgeY));will-change:transform
+}
+.ak .cross__fig{
+  position:absolute;z-index:2;left:0;right:0;top:var(--frameTop);
+  display:grid;justify-items:center;margin:0;padding-inline:var(--pad)
+}
+/* ------------------------------------------------------------------
+ENHETSGRUPPEN I HEROEN
+Tre ekte skjermbilder fra den offentlige demoen, tatt i samme økt:
+boets oversikt på PC, gjenstandsgalleriet på nettbrett og
+begrunnelsene på telefon. Rammene er tegnet i CSS; skjerminnholdet
+er uendret.
+
+Høyden på hver enhet kommer fra skjermens sideforhold pluss rammen,
+ikke fra et tall. Da stemmer forholdet mellom dem: et nettbrett i
+stående format er høyere enn en PC-skjerm, og telefonen er under
+halvparten. Lyset kommer fra øvre venstre.
+------------------------------------------------------------------ */
+.ak .rigg{
+  position:relative;width:min(100%,1140px);height:var(--frameH);overflow:hidden;
+  translate:0 calc((1 - var(--lift)) * 2.4svh);
+  --skall:color-mix(in srgb, #E6E2D8 calc(var(--lift) * 100%), #2C2F2A);
+  --skallkant:color-mix(in srgb, #C2BEB2 calc(var(--lift) * 100%), rgba(242,238,230,.2));
+  --skallmork:color-mix(in srgb, #CDC8BC calc(var(--lift) * 100%), #23261F);
+  --skygge:rgba(20,24,20,calc(.42 * var(--lift)))
+}
+/* underlaget: én myk kontaktskygge som binder de tre sammen */
+.ak .rigg__gulv{
+  position:absolute;left:8%;right:8%;bottom:9%;height:52px;z-index:0;
+  border-radius:50%;pointer-events:none;filter:blur(16px);
+  background:radial-gradient(ellipse at center, var(--skygge) 0%, transparent 70%)
+}
+.ak .dev{
+  position:absolute;background:var(--skall);border:1px solid var(--skallkant)
+}
+.ak .dev__sk{
+  position:relative;overflow:hidden;background:var(--papir)
+}
+.ak .dev__sk img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:top center
+}
+/* PC: skjermpanel med hengselhakk, og en underdel bredere enn skjermen */
+.ak .dev--lap{
+  left:50%;top:8%;width:62%;translate:-50% 0;z-index:3;
+  border-radius:9px 9px 3px 3px;padding:11px 11px 16px;
+  box-shadow:0 24px 40px -28px var(--skygge)
+}
+.ak .dev--lap .dev__sk{
+  aspect-ratio:16/10;border-radius:2px
+}
+.ak .dev--lap::before{
+  content:'';position:absolute;left:50%;bottom:6px;translate:-50% 0;
+  width:54px;height:3px;border-radius:99px;background:var(--skallmork)
+}
+.ak .dev__base{
+  position:absolute;left:50%;top:100%;translate:-50% 0;
+  width:114%;height:15px;border-radius:0 0 12px 12px;
+  background:linear-gradient(180deg, var(--skall) 0%, var(--skallmork) 100%);
+  border:1px solid var(--skallkant);border-top:none;
+  box-shadow:0 14px 24px -14px var(--skygge)
+}
+.ak .dev__base::after{
+  content:'';position:absolute;left:50%;top:-1px;translate:-50% 0;
+  width:16%;height:5px;border-radius:0 0 6px 6px;background:var(--skallmork)
+}
+/* Nettbrett: stående, bak til venstre, hele silhuetten synlig */
+.ak .dev--tab{
+  left:1%;top:1%;width:28%;z-index:2;
+  border-radius:14px;padding:9px;
+  box-shadow:0 20px 36px -26px var(--skygge)
+}
+.ak .dev--tab .dev__sk{
+  aspect-ratio:3/4;border-radius:7px
+}
+/* Telefon: foran til høyre, minst */
+.ak .dev--phone{
+  right:2%;top:30%;width:14.5%;z-index:4;
+  border-radius:21px;padding:5px;
+  box-shadow:0 20px 32px -20px var(--skygge)
+}
+.ak .dev--phone .dev__sk{
+  aspect-ratio:9/19.5;border-radius:17px
+}
+.ak .dev--phone::before{
+  content:'';position:absolute;left:50%;top:11px;translate:-50% 0;z-index:2;
+  width:28%;height:4px;border-radius:99px;background:rgba(20,24,20,.4)
+}
+.ak .dev--phone::after{
+  content:'';position:absolute;right:-2px;top:24%;width:2px;height:7%;
+  border-radius:0 2px 2px 0;background:var(--skallmork)
+}
+.ak .rigg__veil{
+  position:absolute;left:0;right:0;top:0;height:300svh;z-index:5;
+  background:var(--natt);opacity:.8;pointer-events:none;
+  transform:translateY(calc(var(--edgeY) - var(--winTop) - 300svh));will-change:transform
+}
+.ak .rigg__veil::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:rgba(157,170,140,.6)
+}
+.ak .cross .rigg__mobil{
+  display:none
+}
+@media (max-width:980px){
+  .ak .cross .rigg{
+    display:none
+  }
+  .ak .cross .rigg__mobil{
+    display:block
+  }
+}
+.ak .frame{
+  position:relative;width:min(100%,300px);height:var(--frameH);
+  border:1px solid var(--strek);
+  border-radius:2px;padding:var(--fpad);background:var(--kalk);
+  translate:0 calc((1 - var(--lift)) * 2.4svh);
+  box-shadow:0 26px 56px -44px rgba(31,35,38,.5);
+}
+.ak .frame::before{
+  content:'';position:absolute;inset:-1px;z-index:0;border-radius:inherit;
+  background:var(--natt);border:1px solid rgba(242,238,230,.24);
+  opacity:calc(1 - var(--lift));pointer-events:none
+}
+.ak .frame__win{
+  position:relative;z-index:1;width:100%;height:100%;overflow:hidden;
+  border-radius:1px;background:var(--papir)
+}
+.ak .frame img{
+  width:100%;height:100%;object-fit:cover;object-position:top center
+}
+.ak .frame__veil{
+  position:absolute;left:0;right:0;top:0;height:300svh;background:var(--natt);opacity:.8;
+  transform:translateY(calc(var(--edgeY) - var(--winTop) - 300svh));will-change:transform
+}
+.ak .frame__veil::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:rgba(157,170,140,.6)
+}
+.ak .cross__cap{
+  position:absolute;z-index:4;left:0;right:0;top:calc(var(--frameTop) + var(--frameH) + 26px);
+  padding-inline:var(--pad);
+  opacity:clamp(0,calc(var(--lift) * 2.6 - 1.6),1);
+  transition:opacity var(--t-m) var(--ease)
+}
+.ak .cross .phone{
+  display:none
+}
+.ak .cap--c{
+  justify-items:center;text-align:center;margin-inline:auto
+}
+@media (max-width:760px){
+  .ak .deskframe{
+    overflow:hidden
+  }
+  .ak .deskframe img{
+    width:calc(100% * var(--zoom,1));max-width:none
+  }
+  /* bare de forstørrede: tonen ut mot høyre sier at dette er et utsnitt */
+  .ak .deskframe[style*="--zoom"] img{
+    -webkit-mask:linear-gradient(to right,#000 88%,transparent);
+    mask:linear-gradient(to right,#000 88%,transparent)
+  }
+}
+@media (max-width:980px){
+  .ak .cross{
+    --edgeY:calc(86svh - var(--lift) * 80svh);--frameTop:6svh;--frameH:70svh;height:95svh;--fpad:7px;--winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 2px + var(--fpad))
+  }
+  .ak .cross .desk{
+    display:none
+  }
+  .ak .cross .phone{
+    display:block
+  }
+  .ak .frame{
+    width:min(100%,300px);border-radius:30px;padding:7px;
+    border-width:2px;height:var(--frameH)
+  }
+  .ak .frame__win{
+    border-radius:24px
+  }
+  .ak .frame__veil{
+    border-radius:24px
+  }
+  .ak .cross__cap{
+    top:calc(var(--frameTop) + var(--frameH) + 20px)
+  }
+  .ak .cap{
+    max-width:none
+  }
+}
+/* ============================================================
+   §2 — oversikt, KI-bånd, radfaner
+   ============================================================ */
+.ak .s2__head{
+  display:grid;gap:clamp(14px,1.6vw,22px);max-width:62ch
+}
+.ak .ki .overline{
+  color:var(--messing-lys)
+}
+.ak .g-papir .shotfig:hover .phoneframe{
+  border-color:var(--granskog)
+}
+.ak .ki__shots .phoneframe{
+  --ph:clamp(300px,30vw,430px)
+}
+.ak .quotes .rows>li{
+  border-color:rgba(242,238,230,.16)
+}
+.ak .quotes .row{
+  padding-block:clamp(14px,1.5vw,18px)
+}
+.ak .quotes .row__d{
+  color:var(--lin-dempet);font-family:var(--serif);font-style:italic;font-size:1.02rem;max-width:62ch
+}
+/* Radioknappen dekker hele raden sin i stedet for å være ett usynlig punkt.
+Da havner fokusringen rundt raden den gjelder, og ingen tabulatorstopp er usynlig.
+pointer-events er av, så etiketten håndterer pekeren og hover virker som før. */
+.ak .tabs .rows>li{
+  position:relative;transition:none
+}
+.ak .tabs .row{
+  cursor:pointer;width:100%;text-align:left;padding-right:1em
+}
+.ak .tabs .row__n{
+  opacity:.82
+}
+.ak .tabs .row__t{
+  color:var(--muted);transition:color var(--t-s) var(--ease)
+}
+.ak .tabs .row__d{
+  transition:color var(--t-s) var(--ease)
+}
+.ak .tabs .row:hover{
+  transform:translateY(-2px)
+}
+.ak .tabs .row:hover::before{
+  width:100%
+}
+.ak .tabs .row:hover .row__n{
+  opacity:1
+}
+.ak .tabs .row:hover .row__t{
+  color:var(--accent)
+}
+.ak .faq details>summary:hover .faq__n{
+  opacity:1
+}
+.ak .faq details>summary:hover .faq__q{
+  color:var(--accent)
+}
+.ak .tabshots .shotfig{
+  grid-area:1/1;opacity:0;visibility:hidden;
+  translate:0 14px;transition:opacity var(--t-m) var(--ease),translate var(--t-m) var(--ease)
+}
+/* standard, også uten :has() */
+.ak .tabshots .deskframe{
+  border:1px solid var(--strek);border-radius:2px;padding:8px;background:var(--kalk);
+  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+}
+.ak .tabshots .shotfig:hover .deskframe{
+  transform:translateY(-5px);border-color:var(--granskog)
+}
+.ak .tabs .rows>li:has(input:checked) .row::before{
+  width:100%
+}
+.ak .tabs .rows>li:has(input:checked) .row__n{
+  opacity:1
+}
+.ak .tabs .rows>li:has(input:checked) .row{
+  transform:translateY(-2px)
+}
+.ak .tabs .rows>li:has(input:checked) .row__t,.ak .tabs .rows>li:has(input:checked) .row__d{
+  color:var(--ink)
+}
+.ak .tabs .rows>li:has(input:checked) .row:hover .row__t{
+  color:var(--accent)
+}
+@media (max-width:980px){
+  .ak .tabs .rows{
+    order:2
+  }
+}
+.ak .s3__shot .deskframe{
+  border:1px solid rgba(242,238,230,.2);border-radius:2px;padding:8px;
+  background:rgba(242,238,230,.05);width:min(100%,980px);
+  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+}
+.ak .s3__shot .phone{
+  display:none
+}
+@media (max-width:760px){
+  .ak .s3__shot .desk{
+    display:none
+  }
+  .ak .s3__shot .phone{
+    display:block
+  }
+  .ak .s3__shot .deskframe{
+    width:min(100%,420px)
+  }
+}
+.ak .s3__shot:hover .deskframe{
+  transform:translateY(-5px);border-color:var(--mose)
+}
+.ak .s3__metshot .deskframe{
+  border:1px solid rgba(242,238,230,.2);border-radius:2px;padding:7px;
+  background:rgba(242,238,230,.05);max-width:400px;
+  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+}
+.ak .s3__metshot:hover .deskframe{
+  transform:translateY(-5px);border-color:var(--mose)
+}
+/* ============================================================
+   §4 / §7 — tekst + telefon
+   ============================================================ */
+.ak .split{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.7fr);
+  gap:clamp(30px,4vw,64px);align-items:start
+}
+.ak .split--rev{
+  grid-template-columns:minmax(0,.7fr) minmax(0,1.15fr)
+}
+.ak .split--rev .split__txt{
+  order:2
+}
+.ak .split__txt{
+  display:grid;gap:clamp(14px,1.8vw,24px);justify-items:start
+}
+.ak .split__fig{
+  margin:0;display:grid;gap:14px;justify-items:center;align-content:start
+}
+.ak .split__fig .phoneframe{
+  max-width:330px;--ph:clamp(380px,40vw,540px)
+}
+@media (max-width:980px){
+  .ak .split,.ak .split--rev{
+    grid-template-columns:1fr;gap:34px
+  }
+  .ak .split--rev .split__txt{
+    order:0
+  }
+  .ak .split__fig{
+    justify-items:start
+  }
+}
+/* ---- valgfri KI-hjelp: et smalt bånd, ikke et eget hovedsteg ---- */
+.ak .valgfri{
+  margin-top:clamp(40px,5vw,72px);border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);padding-block:clamp(22px,2.8vw,36px)
+}
+.ak .valgfri__grid{
+  display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1fr);
+  gap:clamp(18px,3vw,56px);align-items:start
+}
+.ak .valgfri h3{
+  font-size:clamp(1.2rem,1rem + .8vw,1.65rem);line-height:1.2;
+  color:var(--ink);margin-top:.45em;max-width:16ch
+}
+.ak .valgfri__t{
+  display:grid;gap:.6em;justify-items:start
+}
+.ak .valgfri__t p{
+  color:var(--muted);max-width:56ch
+}
+@media (max-width:820px){
+  .ak .valgfri__grid{
+    grid-template-columns:1fr;gap:14px
+  }
+}
+/* ============================================================
+   §5 — teamet
+   ============================================================ */
+.ak .team{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:1px;background:var(--rule);border-block:1px solid var(--rule);
+  margin-top:clamp(40px,5vw,72px)
+}
+.ak .team li{
+  background:var(--natt);padding:clamp(18px,2vw,28px) clamp(14px,1.6vw,24px)
+}
+.ak .portrait{
+  aspect-ratio:4/5;max-width:190px;background:var(--jord);
+  border:1px dashed rgba(242,238,230,.26);
+  border-radius:2px;display:grid;place-items:center;margin-bottom:16px;
+  color:var(--lin-dempet);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase
+}
+.ak .team__n{
+  font-family:var(--serif);font-size:clamp(1.1rem,1rem + .35vw,1.3rem);line-height:1.22;
+  color:var(--lin);text-wrap:balance
+}
+.ak .team__r{
+  font-size:.95rem;line-height:1.4;color:var(--lin-dempet);margin-top:.25em
+}
+.ak .team__links{
+  display:flex;gap:clamp(18px,2.5vw,32px);flex-wrap:wrap;margin-top:clamp(28px,3.5vw,46px)
+}
+@media (max-width:860px){
+  .ak .team{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+  /* navn og rolle skal staa paa linje med hverandre selv naar ett navn brekker */
+  .ak .team__n{
+    min-height:2.44em
+  }
+  .ak .team__r{
+    min-height:2.8em
+  }
+}
+@media (max-width:620px){
+  .ak .portrait{
+    aspect-ratio:1/1;max-width:none;margin-bottom:12px
+  }
+}
+/* ============================================================
+   §6 — spørsmål og svar
+   ============================================================ */
+.ak .faq{
+  margin-top:clamp(36px,4.5vw,64px);max-width:1000px
+}
+.ak .faq>li{
+  border-top:1px solid var(--rule)
+}
+.ak .faq>li:last-child{
+  border-bottom:1px solid var(--rule)
+}
+.ak .faq details>summary{
+  list-style:none;cursor:pointer;position:relative;
+  display:grid;grid-template-columns:auto 1fr auto;gap:.4em clamp(18px,2.4vw,34px);
+  align-items:center;padding:clamp(20px,2.4vw,30px) 0;
+  transition:transform var(--t-m) var(--ease)
+}
+.ak .faq details>summary::-webkit-details-marker{
+  display:none
+}
+.ak .faq details>summary::before{
+  content:'';position:absolute;left:0;top:0;height:1px;width:0;
+  background:var(--accent);transition:width var(--t-l) var(--ease)
+}
+.ak .faq details>summary:hover{
+  transform:translateY(-2px)
+}
+.ak .faq details>summary:hover::before,.ak .faq details[open]>summary::before{
+  width:100%
+}
+.ak .faq__n{
+  font-family:var(--serif);font-size:1.05rem;color:var(--accent);min-width:2.2ch;opacity:.82
+}
+.ak .faq details[open] .faq__n{
+  opacity:1
+}
+.ak .faq__q{
+  font-family:var(--serif);font-size:clamp(1.15rem,.95rem + .85vw,1.65rem);
+  line-height:1.25;letter-spacing:-.01em;color:var(--ink)
+}
+.ak .faq__i{
+  position:relative;width:18px;height:18px;flex:0 0 auto
+}
+.ak .faq__i::before,.ak .faq__i::after{
+  content:'';position:absolute;background:var(--accent);
+  transition:transform var(--t-m) var(--ease),opacity var(--t-s) var(--ease)
+}
+.ak .faq__i::before{
+  left:0;right:0;top:8px;height:1px
+}
+.ak .faq__i::after{
+  top:0;bottom:0;left:8px;width:1px
+}
+.ak .faq details[open] .faq__i::after{
+  transform:scaleY(0);opacity:0
+}
+.ak .faq__a{
+  padding:0 0 clamp(24px,2.6vw,34px) 0;color:var(--muted);max-width:62ch
+}
+@media (min-width:861px){
+  .ak .faq__a{
+    padding-left:calc(2.2ch + clamp(18px,2.4vw,34px))
+  }
+}
+/* ============================================================
+   PRODUKTREISEN — fire steg, én gjenstand hele veien
+   Bryteren er radioknapper og :has(). Den virker uten JavaScript;
+   «Neste steg» er bare et tillegg for den som heller vil klikke framover.
+   ============================================================ */
+.ak .reise{
+  margin-top:clamp(40px,5vw,74px)
+}
+.ak .rail{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 clamp(12px,1.5vw,24px)
+}
+.ak .rail>li{
+  position:relative
+}
+.ak .rail input{
+  position:absolute;inset:0;margin:0;appearance:none;background:none;border:0;
+  color:transparent;font-size:0;pointer-events:none
+}
+.ak .rail input:focus-visible{
+  outline:2px solid var(--focus);outline-offset:-3px;border-radius:2px
+}
+.ak .rail__b{
+  display:grid;grid-template-columns:auto 1fr;gap:.2em .75em;align-items:baseline;
+  border-top:1px solid var(--rule);padding:clamp(16px,1.8vw,22px) 0 clamp(14px,1.6vw,18px);
+  min-height:64px;cursor:pointer;position:relative;
+  transition:transform var(--t-m) var(--ease)
+}
+.ak .rail__b::before{
+  content:'';position:absolute;left:0;top:0;height:2px;width:0;background:var(--accent);
+  transition:width var(--t-l) var(--ease)
+}
+.ak .rail__n{
+  font-family:var(--serif);font-size:1rem;color:var(--accent);opacity:.82;
+  transition:opacity var(--t-s) var(--ease)
+}
+.ak .rail__t{
+  font-family:var(--serif);font-size:clamp(1.02rem,.9rem + .5vw,1.3rem);line-height:1.2;
+  color:var(--muted);transition:color var(--t-s) var(--ease)
+}
+.ak .rail__b:hover{
+  transform:translateY(-2px)
+}
+.ak .rail__b:hover::before{
+  width:100%
+}
+.ak .rail__b:hover .rail__n{
+  opacity:1
+}
+.ak .rail__b:hover .rail__t{
+  color:var(--accent)
+}
+.ak .reise:has(#r1:checked) li:nth-child(1) .rail__b::before,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__b::before,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__b::before,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__b::before{
+  width:100%
+}
+.ak .reise:has(#r1:checked) li:nth-child(1) .rail__n,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__n,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__n,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__n{
+  opacity:1
+}
+.ak .reise:has(#r1:checked) li:nth-child(1) .rail__t,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__t,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__t,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__t{
+  color:var(--ink)
+}
+.ak .reise:has(#r1:checked) li:nth-child(1) .rail__b:hover .rail__t,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__b:hover .rail__t,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__b:hover .rail__t,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__b:hover .rail__t{
+  color:var(--accent)
+}
+.ak .stage{
+  margin-top:clamp(30px,3.6vw,52px)
+}
+.ak .st{
+  display:none;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
+  gap:clamp(26px,3.6vw,64px);align-items:start
+}
+.ak .stage .s1{
+  display:grid
+}
+/* standard, også uten :has() */
+.ak .reise:has(#r2:checked) .s1,.ak .reise:has(#r3:checked) .s1,.ak .reise:has(#r4:checked) .s1{
+  display:none
+}
+.ak .reise:has(#r1:checked) .s1,.ak .reise:has(#r2:checked) .s2,.ak .reise:has(#r3:checked) .s3,.ak .reise:has(#r4:checked) .s4{
+  display:grid;animation:ak-stegfram 420ms var(--ease) both
+}
+.ak .quotes-int .row{
+  padding-block:clamp(11px,1.2vw,15px)
+}
+.ak .quotes-int .row__d{
+  font-family:var(--serif);font-style:italic;font-size:1rem;max-width:54ch
+}
+@keyframes ak-stegfram{
+  from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}
+}
+.ak .st__txt{
+  display:grid;gap:clamp(13px,1.5vw,20px);align-content:start
+}
+.ak .st__nr{
+  font-family:var(--sans);font-size:.78rem;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent)
+}
+.ak .st__txt h3{
+  color:var(--ink);max-width:17ch
+}
+.ak .st__txt p{
+  color:var(--muted);max-width:52ch
+}
+.ak .st__next{
+  display:flex;align-items:flex-start;gap:.6em;border-top:1px solid var(--rule);
+  padding-top:clamp(13px,1.5vw,18px);margin-top:clamp(4px,.6vw,8px);
+  font-size:1rem;color:var(--muted)
+}
+.ak .st__next svg{
+  flex:0 0 auto;margin-top:.35em;color:var(--accent)
+}
+.ak .st__shots{
+  display:grid;gap:clamp(14px,1.8vw,24px)
+}
+.ak .st__shots--duo{
+  grid-template-columns:minmax(0,300px) minmax(0,1fr);align-items:start
+}
+.ak .st__shots--pair{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start
+}
+.ak .sh{
+  margin:0;display:grid;gap:12px;align-content:start;justify-items:start
+}
+.ak .sh__f{
+  border:1px solid var(--strek);border-radius:2px;padding:7px;background:var(--kalk);
+  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+}
+.ak .sh:hover .sh__f{
+  transform:translateY(-4px);border-color:var(--granskog)
+}
+.ak .sh__f img{
+  width:100%
+}
+.ak .sh--foto .sh__f{
+  background:var(--papir);max-width:300px
+}
+.ak .sh--sim .sh__f{
+  border-style:dashed
+}
+.ak .reise__nav{
+  display:flex;align-items:center;gap:clamp(14px,2vw,24px);flex-wrap:wrap;
+  margin-top:clamp(26px,3vw,42px)
+}
+.ak .nostep{
+  display:none
+}
+.ak.ak-js .nostep{
+  display:inline-flex
+}
+.ak .btn--sm{
+  min-height:50px;padding:.7em 1.6em;font-size:1rem
+}
+@media (max-width:1180px){
+  .ak .rail{
+    grid-template-columns:repeat(3,minmax(0,1fr))
+  }
+}
+@media (max-width:980px){
+  .ak .rail{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+  .ak .st{
+    grid-template-columns:1fr;gap:26px
+  }
+  .ak .st__shots{
+    order:2
+  }
+  .ak .st__shots--duo{
+    grid-template-columns:1fr;justify-items:start
+  }
+}
+@media (max-width:560px){
+  .ak .st__shots--pair{
+    grid-template-columns:1fr
+  }
+}
+/* portretter: ekte bilder i stedet for plassholdere */
+.ak .portrait--foto{
+  border:none;padding:0;overflow:hidden;background:var(--jord);
+  aspect-ratio:4/5;max-width:190px;border-radius:2px;margin-bottom:16px;
+  transition:transform var(--t-m) var(--ease)
+}
+.ak .portrait--foto img{
+  width:100%;height:100%;object-fit:cover
+}
+.ak .team li:hover .portrait--foto{
+  transform:translateY(-4px)
+}
+/* ============================================================
+   FAST DEMOKNAPP PÅ MOBIL
+   Siden er lang. Knappen følger med fra man har rullet forbi heroen
+   til man når den avsluttende demoseksjonen, og forsvinner der, så
+   den aldri står oppå den samme handlingen to ganger.
+   ============================================================ */
+.ak .dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
+  padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom));
+  background:rgba(31,34,30,.94);
+  /* Safari under 18 kjenner bare den prefiksede varianten */
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-top:1px solid rgba(242,238,230,.16);
+  transform:translateY(102%);transition:transform var(--t-m) var(--ease)
+}
+.ak .dock[data-vis="1"]{
+  transform:none
+}
+.ak .dock__in{
+  display:flex;align-items:center;gap:14px
+}
+.ak .dock__t{
+  flex:1;min-width:0;color:var(--lin-dempet);font-size:.9375rem;line-height:1.3
+}
+.ak .dock__t b{
+  display:block;color:var(--lin);font-weight:600;font-size:1rem
+}
+.ak .dock .btn{
+  flex:none;min-height:50px;padding:.6em 1.4em;font-size:1rem;
+  background:var(--lin);color:var(--natt)
+}
+@media (max-width:980px){
+  .ak.ak-js .dock{
+    display:block
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .ak .dock{
+    transition:none
+  }
+  .ak .hero__glow{
+    transform:translate(-50%,-50%);opacity:1
+  }
+  .ak .st{
+    animation:none !important
+  }
+  .ak .dev{
+    box-shadow:0 18px 34px -30px rgba(31,35,38,.4)
+  }
+  .ak .btn:hover,.ak .row:hover,.ak .faq details>summary:hover,.ak .ul:hover,.ak .brand:hover,.ak .rail__b:hover,.ak .sh:hover .sh__f,.ak .team li:hover .portrait--foto,.ak .shotfig:hover .phoneframe,.ak .menu>summary:hover{
+    transform:none
+  }
+}
+/* ============================================================
+   SIDEEGEN KOMPOSISJON
+   Forsiden er bygget rundt hva løsningen viser. Denne siden er
+   bygget rundt hvem som gjør hva. Derfor to baner som møtes,
+   ikke en ny rekke med seksjoner.
+   ============================================================ */
+/* ---- sidetopp: tallene fra eksempelboet som grunnlinje ---- */
+.ak .phero--slik{
+  border-bottom:1px solid rgba(242,238,230,.1)
+}
+.ak .fakta{
+  display:flex;flex-wrap:wrap;gap:0;margin-top:clamp(22px,3vw,38px);
+  border-top:1px solid var(--rule)
+}
+.ak .fakta div{
+  flex:1 1 180px;padding:clamp(16px,2vw,24px) clamp(14px,2vw,26px) clamp(16px,2vw,24px) 0;
+  border-right:1px solid var(--rule)
+}
+.ak .fakta div:last-child{
+  border-right:0
+}
+.ak .fakta dt{
+  font-size:.78rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--messing-lys);margin-bottom:.5em
+}
+.ak .fakta dd{
+  margin:0;font-family:var(--serif);font-size:clamp(1.1rem,.95rem + .6vw,1.5rem);
+  line-height:1.25;color:var(--lin);font-optical-sizing:none
+}
+@media (max-width:620px){
+  .ak .fakta div{
+    flex:1 1 100%;border-right:0;border-bottom:1px solid var(--rule);padding-right:0
+  }
+  .ak .fakta div:last-child{
+    border-bottom:0
+  }
+}
+/* ---- to baner som møtes ---- */
+.ak .baner{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:0;margin-top:clamp(34px,4.2vw,58px);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)
+}
+.ak .bane{
+  padding:clamp(22px,2.6vw,34px) clamp(20px,2.4vw,34px) clamp(26px,3vw,40px) 0
+}
+.ak .bane+.bane{
+  border-left:1px solid var(--rule);padding-left:clamp(20px,2.4vw,34px)
+}
+.ak .bane__h{
+  display:grid;gap:.7em;justify-items:start;margin-bottom:clamp(16px,2vw,24px)
+}
+.ak .bane__t{
+  font-family:var(--serif);font-size:clamp(1.2rem,1rem + .8vw,1.65rem);
+  line-height:1.2;color:var(--ink);font-optical-sizing:none
+}
+.ak .bane ol{
+  display:grid;gap:clamp(12px,1.4vw,18px);counter-reset:b
+}
+.ak .bane li{
+  display:grid;grid-template-columns:auto 1fr;gap:.9em;align-items:baseline;
+  color:var(--muted);font-size:1rem;line-height:1.5
+}
+.ak .bane li::before{
+  counter-increment:b;content:counter(b,decimal-leading-zero);
+  font-family:var(--serif);font-size:.95rem;color:var(--accent);font-optical-sizing:none
+}
+.ak .bane b{
+  color:var(--ink);font-weight:600
+}
+/* Sammenføyningen: en full bredde under begge banene. */
+.ak .sammen{
+  border-bottom:1px solid var(--rule);padding:clamp(22px,2.6vw,34px) 0 clamp(26px,3vw,38px)
+}
+.ak .sammen__h{
+  display:grid;gap:.7em;justify-items:start;margin-bottom:clamp(14px,1.8vw,20px)
+}
+.ak .sammen ul{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(18px,2.4vw,34px)
+}
+.ak .sammen li{
+  color:var(--muted);font-size:1rem;line-height:1.5;
+  border-top:1px solid var(--rule);padding-top:.9em
+}
+.ak .sammen b{
+  display:block;color:var(--ink);font-family:var(--serif);font-weight:400;
+  font-size:1.12rem;margin-bottom:.3em;font-optical-sizing:none
+}
+@media (max-width:860px){
+  .ak .baner{
+    grid-template-columns:1fr
+  }
+  .ak .bane{
+    padding-right:0
+  }
+  .ak .bane+.bane{
+    border-left:0;border-top:1px solid var(--rule);padding-left:0
+  }
+  .ak .sammen ul{
+    grid-template-columns:1fr;gap:0
+  }
+  .ak .sammen li{
+    padding-block:.9em
+  }
+}
+/* ---- det klikkbare eksempelet ---- */
+/* Alle seks radene står alltid med full tekst. Det eneste som skifter
+er hvilket skjermbilde som vises ved siden av. Siden er derfor
+fullt lesbar uten at noen trykker på noe, og uten JavaScript. */
+.ak .gang{
+  margin-top:clamp(30px,3.6vw,50px);display:grid;
+  grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:clamp(28px,4vw,66px);align-items:start
+}
+.ak .gang .rows>li{
+  position:relative
+}
+.ak .gang input{
+  position:absolute;inset:0;margin:0;appearance:none;background:none;border:0;
+  color:transparent;pointer-events:none;font-size:0
+}
+.ak .gang input:focus-visible{
+  outline:2px solid var(--focus);outline-offset:-3px;border-radius:2px
+}
+.ak .gang .row{
+  cursor:pointer;width:100%;text-align:left;padding-right:1em;
+  grid-template-columns:auto 1fr
+}
+.ak .gang .row__t{
+  color:var(--muted);transition:color var(--t-s) var(--ease)
+}
+.ak .gang .row__d{
+  transition:color var(--t-s) var(--ease)
+}
+.ak .gang .row__w{
+  grid-column:2;margin-bottom:.55em
+}
+.ak .gang .row:hover{
+  transform:translateY(-2px)
+}
+.ak .gang .row:hover::before{
+  width:100%
+}
+.ak .gang .row:hover .row__n{
+  opacity:1
+}
+.ak .gang .row:hover .row__t{
+  color:var(--accent)
+}
+.ak .gang .rows>li:has(input:checked) .row::before{
+  width:100%
+}
+.ak .gang .rows>li:has(input:checked) .row{
+  transform:translateY(-2px)
+}
+.ak .gang .rows>li:has(input:checked) .row__n{
+  opacity:1
+}
+.ak .gang .rows>li:has(input:checked) .row__t,.ak .gang .rows>li:has(input:checked) .row__d{
+  color:var(--ink)
+}
+.ak .gang .rows>li:has(input:checked) .row:hover .row__t{
+  color:var(--accent)
+}
+.ak .scene{
+  display:grid;position:relative;position:sticky;top:96px
+}
+.ak .scene .shotfig{
+  grid-area:1/1;opacity:0;visibility:hidden;translate:0 14px;
+  transition:opacity var(--t-m) var(--ease),translate var(--t-m) var(--ease)
+}
+.ak .scene .g1{
+  opacity:1;visibility:visible;translate:0 0
+}
+/* standard, også uten :has() */
+.ak .gang:has(#g2:checked) .g1,.ak .gang:has(#g3:checked) .g1,.ak .gang:has(#g4:checked) .g1,.ak .gang:has(#g5:checked) .g1,.ak .gang:has(#g6:checked) .g1{
+  opacity:0;visibility:hidden;translate:0 14px
+}
+.ak .gang:has(#g2:checked) .g2,.ak .gang:has(#g3:checked) .g3,.ak .gang:has(#g4:checked) .g4,.ak .gang:has(#g5:checked) .g5,.ak .gang:has(#g6:checked) .g6{
+  opacity:1;visibility:visible;translate:0 0
+}
+.ak .scene .deskframe{
+  width:100%
+}
+.ak .scene .phoneframe{
+  max-width:300px
+}
+.ak .scene .duo{
+  display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1fr);
+  gap:clamp(12px,1.6vw,20px);align-items:start;width:100%
+}
+@media (max-width:980px){
+  .ak .gang{
+    grid-template-columns:1fr;gap:26px
+  }
+  .ak .gang .rows{
+    order:2
+  }
+  .ak .scene{
+    order:1;position:static
+  }
+  .ak .scene .shotfig{
+    justify-items:stretch
+  }
+}
+@media (max-width:520px){
+  .ak .scene .duo{
+    grid-template-columns:1fr
+  }
+}
+/* ---- metodene, med demoens egne ord ---- */
+.ak .met{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin-top:clamp(30px,3.6vw,52px)
+}
+.ak .met li{
+  background:var(--ground);padding:clamp(20px,2.4vw,32px);display:grid;gap:.6em;align-content:start
+}
+.ak .met__t{
+  font-family:var(--serif);font-size:clamp(1.15rem,1rem + .6vw,1.5rem);
+  line-height:1.2;color:var(--ink);font-optical-sizing:none
+}
+.ak .met__d{
+  color:var(--muted);font-size:1rem;line-height:1.5
+}
+.ak .met__k{
+  font-family:var(--serif);font-style:italic;font-size:.98rem;
+  color:var(--accent);border-top:1px solid var(--rule);padding-top:.8em;margin-top:.3em
+}
+@media (max-width:860px){
+  .ak .met{
+    grid-template-columns:1fr
+  }
+}
+.ak .metgrid{
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.72fr);
+  gap:clamp(28px,4vw,62px);align-items:start;margin-top:clamp(30px,3.6vw,52px)
+}
+.ak .metgrid .deskframe{
+  max-width:420px
+}
+@media (max-width:980px){
+  .ak .metgrid{
+    grid-template-columns:1fr;gap:30px
+  }
+}
+/* ---- dokumentasjon ---- */
+.ak .dok{
+  display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1fr);
+  gap:clamp(28px,4vw,66px);align-items:start;margin-top:clamp(28px,3.4vw,48px)
+}
+.ak .dok__txt{
+  display:grid;gap:clamp(16px,2vw,26px);justify-items:start
+}
+.ak .dok .phoneframe{
+  max-width:320px;--ph:clamp(400px,42vw,560px)
+}
+.ak .def{
+  display:grid;gap:clamp(14px,1.8vw,22px);margin-top:.4em
+}
+.ak .def>div{
+  border-top:1px solid var(--rule);padding-top:clamp(12px,1.4vw,18px)
+}
+.ak .def__t{
+  font-family:var(--serif);font-size:1.18rem;color:var(--ink);
+  margin-bottom:.35em;font-optical-sizing:none
+}
+.ak .def__d{
+  color:var(--muted);font-size:1rem;line-height:1.55;max-width:54ch
+}
+@media (max-width:980px){
+  .ak .dok{
+    grid-template-columns:1fr;gap:32px
+  }
+}
+/* ---- for den som ikke er vant med data ---- */
+.ak .lett{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(20px,2.6vw,40px);margin-top:clamp(28px,3.4vw,48px)
+}
+.ak .lett li{
+  border-top:1px solid var(--rule);padding-top:clamp(14px,1.6vw,20px);
+  color:var(--muted);font-size:1rem;line-height:1.55
+}
+.ak .lett b{
+  display:block;font-family:var(--serif);font-weight:400;font-size:1.2rem;
+  color:var(--ink);margin-bottom:.35em;font-optical-sizing:none
+}
+@media (max-width:720px){
+  .ak .lett{
+    grid-template-columns:1fr;gap:0
+  }
+  .ak .lett li{
+    padding-block:clamp(14px,1.6vw,20px)
+  }
+}
+/* ============================================================
+   SIDEEGEN KOMPOSISJON
+   En side om fire personer tåler ikke forsidens maskineri. Her
+   er portrettene det største elementet, og teksten står smalt
+   ved siden av, som i en programbok.
+   ============================================================ */
+/* ---- sidetopp med portrettstripe ---- */
+.ak .phero--om{
+  padding-bottom:0;overflow:visible
+}
+/* ---- teamkortene ---- */
+.ak .folk{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin-top:clamp(34px,4.4vw,62px)
+}
+.ak .folk li{
+  background:var(--papir);padding:clamp(20px,2.2vw,30px) clamp(16px,1.8vw,26px)
+}
+.ak .folk img{
+  width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:2px;margin-bottom:clamp(14px,1.8vw,20px)
+}
+.ak .folk__n{
+  font-family:var(--serif);font-size:clamp(1.15rem,1rem + .5vw,1.4rem);
+  line-height:1.2;color:var(--ink);font-optical-sizing:none
+}
+.ak .folk__r{
+  font-size:.95rem;color:var(--muted);margin-top:.3em
+}
+@media (max-width:860px){
+  .ak .folk{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+}
+@media (max-width:420px){
+  .ak .folk{
+    grid-template-columns:1fr
+  }
+}
+/* ---- hvorfor: tekst til venstre, avgrensningen som en marginalie ---- */
+.ak .hvorfor{
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.78fr);
+  gap:clamp(28px,4.5vw,76px);align-items:start;margin-top:clamp(18px,2.2vw,30px)
+}
+.ak .hvorfor__txt{
+  display:grid;gap:clamp(16px,2vw,26px)
+}
+.ak .hvorfor__txt h2{
+  max-width:16ch
+}
+.ak .hvorfor__ved{
+  display:grid;gap:clamp(12px,1.5vw,18px);
+  border-top:1px solid var(--rule);padding-top:clamp(16px,2vw,24px)
+}
+.ak .hvorfor__kort{
+  font-family:var(--serif);font-size:clamp(1.12rem,1rem + .5vw,1.38rem);
+  line-height:1.35;color:var(--ink);font-optical-sizing:none
+}
+@media (max-width:980px){
+  .ak .hvorfor{
+    grid-template-columns:1fr;gap:30px
+  }
+}
+/* ---- sitatblokk om opphavet ---- */
+.ak .opphav{
+  display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1fr);
+  gap:clamp(28px,4.5vw,76px);align-items:start;margin-top:clamp(26px,3.2vw,44px)
+}
+.ak .opphav__sitat{
+  font-family:var(--serif);font-size:clamp(1.3rem,1.05rem + 1.3vw,2.15rem);
+  line-height:1.26;letter-spacing:-.015em;color:var(--ink);font-optical-sizing:none
+}
+.ak .opphav__txt{
+  display:grid;gap:clamp(14px,1.8vw,22px)
+}
+@media (max-width:860px){
+  .ak .opphav{
+    grid-template-columns:1fr;gap:26px
+  }
+}

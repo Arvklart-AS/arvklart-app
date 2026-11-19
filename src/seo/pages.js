@@ -20,21 +20,46 @@ export const DEFAULT_META = {
   description_en: 'Arvklart helps families distribute an inheritance in an orderly, inclusive and fair way.',
 }
 
+// De fire markedssidene fra integrasjonspakken (19.11.2026) finnes bare på norsk. Som guidene i
+// content/guider/*.md får de derfor den norske tittelen og beskrivelsen også på engelsk, så en
+// besøkende som har valgt engelsk ikke får en engelsk tittel over norsk innhold. Språkvalget
+// gjelder appen, veiviseren og innloggingen som før. Se docs/ny-offentlig-nettside.md.
 export const PUBLIC_PAGES = [
   {
     path: '/',
-    ...DEFAULT_META,
+    title: 'Fordeling av innbo ved arv | Arvklart',
+    title_en: 'Fordeling av innbo ved arv | Arvklart',
+    description: 'Samle bilder av innboet, se familiens ønsker og dokumenter fordelingen i Arvklart. Prøv den offentlige demoen uten registrering.',
+    description_en: 'Samle bilder av innboet, se familiens ønsker og dokumenter fordelingen i Arvklart. Prøv den offentlige demoen uten registrering.',
     prerender: true,
     sitemap: true,
     organization: true,
     website: true,
   },
   {
+    path: '/slik-fungerer-det',
+    title: 'Slik fordeler dere innbo med Arvklart',
+    title_en: 'Slik fordeler dere innbo med Arvklart',
+    description: 'Én person oppretter boet og inviterer familien. Dere samler gjenstandene, legger inn ønsker og dokumenterer fordelingen dere blir enige om.',
+    description_en: 'Én person oppretter boet og inviterer familien. Dere samler gjenstandene, legger inn ønsker og dokumenterer fordelingen dere blir enige om.',
+    prerender: true,
+    sitemap: true,
+  },
+  {
+    path: '/om-oss',
+    title: 'Om oss | Arvklart',
+    title_en: 'Om oss | Arvklart',
+    description: 'Teamet bak Arvklart. Ideen kom fra et behov i egen familie ved flytting til mindre bolig. Fire personer utvikler verktøyet videre.',
+    description_en: 'Teamet bak Arvklart. Ideen kom fra et behov i egen familie ved flytting til mindre bolig. Fire personer utvikler verktøyet videre.',
+    prerender: true,
+    sitemap: true,
+  },
+  {
     path: '/kontakt',
-    title: 'Kontakt — Arvklart',
-    title_en: 'Contact — Arvklart',
-    description: 'Har du spørsmål om Arvklart, trenger hjelp med et bo eller vil gi oss tilbakemelding? Send oss en e-post.',
-    description_en: 'Do you have questions about Arvklart, need help with an estate or want to give us feedback? Send us an email.',
+    title: 'Kontakt | Arvklart',
+    title_en: 'Kontakt | Arvklart',
+    description: 'Spør oss om Arvklart, eller meld interesse for å prøve verktøyet med din egen familie. Skriv til admin@arvklart.no.',
+    description_en: 'Spør oss om Arvklart, eller meld interesse for å prøve verktøyet med din egen familie. Skriv til admin@arvklart.no.',
     prerender: true,
     sitemap: true,
   },

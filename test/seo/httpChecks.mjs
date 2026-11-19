@@ -10,7 +10,10 @@ import { PUBLIC_PAGES, SITE_URL, organizationJsonLd, websiteJsonLd } from '../..
 // JavaScript som lastes før en offentlig side er interaktiv (gzip). Før code splitting: 371 kB. Se test/e2e/chunks.mjs.
 export const JS_BUDGET_GZIP = 175 * 1024
 
-export const H1_NO = 'Arvefordeling gjort enklere og inkluderende'
+// Forsidens overskrift. Uttrykket i båndet skifter (src/site/Rotator.jsx), så selve teksten står i
+// deler i HTML-en; H1_NAME er det tilgjengelige navnet, som alltid er den samme hele setningen.
+export const H1_NAME = 'Fordel arvegjenstandene med én felles oversikt'
+export const H1_NO = ['Fordel', 'arvegjenstandene', 'med <em>én felles</em> oversikt']
 const PRIVATE = ['/app', '/logg-inn', '/nytt-passord', '/join/ABC123', '/estate/22222222-0000-0000-0000-000000000001',
   '/estate/22222222-0000-0000-0000-000000000001/fordeling', '/konto', '/founder', '/setup',
   '/kontakt.html', '/index.html', '/shell.html']
@@ -18,7 +21,7 @@ const PRIVATE = ['/app', '/logg-inn', '/nytt-passord', '/join/ABC123', '/estate/
 export const NOT_FOUND = ['/finnes-ikke', '/guider/finnes-ikke', '/guider/mal-for-guide', '/guider', '/a/b', '/index', '/shell', '/home.html']
 
 // Stiene som alltid vises i rapporten (status og hoder), så reglene kan leses av ekte svar
-export const REPORT_PATHS = ['/', '/home', '/kontakt', '/personvern', '/veiviser', '/veiviser.html', '/arveveiviser/ramme.html', '/robots.txt', '/sitemap.xml',
+export const REPORT_PATHS = ['/', '/home', '/slik-fungerer-det', '/om-oss', '/kontakt', '/personvern', '/veiviser', '/veiviser.html', '/arveveiviser/ramme.html', '/robots.txt', '/sitemap.xml',
   '/app', '/logg-inn', '/nytt-passord', '/join/ABC123', '/estate/x', '/konto', '/finnes-ikke', '/guider/finnes-ikke', '/a/b', '/home.html', '/shell.html']
 
 const assert = (cond, msg) => { if (!cond) throw new Error(msg) }
@@ -165,12 +168,32 @@ export async function runHttpChecks(base, { headers = {}, preview = false, fetch
 
   await check('Forsiden «/» uten JavaScript: tekst, lenkene til de offentlige sidene, WebSite og Organization', async () => {
     const { body } = await get('/')
-    for (const text of [H1_NO, 'Én rolig, tydelig vei gjennom en vanskelig prosess.', 'Rettferdig, ikke bare likt', 'Test ut demo nå'])
+    for (const text of [...H1_NO, 'Se tingene og hvem som <em>ønsker</em> dem', 'Teamet bak', 'Kan jeg prøve uten å opprette en konto?', 'Prøv demo'])
       assert(body.includes(text), `mangler «${text}»`)
-    for (const href of ['/veiviser', '/kontakt', '/personvern', '/logg-inn']) assert(body.includes(`href="${href}"`), `lenken til ${href} mangler`)
+    for (const href of ['/slik-fungerer-det', '/om-oss', '/veiviser', '/kontakt', '/personvern', '/logg-inn'])
+      assert(body.includes(`href="${href}"`), `lenken til ${href} mangler`)
+    // Stilene til de offentlige sidene ligger i en egen fil (src/site/site.css), ikke i en <style> i siden
+    assert(/<link rel="stylesheet"[^>]+href="\/assets\/[^"]+\.css"/.test(body), 'stilarket mangler')
     assert(!/&gt;|&#x27;/.test(body.match(/<div id="root"[\s\S]*?<\/style>/)?.[0] || ''), 'CSS-en i <style> er HTML-kodet')
     const ld = [...body.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m => JSON.parse(m[1]))
     assert(JSON.stringify(ld) === JSON.stringify([websiteJsonLd(), organizationJsonLd()]), `JSON-LD: ${JSON.stringify(ld)}`)
+  })
+
+  await check('De nye undersidene uten JavaScript: overskrift, hovedinnhold og brødsmule', async () => {
+    for (const [path, h1, tekst] of [
+      ['/slik-fungerer-det', 'Slik fordeler dere innbo med <em>Arvklart</em>', 'Seks steg, fulgt gjennom <em>ett</em> oljemaleri'],
+      ['/om-oss', 'Teamet bak <em>Arvklart</em>', 'Ideen til Arvklart kom fra et behov i egen familie.'],
+      ['/kontakt', 'Hva kan vi hjelpe deg <em>med</em>?', 'admin@arvklart.no'],
+    ]) {
+      const r = await get(path)
+      assert(r.status === 200, `${path}: status ${r.status}`)
+      assert(r.body.includes(h1), `${path}: mangler overskriften`)
+      assert(r.body.includes(tekst), `${path}: mangler hovedinnholdet`)
+      assert(r.body.includes('<nav class="crumb"'), `${path}: mangler brødsmulen`)
+      assert(r.body.includes(`<link rel="canonical" href="${SITE_URL}${path}" />`), `${path}: canonical mangler eller peker feil`)
+      const note = notNoindexed(path, r)
+      if (note) return note
+    }
   })
 
   await check('Offentlige sider uten forhåndsrendering: appens skall uten canonical, og ingen noindex', async () => {

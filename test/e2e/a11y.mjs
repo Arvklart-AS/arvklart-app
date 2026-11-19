@@ -19,7 +19,9 @@ async function audit(page, path, ready) {
 
 const PAGES = [
   { path: '/logg-inn', ready: /Logg inn/, loggedIn: false },
-  { path: '/', ready: /Test ut demo/, loggedIn: false }, // forsiden
+  { path: '/', ready: /Se tingene og hvem som/, loggedIn: false }, // forsiden
+  { path: '/slik-fungerer-det', ready: /Seks steg, fulgt gjennom/, loggedIn: false },
+  { path: '/om-oss', ready: /Fire personer, fire/, loggedIn: false },
   { path: '/', ready: 'Testbo' },
   { path: `/estate/${EST}`, ready: 'Gyngestol' },
   { path: `/estate/${EST}/item/${ITEM}`, ready: 'Gyngestol' },
@@ -127,9 +129,20 @@ for (const p of PAGES) {
     const r = await page.evaluate(() => {
       const root = parseFloat(getComputedStyle(document.documentElement).fontSize)
       const wide = document.documentElement.scrollWidth > window.innerWidth + 1
+      // Hopper over det som ikke kan leses som kuttet tekst likevel:
+      //  - innhold i en lukket <details> (mobilmenyen) vises ikke
+      //  - flater som klipper med vilje: visuelt skjult tekst for skjermlesere, og ordskiftet i
+      //    forsidens overskrift, der uttrykkene som ikke er aktive står parkert utenfor kanten
+      //    (src/site/Rotator.jsx). Begge bruker clip-path; ingen andre flater gjør det.
+      const medVilje = el => {
+        if (getComputedStyle(el).clipPath !== 'none') return true
+        if ([...el.querySelectorAll('*')].some(c => getComputedStyle(c).clipPath !== 'none')) return true
+        for (let n = el; n; n = n.parentElement) if (n.tagName === 'DETAILS' && !n.open) return true
+        return false
+      }
       const cut = [...document.querySelectorAll('button, a, label, p, span, h1, h2, h3, li')]
         .filter(el => el.offsetParent && el.textContent.trim() && el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 2
-          && !['auto', 'scroll'].includes(getComputedStyle(el).overflowX))
+          && !['auto', 'scroll'].includes(getComputedStyle(el).overflowX) && !medVilje(el))
         .slice(0, 3).map(el => el.textContent.trim().slice(0, 30))
       return { root, wide, cut }
     })
