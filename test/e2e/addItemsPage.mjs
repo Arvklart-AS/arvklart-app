@@ -395,6 +395,31 @@ await run('E3: verdianslaget bruker bildeanalysen (ingen bilder sendes), og AI-e
   await ctx.close()
 })
 
+// Kunst som ren AI-gjetning (ingen sammenligninger): «få den vurdert» i stedet for et tall (src/lib/valueAdvice.js)
+const estimateArt = { ...estimateV2, estimate: { low: 2000, likely: 6000, high: 20000 }, confidence: 'low',
+  basis: { used_analysis: true, identified: [], category_key: 'art', specificity: 'generic' },
+  market: { ...estimateV2.market, low_nok: 2000, likely_nok: 6000, high_nok: 20000 }, summary: { low_nok: 2000, likely_nok: 6000, high_nok: 20000 } }
+
+await run('E5: kunst som AI-gjetning gir «få den vurdert», ikke noe tall; verdien lagres tom og kan ikke bli fordelingsverdi', async () => {
+  const { ctx, page, calls } = await setup(browser, { v2: n => v2Reply(n), estimateReply: () => estimateArt })
+  await openCamera(page)
+  await shoot(page)
+  await page.getByRole('button', { name: 'Ferdig' }).click()
+  await page.getByRole('button', { name: 'Analyser med AI (1)' }).click()
+  await page.getByRole('button', { name: 'Godkjenn og lagre alle (1)' }).waitFor()
+  await page.getByRole('button', { name: 'Anslå verdi for alle (1)' }).click()
+  await page.getByText('Kan ha reell verdi – få den vurdert', { exact: false }).waitFor()
+  assert.equal(await page.getByText('Veiledende AI-anslag, ikke en dokumentert markedsverdi', { exact: false }).count(), 0, 'AI-anslaget ble vist')
+  assert.equal(await page.getByText(/6\s?000/).count(), 0, 'beløpet ble vist')
+  assert.equal(await page.getByRole('button', { name: /Anslå verdi/ }).count(), 0, 'kunne anslå på nytt')
+  await page.getByRole('button', { name: 'Godkjenn og lagre alle (1)' }).click()
+  await page.getByText('✓ 1 gjenstand lagt til i boet').waitFor()
+  const body = calls.insertBodies[0]
+  assert.equal(body.estimated_value, null, 'AI-tallet ble lagret som verdi')
+  assert.ok(!body.estimate_reasoning && !body.estimate_confidence, 'AI-begrunnelsen ble lagret som om tallet var brukt')
+  await ctx.close()
+})
+
 await run('E4: for lite informasjon gir ingen verdi (aldri 0 kr), men tips; «Anslå verdi for alle» hopper over kortet etterpå', async () => {
   const { ctx, page, calls } = await setup(browser, { estimateReply: () => ({ v: 2, status: 'insufficient', estimate: null, missing: ['Et mer presist navn', 'Et bilde av stempelet'], reasoning: '' }) })
   await openCamera(page)
