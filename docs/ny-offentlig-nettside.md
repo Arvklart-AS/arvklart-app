@@ -168,24 +168,146 @@ komponenten og inn i `index.html` under `.consent-ask`:
 
 ---
 
+### 2.7 Tomrommet nederst, og overlappen med pauseknappen
+
+**Årsaken ble målt, ikke gjettet.** Et skript leste `padding-bottom` på `.ak`, høyden på
+samtykkespørsmålet og avstanden fra bunnteksten til dokumentets slutt, på `/`, `/kontakt` og
+`/slik-fungerer-det`, ved 390 og 1440 px, på begge språk, med samtykket ubesvart og avslått:
+
+| | `.ak` padding-bottom | Tomrom under bunnteksten | Bannerets høyde |
+|---|---|---|---|
+| 390 px, ubesvart | 290 px | 290 px | 235 px |
+| 390 px, avslått | 0 px | 0 px | — |
+| 1440 px, ubesvart | 260 px | 260 px | 214–235 px |
+| 1440 px, avslått | 0 px | 0 px | — |
+
+Det var altså ikke en marg som ble stående etter at banneret lukket seg, ikke `min-height`, ikke
+`safe-area-inset` og ingen usynlige elementer: det var regelen
+`body:has(.consent-ask) .ak { padding-bottom: 290px/260px }` som jeg selv la inn forrige runde for
+å gi bunnteksten plass til å rulles fri.
+
+**Løsningen tar bort behovet for plassen i stedet for å skjule den.** Målingen viste at et
+bunnforankret banner i full bredde på mobil dekker *hele* lenkelisten i bunnteksten (8–9 lenker) og
+29 px av pauseknappen i heroen. På markedssidene (`.ak`) står spørsmålet derfor nå **øverst**, rett
+under den klebrige headeren (74 px, 62 px under 981 px bredde), med `z-index` under headeren (50),
+så headeren, den åpne mobilmenyen og «Hopp til innholdet» (999) ligger over. Da dekker det bare
+innledende tekst, ingenting trenger å reserveres, og den faste demoknappen kan stå framme mens
+spørsmålet vises. `/personvern` og guidene bruker appens utforming og beholder plasseringen nederst,
+uendret fra `main`.
+
+Samtykkelogikken, teksten og de to like tydelige valgene er urørt. `CONSENT_VERSION` er ikke økt.
+
+**Kontrollert i 48 kombinasjoner** (360/390/1440 px × norsk/engelsk × `/`, `/slik-fungerer-det`,
+`/kontakt`, `/veiviser` × samtykke ubesvart/avslått): reservert plass 0 px, tomrom under
+bunnteksten 0 px, og pauseknapp, demo-CTA og bunnmeny fri i alle 48.
+
+### 2.8 Felles header på veiviseren, og «Kontakt» i menyen
+
+`/veiviser` bruker nå den samme header-komponenten som de andre offentlige sidene: `SiteHeader`
+eksporteres fra `SiteLayout.jsx` og brukes der — ingen kopi. Veiviserens innhold, meldinger
+(`veiviser-ready`, `-context`, `-save`, `-saved`, `-back`, `-navigate`) og adresser er urørt, og
+iframen brukes som før fra et bo, ved navigering inne i appen og for engelsk veiviser.
+
+«Tilbake til hjemmesiden» er tatt ut **der headeren står over**, siden logoen og menyen fører samme
+vei. To navigasjoner over hverandre tok en tredel av første skjermbilde på mobil, og startkortet
+havnet under folden. Inne i et bo (`/estate/:id/guide`) og for innloggede er linjen uendret.
+
+Språkvalget er ærlig: menyen følger brukerens språk, men veiviserens innhold er norsk, og linjen
+under headeren sier det på engelsk. Ingen oversettelse er lovet.
+
+«Kontakt» er lagt i hovedmenyen, som er **den samme listen** på brede skjermer og i mobilmenyen.
+Fem punkter får plass fra 981 px uten overflyt, uten linjebrudd og uten mindre skrift (29 px fra
+siste lenke til «Prøv demo»), så bruddpunktet på 980 px står. Appens og innloggingens header er
+ikke rørt.
+
+### 2.9 «Slik fungerer det» bygget om
+
+Siden var 10 403 px høy på PC og 12 235 px på mobil, med åtte seksjoner og mye liten tekst. Den er
+nå bygget rundt fire hoveddeler — **6 516 px på PC og 5 776 px på mobil**:
+
+1. Samle gjenstandene
+2. Inviter familien og se ønskene
+3. Finn en fordeling
+4. Se og dokumenter resultatet
+
+Hver del har én overskrift, én kort forklaring og én stor produktvisning. Utdypingene om roller,
+fordelingsmåtene, KI-anslag og godkjenning ligger i ett `<details>`-felt per del, lukket fra start,
+så hoveddelen leses uten ekstra klikk. Forbeholdene står ved funksjonen de gjelder: KI-anslaget i
+del 1, «et manglende svar er ikke et nei» i del 3, BankID i del 4. Ingen faktakolonner, ingen
+kursivblokker og ingen gjentatte forklaringer. Ett oljemaleri følger historien.
+
+**Den trinnvise produktvisningen** i del 3 er fire trinn som hver sier hva du gjør og hva som
+skjer. Byttet er radioknapper og `:has()` i CSS — ingen automatikk, ingen karusell, ingen bevegelse
+som må gå ferdig, og den virker uten JavaScript (trinn 1 står framme). Radioknappen dekker hele
+trinnknappen, så fokusringen havner rundt knappen og ingen tabulatorstopp er usynlig. Ruten er like
+høy i alle fire trinn (395 px), så siden ikke hopper ved bytte. Piltaster bytter trinn, som i en
+radiogruppe.
+
+Brødtekst og forklaringer er minst 16 px på 360 og 390 px, uten avkuttet tekst og uten vannrett
+rulling, på begge språk. Ingen hel mobilskjerm i en liten telefonramme: `m-dok.webp` er delt i to
+lesbare utsnitt.
+
+### 2.10 Skjermbildene med gyngestolfeilen
+
+Demoens «Bestemors gyngestol» har et foto av en vanlig trestol. Bildene er **beskåret**, ikke
+redigert; ingen demodata er endret og ingenting er satt sammen eller tegnet inn.
+
+| Før | Nå | Utsnittet |
+|---|---|---|
+| `d-laptop.webp` | `d-oversikt.webp` (885×553, 16/10) | Boets oversikt ned til og med filtrene, uten kortradene der gyngestolen lå |
+| `d-tablet.webp` | `d-galleri.webp` (400×533, 3/4) | To kolonner fra rad to og ned: bokhylle, oljemaleri, gifteringer, halskjede, familiealbum |
+| `f-ettertraktet.webp` | `f-filtre.webp` + `f-flere.webp` | Filterraden, og de to riktige kortene merket «2 vil ha» |
+| `m-dok.webp` (hel skjerm) | `m-fordeling.webp` + `m-godkjenning.webp` | To lesbare utsnitt i stedet for en hel mobilskjerm |
+| `i-skjema.webp` (hel skjerm) | `i-legg-til.webp` | Utsnittet av skjemaet: bildefeltene og navnefeltet |
+
+De fire ubrukte filene (`d-laptop`, `d-tablet`, `f-ettertraktet`, `fd-ny-lagret`) er slettet.
+`test/seo/nettsted.test.js` feiler hvis et bilde mangler eller blir liggende ubrukt.
+
+På smale skjermer brukes `--zoom`-mekanismen som allerede fantes i `site.css`: brede skjermbilder
+vises forstørret med uttoning mot høyre i stedet for skrumpet til uleselig skrift.
+
+### 2.11 Roller, opphavsavsnitt og to rettelser
+
+* Rollene er avklart (punkt 5.1) og står likt på forsiden og «Om oss», på begge språk.
+  `TEAM` på forsiden var en konstant som kalte `L()` ved import, så rollene ville stått i språket
+  siden ble lastet i, også etter språkbytte. Den er nå en funksjon, som `FOLK()`.
+* Opphavsavsnittet på «Om oss» er erstattet med den avklarte teksten, oversatt til engelsk med samme
+  innhold. Overskriften er kortet til «Slik begynte det.» og andre avsnitt justert, så historien
+  ikke gjentar seg. Meta-beskrivelsen for `/om-oss` er oppdatert tilsvarende.
+* «Et verdianslag er ikke en takst.» er fjernet fra forsiden (står fortsatt som forbehold ved
+  KI-anslaget på «Slik fungerer det», der funksjonen forklares).
+* **`Signature.jsx` hadde ingen `L()`-kall**: alt-tekstene og bildeteksten på forsiden sto bare på
+  norsk, også i den engelske versjonen. Det var et hull i den engelske dekningen jeg meldte som
+  ferdig forrige runde. Rettet.
+
+---
+
 ## 3. Testresultater
 
-### Kjørt nå, på denne greina, etter alle endringene over
+### Kjørt nå, på `166abaa`, etter alle endringene over
 
 | Suite | Resultat |
 |---|---|
 | `npm run build` | OK |
 | `npm test` | **472 av 472** |
 | `npm run test:e2e` (Chromium) | **294 OK, 0 feil** |
-| Egen språk- og tilgjengelighetskontroll (33 sjekker) | **33 av 33** |
-| Egen mobil- og samtykkekontroll (67 sjekker) | **66 av 67** — se punkt 5.6 |
-| `npm run test:db` | **Ikke kjørt her** (krever Docker). Kjørte grønt i CI på forrige commit, og denne endringen rører ikke databasen |
+| Samtykke, bunntekst og pauseknapp (48 kombinasjoner) | **48 av 48** |
+| Meny, bredde og fast demoknapp (18 sjekker) | **18 av 18** |
+| Sluttkontroll: uten JavaScript, tastatur, redusert bevegelse, engelsk (29 sjekker) | **29 av 29** |
+| JavaScript-budsjettet på offentlige sider | **169,54 kB av 175 kB** gzip |
+| `npm run test:db` | **Ikke kjørt her.** Krever Docker, som ikke finnes i dette miljøet. Ingen SQL er endret i denne greina; den kjøres i CI på hver commit |
 
-### Rapportert tidligere, i forrige runde
+### Rapportert tidligere, i tidligere runder
 
-De 466 enhetstestene og 293 e2e-sjekkene fra forrige runde er ikke de samme tallene: antallet har
-økt fordi det er lagt til tester for selskapsopplysningene, de rettede påstandene, pauseknappen,
-`color-mix`-fallbacken, oversettelsene og bildene (`test/seo/nettsted.test.js`, 11 tester).
+Tallene fra runde 1 (466 / 293) og runde 2 (472 / 294) er ikke de samme målingene. Antallet
+enhetstester er uendret fra forrige runde, men innholdet er ikke: tester som pekte på tekst og
+markering som er fjernet i ombyggingen, er skrevet om (`test/seo/nettsted.test.js`,
+`test/seo/httpChecks.mjs`, `test/e2e/a11y.mjs`, `test/e2e/seo.mjs`, `test/e2e/veiviser.mjs`).
+
+**Én test var feil, ikke produktet:** `test/e2e/fixtures.mjs` nullstilte `hs_lang` ved hver
+lasting, også etter at språkbyttet laster siden på nytt. Testen av språkbyttet målte derfor bare
+den forhåndsrendrede norske HTML-en i det korte øyeblikket før appen tok over — ikke selve byttet.
+Oppsettet har nå `resetLang`, og testen venter på at valget faktisk er lagret.
 
 ### Hva kontrollene dekker
 
@@ -195,8 +317,10 @@ De 466 enhetstestene og 293 e2e-sjekkene fra forrige runde er ikke de samme tall
   inngang på undersidene.
 * **Mobil og desktop, 360 / 390 / 1440 px, på begge språk**: ingen avkuttet tekst, ingen horisontal
   rulling, og demoknappen og «ingen registrering» er synlige i første skjermbilde på forsiden.
-* **Faste elementer**: samtykkespørsmålet dekker ingen kontroll på sju av åtte kombinasjoner (se
-  punkt 5.6), den faste demoknappen og spørsmålet overlapper ikke, og bunnteksten kan rulles fri.
+* **Faste elementer**: samtykkespørsmålet dekker **ingen** kontroll i noen av de 48 kombinasjonene
+  (punkt 2.7). Hele pauseknappen og demo-CTA-en er tilgjengelige mens spørsmålet vises, bunnmenyen
+  er fri, den faste demoknappen og spørsmålet overlapper ikke, og det er 0 px tomrom under
+  bunnteksten før og etter samtykke.
 * **Sporing** (teknisk måling, ikke en juridisk konklusjon): med samtykke lastes
   `googletagmanager.com` på nøyaktig de seks offentlige sidene og ingen andre. `/logg-inn`,
   `/nytt-passord`, `/join/…` og 404-siden laster ingenting. `/app`, `/konto` og `/estate/…` uten
@@ -262,35 +386,36 @@ ansvarsområder. De står likt på forsiden (`src/pages/LandingPage.jsx`, `TEAM(
 `TEAM` på forsiden var en konstant som kalte `L()` ved import, så rollene ville stått i det språket
 siden ble lastet i, også etter språkbytte. Den er nå en funksjon, som `FOLK()` på «Om oss».
 
-### 5.2 Skjermbilder som må byttes før publisering
+### 5.2 Skjermbildene — løst ved beskjæring, men rotårsaken står igjen
 
-Jeg kan ikke ta nye skjermbilder: det krever innlogging i den ekte demoen, og demodata skal ikke
-røres i denne oppgaven. Bildene er kontrollert ett for ett.
+Bildene som viste «Bestemors gyngestol» med et foto av en vanlig trestol, er byttet ut med utsnitt
+uten den gjenstanden (punkt 2.10). Ingen demodata er endret og ingen skjermbilder er manipulert.
 
-**Må byttes — viser «Bestemors gyngestol» med et foto av en vanlig trestol:**
+**Rotårsaken står igjen, og hører hjemme i en egen endring:** `face0001` heter «Bestemors
+gyngestol» og beskrives som en gyngestol i `supabase/seed/demo_estate.sql:100`, mens fotoet i
+lagringen viser en vanlig stol. Det bryter med repoets egen regel om at demotekstene bare skal
+beskrive det bildene viser. Rettingen er enten nytt foto eller ny tittel — og den krever en
+migrering, som er utenfor denne oppgaven.
 
-| Fil | Hvor |
-|---|---|
-| `public/nettsted/d-tablet.webp` | Enhetsgruppen i forsidens hero (nettbrett) |
-| `public/nettsted/d-laptop.webp` | Enhetsgruppen i forsidens hero (PC) |
-| `public/nettsted/f-ettertraktet.webp` | «Slik fungerer det», steg 03 — tydeligst her |
+Så lenge rotårsaken står, kan ikke nye skjermbilder tas fra et galleri som viser hele boet, og
+`i-legg-til.webp` viser skjemaets egen plassholdertekst «f.eks. Bestemors gyngestol». Det er appens
+faktiske grensesnitt, ikke et feil bilde.
 
 **Trenger ikke byttes:** gitarens kategori («Sigma akustisk gitar» under «Elektronikk») er **ikke
 synlig** i noe skjermbilde. Galleriet viser tittel, pris og hvem som ønsker gjenstanden, ikke
-kategori. De øvrige 15 bildene viser ikke feilen.
+kategori.
 
-Rotårsaken er demodataene, ikke bildene: `face0001` heter «Bestemors gyngestol» og beskrives som en
-gyngestol i `supabase/seed/demo_estate.sql:100`, mens fotoet i lagringen viser en vanlig stol. Det
-bryter med repoets egen regel om at demotekstene bare skal beskrive det bildene viser. Rettingen
-hører hjemme i en egen endring — enten nytt foto eller ny tittel.
+### 5.3 Engelsk indeksering — avklart 20.11.2026: egen oppfølging
 
-### 5.3 Engelsk indeksering
+Den fulle engelske versjonen beholdes. Egne engelske adresser og indeksering er en **egen sak**, og
+rutingen er ikke utvidet i denne runden. Begrensningen med dagens språkvalg står i punkt 2.4:
+begge språk ligger på samme adresse, det finnes én canonical og ingen `hreflang`, den
+forhåndsrendrede HTML-en er norsk, og engelsk kan derfor ikke indekseres.
 
-Punkt 2.4. Si fra om dere vil ha engelske søsteradresser, så gjør jeg den avgrensede endringen.
+### 5.4 Forretningsadressen — avklart 20.11.2026: ikke nå
 
-### 5.4 Forretningsadressen i personvernerklæringen
-
-Punkt 2.3. Skal `Tertnesgrenden 13, 5113 Tertnes` inn som kontaktopplysning for behandlingsansvarlig?
+Verifisert selskapsnavn, organisasjonsnummer og e-postadresse står. `Tertnesgrenden 13, 5113
+Tertnes` er **ikke** lagt inn som ny synlig kontaktopplysning i denne runden.
 
 ### 5.5 `CONSENT_VERSION` er ikke økt
 
@@ -303,13 +428,10 @@ samme sletting av `_ga` ved avslag, samme avgrensning til offentlige sider. Derf
 Dette er en teknisk konklusjon, ikke en juridisk. **Vil dere at alle skal spørres på nytt, er det
 én linje.**
 
-### 5.6 Én gjenstående overlapp
+### 5.6 Overlappen med pauseknappen — løst
 
-På forsiden ved 390 px dekker samtykkespørsmålet de nederste ~29 px av pauseknappen til det er
-besvart. Knappens øvre halvdel er synlig og klikkbar, og den blir helt fri så snart man svarer
-eller ruller ~30 px. Et fast bunnbanner vil alltid ligge over noe nederst i skjermbildet; jeg har
-prioritert at ingen **primær** handling dekkes. Si fra hvis dere heller vil at pauseknappen skal
-ligge over spørsmålet.
+Den gjenstående overlappen ved 390 px er borte: samtykkespørsmålet står nå øverst på markedssidene,
+og hele pauseknappen er tilgjengelig mens det vises. Se punkt 2.7 for målingene.
 
 ### 5.7 Forhåndsvisningen
 
