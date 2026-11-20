@@ -1827,14 +1827,6 @@ ned ville gitt uleselig skrift. Høydetaket er da av, så ingenting klippes på 
 .ak .def__d{
   color:var(--muted);font-size:1rem;line-height:1.55;max-width:60ch
 }
-@media (prefers-reduced-motion: reduce){
-  .ak .trinn__steg{
-    transition:none;translate:none
-  }
-  .ak .utdyp details>summary::before{
-    transition:none
-  }
-}
 /* ============================================================
    SIDEEGEN KOMPOSISJON
    En side om fire personer tåler ikke forsidens maskineri. Her
