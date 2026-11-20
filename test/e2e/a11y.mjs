@@ -21,7 +21,9 @@ const PAGES = [
   { path: '/logg-inn', ready: /Logg inn/, loggedIn: false },
   { path: '/', ready: /Test ut demo/, loggedIn: false }, // forsiden
   { path: '/', ready: 'Testbo' },
-  { path: `/estate/${EST}`, ready: 'Gyngestol' },
+  { path: `/estate/${EST}`, ready: 'Hva vil du gjøre?' }, // oversikten (mørk)
+  { path: `/estate/${EST}/gjenstander`, ready: 'Gyngestol' }, // gjenstandslisten (mørk)
+  { path: `/estate/${EST}/gjenstander?visning=analyse`, ready: 'Gjenstander per kategori' },
   { path: `/estate/${EST}/item/${ITEM}`, ready: 'Gyngestol' },
   { path: `/estate/${EST}/swipe`, ready: 'Gyngestol' },
   { path: `/estate/${EST}/heirs`, ready: 'Kari' },
@@ -90,7 +92,7 @@ await check('Tastatur: bokortet åpnes med Enter (lenken heter det som står på
 })
 
 await check('Dialog: fokus på «Avbryt», Esc lukker, fokus tilbake til «Slett»', async page => {
-  await page.goto(`${BASE}/estate/${EST}`)
+  await page.goto(`${BASE}/estate/${EST}/gjenstander`)
   const del = page.getByRole('button', { name: 'Slett «Gyngestol»' })
   await del.click()
   await page.getByRole('dialog', { name: 'Slett gjenstand' }).waitFor()
