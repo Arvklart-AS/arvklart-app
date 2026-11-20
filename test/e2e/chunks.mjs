@@ -43,7 +43,7 @@ await check('Ikke innlogget: forsiden henter ingen app-sider', async page => {
   const requested = []
   page.on('request', r => requested.push(new URL(r.url()).pathname))
   await page.goto(`${BASE}/`)
-  await page.getByRole('button', { name: 'Test ut demo nå' }).waitFor()
+  await page.locator('.hdr a.btn').waitFor()
   await page.waitForTimeout(2500)
   assert(!requested.some(p => APP_CHUNK.test(p)), `app-sider ble hentet: ${requested.filter(p => APP_CHUNK.test(p))}`)
 }, { loggedIn: false })

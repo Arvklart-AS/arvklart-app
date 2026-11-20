@@ -9,6 +9,10 @@ import {
 import { L, isEn } from '../lib/lang'
 import { HOME, LANDING_STATE } from '../lib/routes'
 import { usePageData } from '../seo/pageData'
+// Samme header som de andre offentlige sidene — komponenten deles, den kopieres ikke
+import { SiteHeader } from '../site/SiteLayout'
+import { useHydrated } from '../site/useHydrated'
+import useDemo from '../site/useDemo'
 
 // Hindrer at en ventende lagring kjøres to ganger hvis siden monteres på nytt underveis
 let processingPending = false
@@ -50,6 +54,9 @@ export default function GuidePage({ standalone = false, session = null, onToast 
   const { id } = useParams()
   const { pathname } = useLocation()
   const pageData = usePageData()
+  const hydrated = useHydrated()
+  // Demoinngangen i headeren er den samme som på de andre offentlige sidene (src/site/useDemo.js)
+  const demo = useDemo({ loggedIn: Boolean(session) })
   // Veiviseren ligger i siden (se over): bare /veiviser lastet fra serveren, og ikke engelsk veiviser (den er i rammen)
   const inline = !id && pageData?.kind === 'veiviser' && pageData.path === pathname && !(isEn() && GUIDE_EN)
     && (typeof document === 'undefined' || Boolean(hostEl()))
@@ -231,15 +238,21 @@ export default function GuidePage({ standalone = false, session = null, onToast 
     await saveInto(estate.id, estate.name)
   }
 
-  const bar = (
+  // «Tilbake» utelått der den offentlige headeren står over: den har både logoen og menyen,
+  // og to navigasjoner over hverandre tok en tredel av første skjermbilde på mobil.
+  const visTilbake = !(inline && !session)
+  const enMerknad = isEn() && !GUIDE_EN
+  const bar = (visTilbake || busy || enMerknad) ? (
       <div style={{ padding: '12px 20px', background: '#FBF9F5', borderBottom: '1px solid #D9CFC0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button onClick={goBack} style={{ background: 'none', border: 'none', color: '#75604B', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
-          {id ? L('← Tilbake til boet', '← Back to the estate') : L('← Tilbake til hjemmesiden', '← Back to the home page')}
-        </button>
+        {visTilbake && (
+          <button onClick={goBack} style={{ background: 'none', border: 'none', color: '#75604B', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+            {id ? L('← Tilbake til boet', '← Back to the estate') : L('← Tilbake til hjemmesiden', '← Back to the home page')}
+          </button>
+        )}
         {busy && <span style={{ fontSize: '0.8125rem', color: '#5F6E52', fontFamily: 'Karla, sans-serif' }}>{L('Lagrer i boet …', 'Saving to the estate …')}</span>}
-        {isEn() && !GUIDE_EN && <span style={{ fontSize: '0.8125rem', color: '#75604B', fontFamily: 'Karla, sans-serif', marginLeft: 'auto' }}>The inheritance guide follows Norwegian law and is only available in Norwegian.</span>}
+        {enMerknad && <span style={{ fontSize: '0.8125rem', color: '#75604B', fontFamily: 'Karla, sans-serif', marginLeft: visTilbake ? 'auto' : 0 }}>The inheritance guide follows Norwegian law and is only available in Norwegian.</span>}
       </div>
-  )
+  ) : null
   const modals = (
     <>
       {modal?.kind === 'auth' && (
@@ -251,8 +264,28 @@ export default function GuidePage({ standalone = false, session = null, onToast 
     </>
   )
 
-  // Veiviseren står i siden under appen: bare linjen og dialogene her (linjen blir stående øverst, se veiviserHost.js)
-  if (inline) return <>{bar}{modals}</>
+  // Veiviseren står i siden under appen: headeren, linjen og dialogene her (de blir stående øverst,
+  // se veiviserHost.js, som gjør #root klebrig). Veiviserens eget innhold og adressene er urørt.
+  //
+  // Headeren er den delte komponenten fra src/site/SiteLayout.jsx. CSS-en i site.css er avgrenset til
+  // rotklassen «ak», så headeren må ligge inne i en «ak»-rot. Den dekker bare headeren, ikke veiviseren.
+  //
+  // Språkvalget er ærlig: menyen følger brukerens språk, men veiviserens innhold er norsk, og
+  // linjen under sier det på engelsk (se «bar» over). Ingen oversettelse er lovet.
+  //
+  // Innlogget ligger menyen i TopBar, som på de andre offentlige sidene, og headeren er skjult.
+  if (inline) return (
+    <>
+      {!session && (
+        <div className={`ak${hydrated ? ' ak-js' : ''}`} lang={isEn() ? 'en' : 'nb'}>
+          <a className="skip" href="#veiviser">{L('Hopp til veiviseren', 'Skip to the guide')}</a>
+          <SiteHeader demo={demo} current="/veiviser" />
+        </div>
+      )}
+      {bar}
+      {modals}
+    </>
+  )
 
   return (
     <div className={standalone ? 'guide-shell standalone' : 'guide-shell'} style={{ height: standalone ? '100vh' : 'calc(100vh - 56px)', display: 'flex', flexDirection: 'column' }}>

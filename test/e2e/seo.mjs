@@ -4,13 +4,26 @@
 // (norsk/engelsk, innlogget/ikke innlogget, demo, innlogging og direkte lenker). Kjøres av test/e2e/run.sh.
 import { BASE, EST, launch, checker, assert, sessionFor, DEMO } from './fixtures.mjs'
 import { PUBLIC_PAGES, SITE_URL } from '../../src/seo/pages.js'
-import { runHttpChecks } from '../seo/httpChecks.mjs'
+import { runHttpChecks, H1_NAME } from '../seo/httpChecks.mjs'
 
 const browser = await launch()
 const results = []
 const check = checker(browser, results)
-const H1_NO = 'Arvefordeling gjort enklere og inkluderende'
-const H1_EN = 'Inheritance distribution made simpler and more inclusive'
+// Forsidens overskrift. Uttrykket i båndet skifter, så teksten kontrolleres som det tilgjengelige
+// navnet, som alltid er den samme hele setningen (src/site/Rotator.jsx).
+const H1_NO = H1_NAME
+const H1_EN = 'Divide the belongings with one shared overview'
+// De fire offentlige sidene finnes bare på norsk (src/seo/pages.js). Et engelsk språkvalg gjelder
+// appen, veiviseren og innloggingen; disse sidene vises på norsk uansett.
+const h1Name = async page => (await page.locator('h1').ariaSnapshot()).match(/heading "([^"]+)"/)?.[1]
+const demoKnapp = page => page.locator('.hdr a.btn')
+// På smale skjermer (testenes standard er 390 px) ligger menylenkene i <details class="menu">
+const loggInn = async page => {
+  const nav = page.locator('.hdr .nav a[href="/logg-inn"]')
+  if (await nav.isVisible()) return nav
+  await page.locator('.menu > summary').click()
+  return page.locator('.menu__panel a[href="/logg-inn"]')
+}
 
 // ── HTTP: det søkemotorene får før JavaScript (samme sjekker som scripts/check-seo.mjs kjører mot Vercel) ─────
 for (const line of await runHttpChecks(BASE)) results.push(line)
@@ -25,7 +38,10 @@ async function observe(page, { lang } = {}) {
   page.on('pageerror', e => errors.push(e.message.slice(0, 200)))
   // Skrifttypene stenges, så bytte av skrift ikke gir layoutskift i målingen
   await page.route(/fonts\.(googleapis|gstatic)\.com/, route => route.abort())
-  if (lang) await page.addInitScript(l => localStorage.setItem('hs_lang', l), lang)
+  // Bare første lasting: skriptet kjører på hver navigering og ville ellers overskrevet et
+  // språkbytte brukeren gjør i testen (toggleLang laster siden på nytt). Språket ligger
+  // i localStorage og følger likevel med til neste side.
+  if (lang) await page.addInitScript(l => { if (localStorage.getItem('hs_lang') === null) localStorage.setItem('hs_lang', l) }, lang)
   await page.addInitScript(() => {
     window.__seo = { removed: 0, visibility: null, h1: null, shift: 0, csp: [] }
     document.addEventListener('securitypolicyviolation', e => window.__seo.csp.push(`${e.violatedDirective} ${e.blockedURI}`))
@@ -50,18 +66,21 @@ await check('Uten JavaScript: forsiden viser overskrift, tekst og lenker', async
   const ctx = await browser.newContext({ javaScriptEnabled: false })
   const page = await ctx.newPage()
   await page.goto(`${BASE}/`)
-  assert((await page.locator('h1').textContent()) === H1_NO, 'overskriften vises ikke')
-  assert(await page.getByText('Én rolig, tydelig vei gjennom en vanskelig prosess.').isVisible(), 'teksten vises ikke')
-  assert(await page.getByRole('link', { name: 'Kontakt' }).count() === 1, 'lenken til Kontakt mangler')
-  await page.goto(`${BASE}/kontakt`)
-  assert((await page.locator('h1').textContent()) === 'Ta kontakt med oss', 'kontaktsiden er ikke forhåndsrendret')
+  assert(await h1Name(page) === H1_NO, `overskriften vises ikke: ${await h1Name(page)}`)
+  assert(await page.getByText('Se tingene og hvem som ønsker dem').isVisible(), 'teksten vises ikke')
+  // «Kontakt» står både i hovedmenyen og i bunnmenyen
+  assert(await page.getByRole('link', { name: 'Kontakt', exact: true }).count() === 2, 'lenken til Kontakt mangler i hovedmenyen eller bunnmenyen')
+  for (const [path, h1] of [['/kontakt', 'Hva kan vi hjelpe deg med?'], ['/slik-fungerer-det', 'Slik fordeler dere innbo med Arvklart'], ['/om-oss', 'Teamet bak Arvklart']]) {
+    await page.goto(BASE + path)
+    assert(await h1Name(page) === h1, `${path} er ikke forhåndsrendret: ${await h1Name(page)}`)
+  }
   await ctx.close()
 }, { loggedIn: false })
 
 await check('Norsk, ikke innlogget: hydrering uten at noe byttes ut, uten layoutskift og uten feil', async page => {
   const state = await observe(page)
   await page.goto(`${BASE}/`)
-  await page.getByRole('button', { name: 'Test ut demo nå' }).waitFor()
+  await demoKnapp(page).waitFor()
   await settle(page)
   const s = await state()
   assert(s.prerendered && s.visibility === 'visible', `forhåndsrendret ${s.prerendered}, synlighet ${s.visibility}`)
@@ -70,9 +89,11 @@ await check('Norsk, ikke innlogget: hydrering uten at noe byttes ut, uten layout
   assert(s.shift < 0.01, `layoutskift ${s.shift}`)
   noErrors(s)
   assert(JSON.stringify(await canonicals(page)) === JSON.stringify([`${SITE_URL}/`]), `canonical: ${await canonicals(page)}`)
-  // Siden er interaktiv: menyen på mobil åpnes
-  await page.getByRole('button', { name: 'Meny' }).click()
-  assert(await page.getByRole('button', { name: 'Meny' }).getAttribute('aria-expanded') === 'true', 'menyen reagerer ikke')
+  // Siden er interaktiv: menyen på mobil åpnes (<details>, lukkes med Escape)
+  await page.locator('.menu > summary').click()
+  assert(await page.locator('.menu').evaluate(e => e.open), 'menyen reagerer ikke')
+  await page.keyboard.press('Escape')
+  assert(!(await page.locator('.menu').evaluate(e => e.open)), 'menyen lukkes ikke med Escape')
 }, { loggedIn: false })
 
 await check('Norsk, ikke innlogget: kontaktsiden hydreres uten feil', async page => {
@@ -82,10 +103,12 @@ await check('Norsk, ikke innlogget: kontaktsiden hydreres uten feil', async page
   const s = await state()
   assert(s.prerendered && s.sameH1 && s.removed === 0, `byttet ut: ${s.removed}`)
   noErrors(s)
-  assert(await page.title() === 'Kontakt — Arvklart', `tittel: ${await page.title()}`)
+  assert(await page.title() === 'Kontakt | Arvklart', `tittel: ${await page.title()}`)
 }, { loggedIn: false })
 
-await check('Engelsk, ikke innlogget: den norske teksten er skjult til appen viser engelsk, uten feil', async page => {
+await check('Engelsk språkvalg, ikke innlogget: forsiden vises på engelsk, uten feil', async page => {
+  // Den forhåndsrendrede HTML-en er norsk (det søkemotorene leser). Med engelsk språkvalg hydreres
+  // den ikke; appen rendrer siden på engelsk, og den norske teksten er skjult til den er byttet ut.
   const state = await observe(page, { lang: 'en' })
   await page.goto(`${BASE}/`)
   await page.getByRole('heading', { level: 1, name: H1_EN }).waitFor()
@@ -93,11 +116,38 @@ await check('Engelsk, ikke innlogget: den norske teksten er skjult til appen vis
   const s = await state()
   assert(s.prerendered && s.visibility === 'hidden', `synlighet før appen: ${s.visibility}`)
   assert(await page.locator('#root').evaluate(r => getComputedStyle(r).visibility) === 'visible', 'siden er fortsatt skjult')
-  assert(await page.getByText(H1_NO).count() === 0, 'norsk tekst står igjen')
+  assert(await page.getByText('Fordel arvegjenstandene').count() === 0, 'norsk tekst står igjen')
   noErrors(s)
-  assert(await page.title() === 'Arvklart — Inheritance distribution made simpler', `tittel: ${await page.title()}`)
+  assert(await page.title() === 'Sharing out household contents in an inheritance | Arvklart', `tittel: ${await page.title()}`)
+  assert(await page.locator('.ak').getAttribute('lang') === 'en', 'innholdet er ikke merket som engelsk')
+  // Begge språk ligger på samme adresse: én canonical, ingen hreflang (det finnes ingen språkadresser)
   assert(JSON.stringify(await canonicals(page)) === JSON.stringify([`${SITE_URL}/`]), 'én canonical')
+  assert(await page.locator('link[rel=alternate][hreflang]').count() === 0, 'hreflang peker på språkadresser som ikke finnes')
 }, { loggedIn: false })
+
+await check('Engelsk: de tre undersidene, språkbytte fra bunnteksten og overgangen til demoen', async page => {
+  const state = await observe(page, { lang: 'en' })
+  for (const [path, h1, tittel] of [
+    ['/slik-fungerer-det', 'How you share out a home with Arvklart', 'How you share out household contents with Arvklart'],
+    ['/om-oss', 'The team behind Arvklart', 'About us | Arvklart'],
+    ['/kontakt', 'What can we help you with?', 'Contact | Arvklart'],
+  ]) {
+    await page.goto(BASE + path)
+    await page.getByRole('heading', { level: 1, name: h1 }).waitFor()
+    assert(await page.title() === tittel, `${path}: tittel ${await page.title()}`)
+    assert(await page.locator('.ak').getAttribute('lang') === 'en', `${path}: feil språkmerking`)
+    assert(JSON.stringify(await canonicals(page)) === JSON.stringify([SITE_URL + path]), `${path}: ${await canonicals(page)}`)
+  }
+  // Språkbytte fra bunnteksten: samme side, nå på norsk
+  await page.getByRole('link', { name: 'Norsk', exact: true }).click()
+  await page.waitForFunction(() => localStorage.getItem('hs_lang') === 'no')
+  await page.waitForFunction(() => document.querySelector('.ak')?.lang === 'nb')
+  await page.getByRole('heading', { level: 1, name: 'Hva kan vi hjelpe deg med?' }).waitFor()
+  assert(new URL(page.url()).pathname === '/kontakt', `språkbytte flyttet siden til ${page.url()}`)
+  noErrors(await state())
+  // resetLang: false — ellers fjerner oppsettet språkvalget igjen når toggleLang laster siden på nytt,
+  // og testen måler bare den forhåndsrendrede norske HTML-en i stedet for selve byttet.
+}, { loggedIn: false, resetLang: false })
 
 for (const lang of ['no', 'en']) {
   await check(`Innlogget (${lang}) åpner «/» (bokmerke): forhåndsrendret tekst skjult, rett til appen på /app`, async page => {
@@ -108,7 +158,7 @@ for (const lang of ['no', 'en']) {
     await settle(page)
     const s = await state()
     assert(s.prerendered && s.visibility === 'hidden', `synlighet før appen: ${s.visibility}`)
-    assert(await page.locator('.lp').count() === 0, 'forsiden vises for en innlogget som åpnet «/» direkte')
+    assert(await page.locator('.ak').count() === 0, 'forsiden vises for en innlogget som åpnet «/» direkte')
     noErrors(s)
     assert((await canonicals(page)).length === 0, 'appen har canonical')
   })
@@ -121,8 +171,8 @@ await check('Innlogget: «Tilbake til hjemmesiden» viser forsiden, og «Gå til
   await page.locator('.tb-logo').click()
   await page.getByRole('menuitem', { name: /Tilbake til hjemmesiden/ }).click()
   await page.waitForURL(`${BASE}/`)
-  await page.locator('.lp.logged-in').waitFor()
-  await page.getByRole('button', { name: 'Gå til mine bo' }).first().click()
+  await page.locator('.ak.ak--innlogget').waitFor()
+  await page.getByRole('link', { name: 'Gå til mine bo' }).first().click()
   await page.waitForURL(`${BASE}/app`)
   await page.getByText('Testbo').first().waitFor()
   await page.locator('.tb-logo').click()
@@ -142,7 +192,7 @@ await check('Gammel adresse /home: permanent til «/» (ikke innlogget: forsiden
 await check('Gammel adresse /home uten innlogging: forsiden på «/»', async page => {
   await page.goto(`${BASE}/home`)
   await page.waitForURL(`${BASE}/`)
-  await page.getByRole('button', { name: 'Test ut demo nå' }).waitFor()
+  await demoKnapp(page).waitFor()
 }, { loggedIn: false })
 
 await check('E-postbekreftelse (#access_token på «/»): forsiden hydreres ikke, brukeren havner i appen', async page => {
@@ -178,7 +228,7 @@ await check('Innlogging fra forsiden: etter innlogging til appen på /app', asyn
   const { session } = await import('./fixtures.mjs')
   await page.route('https://test.supabase.co/auth/v1/token**', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(session) }))
   await page.goto(`${BASE}/`)
-  await page.locator('a.nav-login').first().click()
+  await (await loggInn(page)).click()
   await page.waitForURL(`${BASE}/logg-inn`)
   await page.locator('input[type=email]').fill('test@test.no')
   await page.locator('input[type=password]').fill('hemmelig')
@@ -187,13 +237,13 @@ await check('Innlogging fra forsiden: etter innlogging til appen på /app', asyn
   await page.getByText('Testbo').first().waitFor()
 }, { loggedIn: false })
 
-await check('Demo: «Test ut demo nå» fra forsiden «/» åpner demo-boet', async page => {
+await check('Demo: «Prøv demo» fra forsiden «/» åpner demo-boet', async page => {
   const demo = sessionFor(DEMO.email, DEMO.meta)
   await page.route('https://test.supabase.co/functions/v1/demo-login', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ access_token: demo.access_token, refresh_token: 'r' }) }))
   await page.route('https://test.supabase.co/auth/v1/user', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(demo.user) }))
   const state = await observe(page)
   await page.goto(`${BASE}/`)
-  await page.getByRole('button', { name: 'Test ut demo nå' }).click()
+  await demoKnapp(page).click()
   await page.waitForURL(`${BASE}/estate/${EST}`)
   await page.getByText(/Du ser på en/).waitFor()
   noErrors(await state())
@@ -201,7 +251,7 @@ await check('Demo: «Test ut demo nå» fra forsiden «/» åpner demo-boet', as
 
 await check('Innlogging virker som før fra den forhåndsrendrede forsiden', async page => {
   await page.goto(`${BASE}/`)
-  await page.locator('a.nav-login').first().click()
+  await (await loggInn(page)).click()
   await page.waitForURL(`${BASE}/logg-inn`)
   await page.locator('input[type=email]').waitFor()
   assert((await canonicals(page)).length === 0, 'innloggingssiden har canonical')
@@ -223,7 +273,7 @@ await check('Ukjent adresse: HTTP 404 med 404-siden (uten appen), og «Til forsi
   }
   await page.getByRole('link', { name: 'Til forsiden' }).click()
   await page.waitForURL(`${BASE}/`)
-  await page.getByRole('button', { name: 'Test ut demo nå' }).waitFor()
+  await demoKnapp(page).waitFor()
 }, { loggedIn: false })
 
 await check('Ukjent adresse med innlogging: 404-siden, og «Mine bo» går til appen', async page => {
