@@ -165,6 +165,37 @@ export default function HowItWorksPage({ loggedIn = false }) {
         )}</p>
       </PageHero>
 
+      {/* ============ VIDEOEN ============ */}
+      {/* Uten lyd, uten autostart og uten løkke: den starter bare når noen trykker, så den
+          respekterer både «reduser bevegelse» og databruk. Plakatbildet har samme mål som
+          videoen, så siden ikke hopper mens den lastes. De fire delene under sier det samme
+          i tekst, og det er tekstalternativet til videoen (WCAG 1.2.1). */}
+      <section className="ground g-natt sec sec--tight" aria-labelledby="h2-video">
+        <div className="rules" aria-hidden="true"><i /></div>
+        <div className="wrap">
+          <h2 id="h2-video" className="visuelt-skjult">{L('Film: Arvklart på ett minutt', 'Film: Arvklart in one minute')}</h2>
+          <figure className="vid">
+            <video className="vid__v" controls playsInline preload="metadata"
+              poster="/nettsted/produktvideo-plakat.webp" width={1920} height={1080}
+              aria-label={L(
+                'Film på 1 minutt og 15 sekunder, uten lyd: skjermbilder fra Arvklart som viser gjenstandene i et bo, ønskene fra familien og fordelingen.',
+                'A film of 1 minute 15 seconds, without sound: screens from Arvklart showing the items in an estate, the family’s wishes and the division.',
+              )}>
+              <source src="/nettsted/produktvideo.mp4" type="video/mp4" />
+              {L('Nettleseren din kan ikke spille av denne filmen. De fire delene under forklarer det samme i tekst.',
+                 'Your browser cannot play this film. The four parts below explain the same thing in text.')}
+            </video>
+            <figcaption className="cap">
+              <span className="label">{L('Film uten lyd', 'Film without sound')}</span>
+              <i>{L(
+                '1 min 15 sek. Alt filmen viser, står også i tekst i de fire delene under.',
+                '1 min 15 sec. Everything the film shows is also written out in the four parts below.',
+              )}</i>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
       {/* ============ DEL 1 ============ */}
       <Del n={1} id="h2-1" overline={L('Del 1 av 4', 'Part 1 of 4')}
         h2={L(<>Samle <em>gjenstandene</em></>, <>Gather the <em>items</em></>)}

@@ -1640,6 +1640,17 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 .ak .phero--slik{
   border-bottom:1px solid rgba(242,238,230,.1)
 }
+/* ---- filmen øverst ---- */
+.ak .vid{
+  margin:0 auto;max-width:1100px
+}
+.ak .vid__v{
+  display:block;width:100%;height:auto;aspect-ratio:16/9;
+  border:1px solid var(--rule);border-radius:2px;background:var(--natt)
+}
+.ak .vid .cap{
+  margin-top:clamp(12px,1.4vw,18px)
+}
 /* ---- en hoveddel ---- */
 .ak .del__h{
   display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,2vw,26px);align-items:baseline;
