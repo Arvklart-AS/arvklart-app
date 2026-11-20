@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { L } from '../lib/lang'
 import { DemoCta } from './SiteLayout'
 
 // FAST DEMOKNAPP PÅ MOBIL
@@ -40,7 +41,10 @@ export default function MobileDock({ demo, heroId = 'top', sluttId = 'h2-8' }) {
   return (
     <div className="dock" id="dock" aria-hidden="true" ref={dock}>
       <div className="dock__in">
-        <p className="dock__t"><b>Prøv eksempelboet</b>Ingen registrering.</p>
+        <p className="dock__t">
+          <b>{L('Prøv eksempelboet', 'Try the example estate')}</b>
+          {L('Ingen registrering.', 'No sign-up.')}
+        </p>
         <DemoCta demo={demo} tabIndex={-1} />
       </div>
     </div>

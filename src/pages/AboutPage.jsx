@@ -3,6 +3,7 @@ import PageHero from '../site/PageHero'
 import useDemo from '../site/useDemo'
 import { ArrowLink } from '../site/icons'
 import { Img } from '../site/Shot'
+import { L } from '../lib/lang'
 
 // /om-oss — en side om fire personer. Portrettene er det største elementet, og teksten står smalt
 // ved siden av, som i en programbok.
@@ -10,11 +11,11 @@ import { Img } from '../site/Shot'
 // MERK: rollebetegnelsene er foreløpige og skal bekreftes av hver enkelt før publisering
 // (integrasjonspakkens README, punkt 6.2). Se docs/ny-offentlig-nettside.md.
 
-const FOLK = [
-  { bilde: 't-bard.webp', navn: 'Bård Jakobsen Rinnan', rolle: 'Produkt og marked' },
-  { bilde: 't-andrea.webp', navn: 'Andrea Hufthammer Vik', rolle: 'Drift og fremdrift' },
-  { bilde: 't-orjan.webp', navn: 'Ørjan Westre', rolle: 'Teknologi og økonomi' },
-  { bilde: 't-julie.webp', navn: 'Julie Tvedt', rolle: 'Brukeropplevelse og piloter' },
+const FOLK = () => [
+  { bilde: 't-bard.webp', navn: 'Bård Jakobsen Rinnan', rolle: L('Produkt og marked', 'Product and market') },
+  { bilde: 't-andrea.webp', navn: 'Andrea Hufthammer Vik', rolle: L('Drift og fremdrift', 'Operations and delivery') },
+  { bilde: 't-orjan.webp', navn: 'Ørjan Westre', rolle: L('Teknologi og økonomi', 'Technology and finance') },
+  { bilde: 't-julie.webp', navn: 'Julie Tvedt', rolle: L('Brukeropplevelse og piloter', 'User experience and pilots') },
 ]
 
 export default function AboutPage({ loggedIn = false }) {
@@ -22,24 +23,32 @@ export default function AboutPage({ loggedIn = false }) {
 
   return (
     <SiteLayout current="/om-oss" demo={demo} loggedIn={loggedIn}>
-      <PageHero className="phero--om" crumb="Om oss" overline="Om oss"
-        h1={<>Teamet bak <em>Arvklart</em></>}
-        lead="Vi er fire som bygger et verktøy for familier som skal få oversikt over og fordele innbo og løsøre." />
+      <PageHero className="phero--om" crumb={L('Om oss', 'About us')} overline={L('Om oss', 'About us')}
+        h1={L(<>Teamet bak <em>Arvklart</em></>, <>The team behind <em>Arvklart</em></>)}
+        lead={L(
+          'Vi er fire som bygger et verktøy for familier som skal få oversikt over og fordele innbo og løsøre.',
+          'We are four people building a tool for families who need an overview of a home’s contents, and a way to share them out.',
+        )} />
 
       {/* ============ §1 OPPHAVET ============ */}
       <section className="ground g-papir sec" aria-labelledby="h2-1">
         <div className="rules" aria-hidden="true" />
         <div className="wrap">
-          <p className="overline">Hvor det begynte</p>
+          <p className="overline">{L('Hvor det begynte', 'Where it started')}</p>
           <div className="opphav">
-            <h2 className="opphav__sitat" id="h2-1">Ideen til Arvklart kom fra et behov i egen familie.</h2>
+            <h2 className="opphav__sitat" id="h2-1">{L(
+              'Ideen til Arvklart kom fra et behov i egen familie.',
+              'The idea for Arvklart came from a need in our own family.',
+            )}</h2>
             <div className="opphav__txt">
-              <p className="body">Da en i familien skulle flytte til en mindre bolig, skulle mange
-                gjenstander finne nye hjem. Familien trengte en felles oversikt over tingene og
-                hvem som ønsket hva.</p>
-              <p className="body">Gjennom Venture Creation ved NHH ble vi et team og bestemte oss for
-                å utvikle ideen videre. Nå bygger vi Arvklart for familier som skal få oversikt
-                over og fordele innbo og løsøre.</p>
+              <p className="body">{L(
+                'Da en i familien skulle flytte til en mindre bolig, skulle mange gjenstander finne nye hjem. Familien trengte en felles oversikt over tingene og hvem som ønsket hva.',
+                'When someone in the family was moving to a smaller home, a lot of things needed new homes. The family needed a shared overview of what there was, and of who wanted what.',
+              )}</p>
+              <p className="body">{L(
+                'Gjennom Venture Creation ved NHH ble vi et team og bestemte oss for å utvikle ideen videre. Nå bygger vi Arvklart for familier som skal få oversikt over og fordele innbo og løsøre.',
+                'Through Venture Creation at NHH we became a team and decided to take the idea further. Now we are building Arvklart for families who need an overview of a home’s contents, and a way to share them out.',
+              )}</p>
             </div>
           </div>
         </div>
@@ -49,16 +58,19 @@ export default function AboutPage({ loggedIn = false }) {
       <section className="ground g-papir sec sec--tight" aria-labelledby="h2-2">
         <div className="rules" aria-hidden="true" />
         <div className="wrap">
-          <p className="overline">De fire</p>
+          <p className="overline">{L('De fire', 'The four of us')}</p>
           <h2 id="h2-2" style={{ margin: 'clamp(14px,1.6vw,22px) 0 clamp(16px,2vw,26px)', maxWidth: '17ch' }}>
-            Fire personer, fire <em>ansvarsområder</em></h2>
-          <p className="body">Vi deler arbeidet mellom oss. Har du spørsmål om løsningen, er det
-            én innboks å skrive til, uansett hvem av oss som svarer.</p>
+            {L(<>Fire personer, fire <em>ansvarsområder</em></>, <>Four people, four <em>areas of responsibility</em></>)}</h2>
+          <p className="body">{L(
+            'Vi deler arbeidet mellom oss. Har du spørsmål om løsningen, er det én innboks å skrive til, uansett hvem av oss som svarer.',
+            'We share the work between us. If you have a question about the tool, there is one inbox to write to, whichever of us answers.',
+          )}</p>
 
           <ul className="folk">
-            {FOLK.map(p => (
+            {FOLK().map(p => (
               <li key={p.navn}>
-                <Img lazy src={p.bilde} w={460} h={575} alt={`Portrett av ${p.navn}.`} />
+                <Img lazy src={p.bilde} w={460} h={575}
+                  alt={L(`Portrett av ${p.navn}.`, `Portrait of ${p.navn}.`)} />
                 <p className="folk__n">{p.navn}</p>
                 <p className="folk__r">{p.rolle}</p>
               </li>
@@ -71,29 +83,40 @@ export default function AboutPage({ loggedIn = false }) {
       <section className="ground g-natt sec" aria-labelledby="h2-3">
         <div className="rules" aria-hidden="true"><i /></div>
         <div className="wrap">
-          <p className="overline">Hvorfor vi holder på</p>
+          <p className="overline">{L('Hvorfor vi holder på', 'Why we keep at it')}</p>
           <div className="hvorfor">
             <div className="hvorfor__txt">
-              <h2 id="h2-3">Vi bygger for den <em>praktiske</em> delen</h2>
-              <p className="body">Et arveoppgjør har mange sider. Arvklart tar for seg én av dem: å få
-                oversikt over gjenstandene, samle hva hver enkelt ønsker seg, og holde orden på
-                hva dere blir enige om.</p>
-              <p className="body">Et verktøy kan ikke ta en vanskelig samtale for noen. Det vi kan
-                gjøre, er å samle det dere trenger å snakke ut fra på ett sted.</p>
+              <h2 id="h2-3">{L(
+                <>Vi bygger for den <em>praktiske</em> delen</>,
+                <>We build for the <em>practical</em> part</>,
+              )}</h2>
+              <p className="body">{L(
+                'Et arveoppgjør har mange sider. Arvklart tar for seg én av dem: å få oversikt over gjenstandene, samle hva hver enkelt ønsker seg, og holde orden på hva dere blir enige om.',
+                'Settling an estate has many sides. Arvklart takes on one of them: getting an overview of the items, gathering what each person would like, and keeping track of what you agree on.',
+              )}</p>
+              <p className="body">{L(
+                'Et verktøy kan ikke ta en vanskelig samtale for noen. Det vi kan gjøre, er å samle det dere trenger å snakke ut fra på ett sted.',
+                'A tool cannot have a difficult conversation for anyone. What we can do is gather what you need to talk from in one place.',
+              )}</p>
             </div>
             <div className="hvorfor__ved">
-              <p className="label">Hva Arvklart er</p>
-              <p className="hvorfor__kort">Arvklart hjelper familien med oversikt og praktisk fordeling
-                av innbo. Familien tar beslutningene. Tjenesten erstatter ikke juridisk
-                rådgivning.</p>
-              <p className="micro">Vi ønsker kontakt med familier som vil prøve Arvklart og gi
-                tilbakemeldinger på hva som fungerer, og hva som bør bli bedre.</p>
+              <p className="label">{L('Hva Arvklart er', 'What Arvklart is')}</p>
+              <p className="hvorfor__kort">{L(
+                'Arvklart hjelper familien med oversikt og praktisk fordeling av innbo. Familien tar beslutningene. Tjenesten erstatter ikke juridisk rådgivning.',
+                'Arvklart helps the family with an overview and the practical sharing out of a home’s contents. The family makes the decisions. The service does not replace legal advice.',
+              )}</p>
+              <p className="micro">{L(
+                'Vi ønsker kontakt med familier som vil prøve Arvklart og gi tilbakemeldinger på hva som fungerer, og hva som bør bli bedre.',
+                'We would like to hear from families who want to try Arvklart and tell us what works, and what should be better.',
+              )}</p>
             </div>
           </div>
 
           <p style={{ marginTop: 'clamp(30px,3.6vw,50px)' }}>
-            <ArrowLink href="/slik-fungerer-det" small last="praksis">Se hvordan verktøyet
-              fungerer i</ArrowLink>
+            {L(
+              <ArrowLink href="/slik-fungerer-det" small last="praksis">Se hvordan verktøyet fungerer i</ArrowLink>,
+              <ArrowLink href="/slik-fungerer-det" small last="practice">See how the tool works in</ArrowLink>,
+            )}
           </p>
         </div>
       </section>
@@ -103,13 +126,20 @@ export default function AboutPage({ loggedIn = false }) {
         <div className="rules" aria-hidden="true" />
         <div className="wrap">
           <div className="end">
-            <p className="overline overline--c">Ta kontakt</p>
-            <h2 id="h2-4">Vi vil gjerne høre fra familier som står i <em>dette</em> nå</h2>
-            <p className="body">Skriv til oss hvis dere vil prøve Arvklart, eller se først hvordan
-              løsningen ser ut.</p>
+            <p className="overline overline--c">{L('Ta kontakt', 'Get in touch')}</p>
+            <h2 id="h2-4">{L(
+              <>Vi vil gjerne høre fra familier som står i <em>dette</em> nå</>,
+              <>We would like to hear from families going through <em>this</em> right now</>,
+            )}</h2>
+            <p className="body">{L(
+              'Skriv til oss hvis dere vil prøve Arvklart, eller se først hvordan løsningen ser ut.',
+              'Write to us if you want to try Arvklart, or look at the tool first.',
+            )}</p>
             <p className="end__cta">
-              <a className="btn" href="/kontakt">Kontakt oss</a>
-              <a className="ul ul--sub" href={demo.href} onClick={demo.onClick}>{demo.busy ? 'Åpner demo …' : 'Prøv demoen først'}</a>
+              <a className="btn" href="/kontakt">{L('Kontakt oss', 'Contact us')}</a>
+              <a className="ul ul--sub" href={demo.href} onClick={demo.onClick}>
+                {demo.busy ? L('Åpner demo …', 'Opening the demo …') : L('Prøv demoen først', 'Try the demo first')}
+              </a>
             </p>
             <DemoError demo={demo} center />
           </div>

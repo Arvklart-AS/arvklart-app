@@ -20,17 +20,21 @@ export const DEFAULT_META = {
   description_en: 'Arvklart helps families distribute an inheritance in an orderly, inclusive and fair way.',
 }
 
-// De fire markedssidene fra integrasjonspakken (19.11.2026) finnes bare på norsk. Som guidene i
-// content/guider/*.md får de derfor den norske tittelen og beskrivelsen også på engelsk, så en
-// besøkende som har valgt engelsk ikke får en engelsk tittel over norsk innhold. Språkvalget
-// gjelder appen, veiviseren og innloggingen som før. Se docs/ny-offentlig-nettside.md.
+// De fire markedssidene fra integrasjonspakken (19.11.2026) finnes på norsk og engelsk gjennom
+// L() i src/lib/lang.js, som resten av appen. Begge språk ligger på samme adresse — språket følger
+// kontoen og hs_lang, ikke URL-en — så det finnes ingen egne språkadresser. Derfor:
+//   - canonical er den ene adressen, og den er lik for begge språk
+//   - ingen hreflang: det ville krevd adresser per språk, og de finnes ikke
+//   - den forhåndsrendrede HTML-en, altså versjonen søkemotorene leser, er norsk (og:locale nb_NO)
+// RouteMeta bytter tittel og beskrivelse i nettleseren etter språkvalget.
+// Se docs/ny-offentlig-nettside.md for hva som skal til for indekserbar engelsk.
 export const PUBLIC_PAGES = [
   {
     path: '/',
     title: 'Fordeling av innbo ved arv | Arvklart',
-    title_en: 'Fordeling av innbo ved arv | Arvklart',
+    title_en: 'Sharing out household contents in an inheritance | Arvklart',
     description: 'Samle bilder av innboet, se familiens ønsker og dokumenter fordelingen i Arvklart. Prøv den offentlige demoen uten registrering.',
-    description_en: 'Samle bilder av innboet, se familiens ønsker og dokumenter fordelingen i Arvklart. Prøv den offentlige demoen uten registrering.',
+    description_en: 'Gather photos of the household contents, see the family’s wishes and document the division in Arvklart. Try the public demo without signing up.',
     prerender: true,
     sitemap: true,
     organization: true,
@@ -39,27 +43,27 @@ export const PUBLIC_PAGES = [
   {
     path: '/slik-fungerer-det',
     title: 'Slik fordeler dere innbo med Arvklart',
-    title_en: 'Slik fordeler dere innbo med Arvklart',
+    title_en: 'How you share out household contents with Arvklart',
     description: 'Én person oppretter boet og inviterer familien. Dere samler gjenstandene, legger inn ønsker og dokumenterer fordelingen dere blir enige om.',
-    description_en: 'Én person oppretter boet og inviterer familien. Dere samler gjenstandene, legger inn ønsker og dokumenterer fordelingen dere blir enige om.',
+    description_en: 'One person creates the estate and invites the family. You gather the items, register wishes and document the division you agree on.',
     prerender: true,
     sitemap: true,
   },
   {
     path: '/om-oss',
     title: 'Om oss | Arvklart',
-    title_en: 'Om oss | Arvklart',
+    title_en: 'About us | Arvklart',
     description: 'Teamet bak Arvklart. Ideen kom fra et behov i egen familie ved flytting til mindre bolig. Fire personer utvikler verktøyet videre.',
-    description_en: 'Teamet bak Arvklart. Ideen kom fra et behov i egen familie ved flytting til mindre bolig. Fire personer utvikler verktøyet videre.',
+    description_en: 'The team behind Arvklart. The idea came from a need in our own family when someone moved to a smaller home. Four people are building it.',
     prerender: true,
     sitemap: true,
   },
   {
     path: '/kontakt',
     title: 'Kontakt | Arvklart',
-    title_en: 'Kontakt | Arvklart',
+    title_en: 'Contact | Arvklart',
     description: 'Spør oss om Arvklart, eller meld interesse for å prøve verktøyet med din egen familie. Skriv til admin@arvklart.no.',
-    description_en: 'Spør oss om Arvklart, eller meld interesse for å prøve verktøyet med din egen familie. Skriv til admin@arvklart.no.',
+    description_en: 'Ask us about Arvklart, or register interest in trying the tool with your own family. Write to admin@arvklart.no.',
     prerender: true,
     sitemap: true,
   },

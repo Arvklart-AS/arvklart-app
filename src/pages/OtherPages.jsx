@@ -148,7 +148,11 @@ export function CategoriesPage({ onToast }) {
 
 // ── PrivacyPage ───────────────────────────────────────────────────────────────
 // Fyll inn når selskapet er registrert; da vises navn og org.nr. som behandlingsansvarlig.
-const COMPANY = { name: '', orgnr: '' }
+// Verifisert 19.11.2026 mot Enhetsregisteret (data.brreg.no/enhetsregisteret/api/enheter/938816085):
+// ARVKLART AS, aksjeselskap, registrert i Enhets- og Foretaksregisteret 05.11.2026, stiftet 02.11.2026,
+// Tertnesgrenden 13, 5113 Tertnes (Bergen). Ikke konkurs, ikke under avvikling.
+// Samme opplysninger står i bunnteksten på de offentlige sidene (src/site/SiteLayout.jsx).
+const COMPANY = { name: 'Arvklart AS', orgnr: '938 816 085' }
 
 export function PrivacyPage() {
   const [tab, setTab] = useState(() => window.location.hash === '#vilkar' ? 'terms' : 'privacy')

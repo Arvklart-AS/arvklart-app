@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { isEn, setLang } from '../lib/lang'
+import { L, isEn, setLang } from '../lib/lang'
 import { HOME } from '../lib/routes'
 import { useHydrated } from './useHydrated'
 import './site.css'
@@ -7,41 +7,42 @@ import './site.css'
 // Rammen rundt de fire offentlige sidene (/, /slik-fungerer-det, /om-oss, /kontakt).
 //
 // All CSS ligger i site.css og er avgrenset til rotklassen «ak». Appen, demoen og innloggingen
-// bruker ingen av reglene, og ingen av dem treffer inn hit.
+// bruker ingen av reglene; se docs/ny-offentlig-nettside.md for hva avgrensningen dekker og ikke.
 //
-// Sidene er på norsk. Språkvalget på kontoen gjelder appen, veiviseren og innloggingen som før,
-// så lenken «English» står igjen i bunnteksten; innholdet her er merket lang="nb" uansett valg,
-// siden det ikke finnes en engelsk versjon av disse sidene ennå (se docs/ny-offentlig-nettside.md).
+// Språk: sidene finnes på norsk og engelsk gjennom prosjektets egen løsning (L() i src/lib/lang.js).
+// Begge språk ligger på samme adresse – språket følger kontoen og hs_lang, ikke URL-en – så det
+// finnes ingen egne språkadresser å peke hreflang til. Rotelementet merkes med gjeldende språk.
 //
 // «Prøv demo» er alltid en lenke til /#demo, så den virker uten JavaScript. Med JavaScript starter
 // den demoen med én gang (src/site/useDemo.js). Elementtypen endres ikke ved hydrering.
 
-const NAV = [
-  { href: '/slik-fungerer-det', label: 'Slik fungerer det' },
-  { href: '/veiviser', label: 'Veiviser' },
-  { href: '/om-oss', label: 'Om oss' },
-  { href: '/logg-inn', label: 'Logg inn' },
+const NAV = () => [
+  { href: '/slik-fungerer-det', label: L('Slik fungerer det', 'How it works') },
+  { href: '/veiviser', label: L('Veiviser', 'Guide') },
+  { href: '/om-oss', label: L('Om oss', 'About us') },
+  { href: '/logg-inn', label: L('Logg inn', 'Log in') },
 ]
 
-const FOOT = [
-  { href: HOME, label: 'Forsiden' },
-  { href: '/slik-fungerer-det', label: 'Slik fungerer det' },
-  { href: '/om-oss', label: 'Om oss' },
-  { href: '/veiviser', label: 'Veiviser' },
-  { href: '/kontakt', label: 'Kontakt' },
-  { href: '/personvern', label: 'Personvern' },
-  { href: '/personvern#vilkar', label: 'Vilkår' },
-  { href: '/logg-inn', label: 'Logg inn' },
+const FOOT = () => [
+  { href: HOME, label: L('Forsiden', 'Home') },
+  { href: '/slik-fungerer-det', label: L('Slik fungerer det', 'How it works') },
+  { href: '/om-oss', label: L('Om oss', 'About us') },
+  { href: '/veiviser', label: L('Veiviser', 'Guide') },
+  { href: '/kontakt', label: L('Kontakt', 'Contact') },
+  { href: '/personvern', label: L('Personvern', 'Privacy') },
+  { href: '/personvern#vilkar', label: L('Vilkår', 'Terms') },
+  { href: '/logg-inn', label: L('Logg inn', 'Log in') },
 ]
 
-// Språkbytte for besøkende som ikke er innlogget (innloggede bytter i TopBar og under «Min konto»)
+// Språkbytte for besøkende som ikke er innlogget (innloggede bytter i TopBar og under «Min konto»).
+// Siden lastes på nytt, så hele siden – inkludert tittel og lang-attributtet – bytter samtidig.
 const toggleLang = (e) => {
   e.preventDefault()
   setLang(isEn() ? 'no' : 'en')
   window.location.reload()
 }
 
-export function DemoCta({ demo, className = 'btn', idle = 'Prøv demo', tabIndex }) {
+export function DemoCta({ demo, className = 'btn', idle, tabIndex }) {
   return (
     <a className={className} href={demo.href} onClick={demo.onClick} tabIndex={tabIndex} aria-busy={demo.busy || undefined}>
       {demo.label(idle)}
@@ -78,18 +79,18 @@ function Header({ demo, current, onFront }) {
     <header className="hdr">
       <div className="hdr__in">
         <a className="brand" href={onFront ? '#top' : HOME}
-          aria-label={onFront ? 'Arvklart, til toppen av siden' : 'Arvklart, til forsiden'}>
+          aria-label={onFront ? L('Arvklart, til toppen av siden', 'Arvklart, to the top of the page') : L('Arvklart, til forsiden', 'Arvklart, to the home page')}>
           <span className="brand__mark" aria-hidden="true" />
         </a>
 
-        <nav className="nav" aria-label="Hovedmeny">
-          {NAV.map(l => <a key={l.href} href={l.href} {...mark(l.href)}>{l.label}</a>)}
+        <nav className="nav" aria-label={L('Hovedmeny', 'Main menu')}>
+          {NAV().map(l => <a key={l.href} href={l.href} {...mark(l.href)}>{l.label}</a>)}
         </nav>
 
         <details className="menu" ref={menu} onClick={closeMenu}>
-          <summary>Meny</summary>
+          <summary>{L('Meny', 'Menu')}</summary>
           <div className="menu__panel">
-            {NAV.map(l => <a key={l.href} href={l.href} {...mark(l.href)}>{l.label}</a>)}
+            {NAV().map(l => <a key={l.href} href={l.href} {...mark(l.href)}>{l.label}</a>)}
           </div>
         </details>
 
@@ -100,22 +101,24 @@ function Header({ demo, current, onFront }) {
 }
 
 function Footer({ current }) {
-  const links = FOOT.filter(l => !(current === HOME && l.href === HOME))
+  const links = FOOT().filter(l => !(current === HOME && l.href === HOME))
   return (
     <footer className="ground g-natt foot">
       <div className="rules" aria-hidden="true" />
       <div className="wrap">
         <div className="foot__in">
-          <p className="foot__t">Arvklart er et digitalt verktøy for fordeling av innbo og løsøre.
-            Familien tar beslutningene.</p>
-          <nav className="foot__links" aria-label="Bunnmeny">
+          <p className="foot__t">{L(
+            'Arvklart er et digitalt verktøy for fordeling av innbo og løsøre. Familien tar beslutningene.',
+            'Arvklart is a digital tool for sharing out household contents and personal belongings. The family makes the decisions.',
+          )}</p>
+          <nav className="foot__links" aria-label={L('Bunnmeny', 'Footer menu')}>
             {links.map(l => (
               <a key={l.href} href={l.href} {...(l.href === current ? { 'aria-current': 'page' } : {})}>{l.label}</a>
             ))}
-            {/* Språkvalget gjelder appen, veiviseren og innloggingen; disse sidene finnes bare på norsk */}
             <a href="#" onClick={toggleLang} lang={isEn() ? 'no' : 'en'}>{isEn() ? 'Norsk' : 'English'}</a>
           </nav>
-          <p className="foot__org">Arvklart AS &middot; Org.nr. 938&nbsp;816&nbsp;085</p>
+          {/* Verifisert mot Enhetsregisteret 19.11.2026; samme opplysninger i personvernerklæringen */}
+          <p className="foot__org">Arvklart AS &middot; {L('Org.nr.', 'Company no.')} 938&nbsp;816&nbsp;085</p>
         </div>
       </div>
     </footer>
@@ -126,9 +129,9 @@ export default function SiteLayout({ current, demo, loggedIn = false, children, 
   const hydrated = useHydrated()
   const onFront = current === HOME
   return (
-    <div className={`ak${hydrated ? ' ak-js' : ''}${loggedIn ? ' ak--innlogget' : ''}`} lang="nb">
+    <div className={`ak${hydrated ? ' ak-js' : ''}${loggedIn ? ' ak--innlogget' : ''}`} lang={isEn() ? 'en' : 'nb'}>
       {/* Innlogget ligger menyen i TopBar, og «Hopp til innholdet» hører til den */}
-      {!loggedIn && <a className="skip" href="#innhold">Hopp til innholdet</a>}
+      {!loggedIn && <a className="skip" href="#innhold">{L('Hopp til innholdet', 'Skip to content')}</a>}
       {!loggedIn && <Header demo={demo} current={current} onFront={onFront} />}
       <main id="innhold">{children}</main>
       {/* etter <main>: den faste demoknappen på mobil, som ikke er en del av innholdet */}

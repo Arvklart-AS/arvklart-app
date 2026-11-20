@@ -1,12 +1,20 @@
+import { L } from '../lib/lang'
+
 // Skjermbilder fra produktet. Hvert utsnitt har en synlig etikett («Skjermbilde fra demoen» eller
 // «Skjermbilde fra Arvklart») og width/height i markupen. Begge er krav fra integrasjonspakken:
 // etiketten fordi bildene er statiske utsnitt og ikke levende komponenter, målene fordi siden
 // ellers hopper mens bildene lastes.
+//
+// Skjermbildene viser det norske grensesnittet. Det står i den engelske etiketten, så en engelsk
+// leser ikke tror appen er oversatt i bildet. Bildene manipuleres ikke.
 
 export function Cap({ kilde = 'demoen', children, center = false, as: Tag = 'figcaption' }) {
+  const label = kilde === 'arvklart'
+    ? L('Skjermbilde fra Arvklart', 'Screenshot from Arvklart (Norwegian interface)')
+    : L('Skjermbilde fra demoen', 'Screenshot from the demo (Norwegian interface)')
   return (
     <Tag className={center ? 'cap cap--c' : 'cap'}>
-      <span className="label">{kilde === 'arvklart' ? 'Skjermbilde fra Arvklart' : 'Skjermbilde fra demoen'}</span>
+      <span className="label">{label}</span>
       <i>{children}</i>
     </Tag>
   )

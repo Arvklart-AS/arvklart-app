@@ -105,6 +105,12 @@
 .ak p{
   margin:0
 }
+/* Appens globale reset i index.html (* { margin:0; padding:0 }) gjelder også inne i «.ak».
+   Disse sidene skal ikke være avhengige av den, og ikke av nettleserens standardmarger:
+   elementene under settes derfor uttrykkelig her. Se docs/ny-offentlig-nettside.md. */
+.ak dl,.ak dt,.ak dd,.ak figure,.ak figcaption,.ak blockquote,.ak fieldset{
+  margin:0;padding:0
+}
 .ak ol,.ak ul{
   margin:0;padding:0;list-style:none
 }
@@ -607,6 +613,9 @@ må holde kontrastkravet. */
   border-top:1px solid var(--rule);padding-top:clamp(18px,2.2vw,28px)
 }
 .ak .adr__e{
+  /* Lenken er et rutenettsfelt; uten dette strekkes klikkflaten over hele spalten selv om
+     teksten er kort, og den havner under andre flater som ligger nederst på skjermen. */
+  justify-self:start;
   font-family:var(--serif);font-optical-sizing:none;
   font-size:clamp(1.45rem,1rem + 2.3vw,3rem);line-height:1.1;letter-spacing:-.02em;
   color:var(--lin);text-decoration:none;display:inline-block;word-break:break-word;
@@ -773,6 +782,8 @@ et hull midt i overskriften. Dette er den samme messingen trukket mot linet,
 altså en blanding av to farger som allerede står i paletten. Den holder
 overskriften lys og peker mot den varme lyskjeglen bak. */
 .ak .hero{
+  /* Fallback for nettlesere uten color-mix() (Safari under 16.2): samme blanding, fast verdi */
+  --ordfarge:#D7BA9A;
   --ordfarge:color-mix(in srgb, var(--messing-lys) 62%, var(--lin))
 }
 .ak .ordslot__i{
@@ -806,10 +817,30 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
 }
 .ak .hero__micro{
   display:inline-flex;align-items:center;gap:.6em;color:var(--lin-dempet);
-  font-size:1rem;text-align:left
+  font-size:1rem;text-align:left;flex-wrap:wrap;justify-content:center
 }
-.ak .hero__micro svg{
+.ak .hero__micro > svg{
   flex:0 0 auto;color:var(--mose)
+}
+/* ---- pause/start for ordskiftet (WCAG 2.2.2) ----
+   Knappen står alltid i HTML-en, men er usynlig til «.ak-js» er satt. Da flytter ikke heroen seg
+   når JavaScript tar over, og uten JavaScript er den verken synlig, fokuserbar eller i
+   tilgjengelighetstreet. Ved «reduser bevegelse» er det ingen bevegelse å stanse, så den tas bort. */
+.ak .ordpause{
+  visibility:hidden;
+  display:inline-flex;align-items:center;gap:.5em;flex:0 0 auto;
+  min-height:44px;padding:0 .1em;margin-left:.2em;
+  background:none;border:0;cursor:pointer;
+  font-family:var(--sans);font-size:.95rem;font-weight:500;color:var(--lin-dempet);
+  background-image:linear-gradient(currentColor,currentColor);
+  background-size:0% 1px;background-repeat:no-repeat;background-position:0 calc(50% + .8em);
+  transition:background-size var(--t-m) var(--ease),color var(--t-s) var(--ease);
+}
+.ak.ak-js .ordpause{visibility:visible}
+.ak .ordpause:hover{color:var(--lin);background-size:100% 1px}
+.ak .ordpause__i{display:inline-flex;align-items:center;color:var(--mose)}
+@media (prefers-reduced-motion: reduce){
+  .ak .ordpause{display:none}
 }
 @media (max-width:980px){
   .ak .hero{
@@ -895,6 +926,11 @@ halvparten. Lyset kommer fra øvre venstre.
 .ak .rigg{
   position:relative;width:min(100%,1140px);height:var(--frameH);overflow:hidden;
   translate:0 calc((1 - var(--lift)) * 2.4svh);
+  /* Fallback uten color-mix(): sluttilstanden (--lift 1), altså den lyse enheten. Da mister
+     overgangen fargeskiftet på rammene, men enhetene er lyse og lesbare hele veien. */
+  --skall:#E6E2D8;
+  --skallkant:#C2BEB2;
+  --skallmork:#CDC8BC;
   --skall:color-mix(in srgb, #E6E2D8 calc(var(--lift) * 100%), #2C2F2A);
   --skallkant:color-mix(in srgb, #C2BEB2 calc(var(--lift) * 100%), rgba(242,238,230,.2));
   --skallmork:color-mix(in srgb, #CDC8BC calc(var(--lift) * 100%), #23261F);

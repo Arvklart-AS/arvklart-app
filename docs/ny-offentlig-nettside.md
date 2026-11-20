@@ -1,315 +1,399 @@
 # Ny offentlig nettside — integrasjon av designpakken av 19.11.2026
 
-Dette dokumentet beskriver hvordan integrasjonspakken (`integrasjon/`, bygget 19. november 2026) er
-tatt inn i produktrepoet, hvilke valg som er tatt underveis, hva som er testet, og hva som må
-avklares før sidene publiseres.
+De fire offentlige sidene (`/`, `/slik-fungerer-det`, `/om-oss`, `/kontakt`) er bygget opp igjen i
+React fra integrasjonspakken. Appen, demoen, Supabase, innloggingen, invitasjonene, veiviseren og
+personvernerklæringens innhold er ikke endret. Ingen migreringer, ingen edge-funksjoner, ingen
+demodata.
 
-Appen, demoen, Supabase, innloggingen, invitasjonene, veiviseren og personvernerklæringen er ikke
-endret. Ingen migreringer, ingen edge-funksjoner, ingen demodata.
+`senere/guider-skisse.html` er ikke publisert og ligger ikke i repoet.
 
 ---
 
 ## 1. Hva som er bygget
 
-| Rute | Komponent | Status |
-|---|---|---|
-| `/` | `src/pages/LandingPage.jsx` | Erstatter dagens forside |
-| `/slik-fungerer-det` | `src/pages/HowItWorksPage.jsx` | Ny |
-| `/om-oss` | `src/pages/AboutPage.jsx` | Ny |
-| `/kontakt` | `src/pages/ContactPage.jsx` | Erstatter dagens kontaktside |
-
-`senere/guider-skisse.html` er **ikke** publisert og ligger ikke i repoet.
-
-### Filer
-
 ```
 src/site/                 felles grunnlag for de offentlige sidene
   site.css                all CSS, avgrenset til rotklassen «.ak»
-  SiteLayout.jsx          header, meny, bunntekst, demoknapp, hoppelenke
+  SiteLayout.jsx          header, meny, bunntekst, demoknapp, hoppelenke, språkvalg
   PageHero.jsx            sidetopp med brødsmule (undersidene)
-  Rotator.jsx             ordskiftet i forsidens overskrift
+  Rotator.jsx             ordskiftet i overskriften + pause/start (WCAG 2.2.2)
   Signature.jsx           overgangen fra mørke til lys, med enhetsgruppen
   Journey.jsx             produktreisen, fire steg
   Faq.jsx                 spørsmål og svar
   MobileDock.jsx          fast demoknapp på mobil
   Shot.jsx                skjermbilder med etikett og faste mål
-  icons.jsx               pilene og haken fra pakken
-  useDemo.js              demoinngangen (samme flyt som før)
-  useHydrated.js          «ak-js» settes først når React har tatt over
+  icons.jsx, useDemo.js, useHydrated.js
 
 public/nettsted/          18 skjermbilder og portretter + logo-maske.png
 public/fonter/            Bodoni Moda (normal + kursiv) og SIL OFL-lisensen
 ```
 
-### Slik henger det sammen
-
-* **All CSS er avgrenset til `.ak`.** Appen, demoen og innloggingen treffes ikke av en eneste regel
-  herfra, og ingen av deres regler treffer inn. `test/seo/seo.test.js` og e2e-testene av appen
-  kjører uendret.
+* **All CSS er avgrenset til `.ak`.** Se punkt 6 for hva avgrensningen faktisk dekker.
 * **`.ak-js` settes av `useHydrated()`**, ikke av et skript i HTML-en. HTML-en fra
   forhåndsrenderingen er derfor den ferdige versjonen uten JavaScript, og hydreringen legger bare
   til — den fjerner ingen noder (`test/e2e/seo.mjs` håndhever det).
-* **Flatene (`.g-natt` / `.g-papir` / `.g-jord`)** setter `--ink`, `--muted`, `--rule`, `--accent`,
-  `--btn-bg` og `--focus` videre, slik pakken krever. Mønsteret er beholdt.
-* **«Prøv demo» er alltid en `<a href="/#demo">`**, aldri en `<button>`. Uten JavaScript går den til
-  demoseksjonen på forsiden; med JavaScript stoppes navigeringen og `startDemoSession()` kjører —
-  nøyaktig den samme flyten som før. Elementtypen er lik før og etter hydrering, så DOM-en er
-  uendret. Ingen ny demo er bygget.
+* **«Prøv demo» er alltid en `<a href="/#demo">`.** Uten JavaScript går den til demoseksjonen på
+  forsiden; med JavaScript stoppes navigeringen og `startDemoSession()` kjører — nøyaktig den samme
+  flyten som før. Ingen ny demo.
 
 ---
 
-## 2. Valg som er tatt
+## 2. Hva som er rettet i denne runden
 
-### 2.1 CSS i egen fil, ikke i en `<style>` i komponenten
+### 2.1 Produktpåstandene
 
-Pakken har ~1 000 linjer CSS. Lagt i en JavaScript-streng ville den gått inn i hovedfilen, som
-allerede lå på 155 kB gzip mot et budsjett på 175 kB (`JS_BUDGET_GZIP`). `src/site/site.css`
-importeres i stedet av `SiteLayout.jsx` og blir et eget stilark (48 kB rå, **9,6 kB gzip**), som
-ikke teller mot JavaScript-budsjettet, minimeres, og caches for seg.
+Tre påstander stemte ikke med koden. De er rettet, ikke erstattet med nye løfter.
+`test/seo/nettsted.test.js` feiler hvis de gamle formuleringene kommer tilbake.
 
-Det er et avvik fra «ingen CSS-filer» i `CLAUDE.md`. Regelen gjelder komponenter som bruker inline
-`style`-props; et designsystem på 1 000 linjer hører ikke hjemme der. `CLAUDE.md` er oppdatert.
+| Sto før | Står nå | Hva koden gjør |
+|---|---|---|
+| «Hvem som velger når, og hvor mange runder, avtaler dere selv» | «Administrator setter rekkefølgen, enten som listen står eller trukket tilfeldig. Den som velger sist i én runde, velger først i neste. Rundene går til det ikke er mer å velge.» | `ConflictPage.jsx:468–492`: rekkefølgen er listen eller `shuffleSnake()`; rundene snur; de går til gjenstandene er oppbrukt |
+| «filtreres på … hva bare én vil ha, og hva ingen har svart på ennå» | «filtreres på dine egne svar, på hva flere har sagt ja til, hva noen vil ha, hva ingen har sagt ja til, og hva som allerede er tildelt» | `EstatePage.jsx:145–152`: Alle / Mine / Ettertraktede / Noen vil ha / Ingen vil ha / Tildelt |
+| «Alle kan foreslå en verdi» | «Er det satt et KI-anslag, kan hver deltaker si seg uenig og foreslå et annet beløp. Fordelingsverdien … settes av den som administrerer boet.» | `ItemDetailPage.jsx:265–332` + `vote_item_value`: bare som «Uenig», én gang per bruker, og bare når gjenstanden har `estimated_value` |
 
-### 2.2 Fonter: Bodoni Moda selvhostet, Karla fortsatt fra Google
+I tillegg, der begrensningen er relevant for leseren:
 
-* **Bodoni Moda** (normal + kursiv) selvhostes fra `public/fonter/`. Ny familie, ingen konflikt.
-  `font-optical-sizing: none` er beholdt, slik pakken krever.
-* **Karla** hentes fortsatt fra Google Fonts, som i dag. En lokal `@font-face` med familienavnet
-  `Karla` ville blitt deklarert *etter* `<link>`-en i `index.html` og dermed overstyrt appens egne
-  vekter (300/500/600) med den ene 400-fila i pakken. Det ville endret typografien i appen, som
-  oppgaven sier skal være urørt.
-* Reservefontene `Bodoni reserve` og `Karla reserve` med målte `size-adjust`-verdier er beholdt.
+* På «Slik fungerer det» §4 står det nå uttrykkelig at **«Ingen vil ha» samler både det alle har
+  sagt nei takk til og det ingen har rukket å svare på** (`getStatusBreakdown` i
+  `estateProgress.js` teller gjenstander uten interesser), og at den som administrerer boet ser
+  hvem som mangler.
+* «Ingen frist i løsningen» → **«Ingen frist fra Arvklart»**. Familien kan selv sette datoer på
+  oppgaver i boet (`TasksPage.jsx`); Arvklart setter ingen.
+* Forsidens steg 2 sa «hva som ennå ikke er besvart». Oversikten viser ditt eget antall ubesvarte,
+  ikke en egen fane, så teksten sier nå **«hvor mange gjenstander du selv ikke har tatt stilling
+  til»**.
 
-**Verdt å vite:** pakkens `karla-400-latin.woff2` er en *variabel* font (vekt 300–700, kontrollert i
-nettleseren) på 15 kB. Den dekker alle vektene appen bruker. Å selvhoste Karla for hele nettstedet
-ville fjernet et tredjepartskall til Google (personvern) og tre statiske fontfiler, men det endrer
-appens typografi og hører derfor til i en egen endring. Se punkt 5.
+Kontrollert og uendret, fordi de stemmer: invitasjonen deles av et menneske og deltakeren logger
+inn med den registrerte e-posten; administrator setter fordelingsverdien; et KI-anslag er ikke en
+takst; godkjenning er ikke BankID; loddtrekning skjer blant dem som ønsker gjenstanden; metodene
+gjennomføres av administrator; «3 arvinger og 10 gjenstander»; «Last ned utkast (PDF)»;
+begrunnelsen er valgfri; en gjenstand kan legges inn uten bilde; alle medlemmer kan registrere.
 
-### 2.3 Språk: sidene er på norsk
+### 2.2 Pause/start for ordskiftet (WCAG 2.2.2)
 
-Pakken er bare norsk. Dagens forside og kontaktside er tospråklige (`L()`).
+`RotatorPause` i `src/site/Rotator.jsx`, plassert i heroen ved siden av «Ingen registrering».
 
-Valgt løsning, som ikke fjerner funksjonalitet:
+* `<button>` med `aria-pressed`, og navnet skifter mellom «Pause ordskiftet» og «Start ordskiftet»
+  (engelsk: «Pause/Resume the word animation»).
+* Står **alltid** i HTML-en og er `visibility:hidden` til `.ak-js` er satt. Da flytter ikke heroen
+  seg når JavaScript tar over, og uten JavaScript er knappen verken synlig, fokuserbar eller i
+  tilgjengelighetstreet.
+* Ved `prefers-reduced-motion: reduce` er det ingen bevegelse å stanse, og knappen tas helt bort.
+* På pause blir uttrykket som står, stående — den hopper ikke tilbake til det første.
+* Overskriften har fortsatt **én stabil tilgjengelig tekst**: båndet er `aria-hidden`, og det
+  første uttrykket ligger som visuelt skjult tekst ved siden av.
 
-* De fire sidene er på norsk, og innholdet er merket `lang="nb"` på `.ak`.
-* I `src/seo/pages.js` er `title_en`/`description_en` satt lik den norske teksten — samme mønster
-  som guidene i `content/guider/`, som også bare finnes på norsk. En besøkende med engelsk språkvalg
-  får dermed norsk tittel over norsk innhold, ikke en engelsk tittel over norsk tekst.
-* Lenken «English» står igjen i bunnteksten. Språkvalget gjelder appen, veiviseren og innloggingen
-  som før.
+Manuelt kontrollert i Chromium, ikke bare med axe: knappen er tabulatorstopp nr. 10 (1440 px) og
+nr. 7 (390 px), alle stopp har synlig fokusring, `aria-pressed` skifter, ordskiftet står virkelig
+stille på pause (samme uttrykk etter 4,6 s) og starter igjen etterpå. Skjermbilde med fokusring i
+leveransen.
 
-**Ingen engelsk oversettelse er skrevet.** Se punkt 5.
+### 2.3 Selskapsopplysningene
 
-### 2.4 Logoen
+Verifisert 19.11.2026 mot Enhetsregisterets offisielle API
+(`data.brreg.no/enhetsregisteret/api/enheter/938816085`):
 
-Pakkens README anbefaler den ekte SVG-logoen med `fill="currentColor"`. Den kan ikke brukes:
-`public/ARVKLART Horizontal Negative.svg` er ikke en path-logo, men et punktbilde pakket inn i SVG
-med filtre og masker (72 kB, sideforhold 3,56). Pakkens `logo-maske.png` (460×122, sideforhold 3,77,
-11 kB) er laget for formålet og er lagt i `public/nettsted/`. Den lastes som vanlig fil fra samme
-opphav, så CORS-problemet README beskriver (som gjaldt `file://`) finnes ikke her.
+```
+ARVKLART AS · org.nr. 938 816 085 · Aksjeselskap
+registrert i Enhets- og Foretaksregisteret 05.11.2026, stiftet 02.11.2026
+Tertnesgrenden 13, 5113 Tertnes (Bergen)
+konkurs: nei · under avvikling: nei
+vedtektsfestet formål: «Produsere digital løsning for å gjøre arveoppgjør enklere og mer
+oversiktlig for familier.»
+```
 
-### 2.5 Strukturerte data
+`COMPANY` i `src/pages/OtherPages.jsx` er satt til `Arvklart AS` / `938 816 085`, så
+personvernerklæringen og bunnteksten oppgir det samme. `test/seo/nettsted.test.js` feiler hvis de
+to skiller lag.
 
-Pakken har `Organization`, `WebSite`, `WebPage`, `SoftwareApplication` og `FAQPage` i en `@graph`.
-Bare `WebSite` og `Organization` på forsiden er tatt med — det repoet allerede gjør, og det
-`test/seo/seo.test.js` håndhever («bare opplysninger som står på nettstedet», ingen `offers`,
-`aggregateRating` eller `review`).
+Forretningsadressen er **ikke** lagt inn i personvernerklæringen; den sto ikke der fra før, og det
+er en vurdering dere bør ta (GDPR art. 13 krever identiteten og kontaktopplysningene til
+behandlingsansvarlig — e-postadressen står der).
 
-`FAQPage` er utelatt fordi Google i 2023 sluttet å vise FAQ-utdrag for andre enn myndigheter og
-helseinstitusjoner. `SoftwareApplication` uten pris eller vurdering gir ingen kjent effekt. Begge kan
-legges til hvis dere vil — si fra, så gjør jeg det i en egen endring.
+### 2.4 Engelsk
 
-### 2.6 Navigering med vanlige lenker
+Alle fire sidene finnes nå på norsk og engelsk, med prosjektets egen `L()`-løsning. Oversatt:
+navigasjon, brødsmuler, overskrifter, brødtekst, knapper, FAQ, bildetekster, `alt`-tekster,
+`aria-label`-er, tilgjengelige navn, feilmeldinger, mailto-emner og metadata.
 
-Alle interne lenker mellom de offentlige sidene er vanlige `<a href>`, ikke `react-router`-lenker.
-Det er mønsteret de offentlige sidene allerede bruker, det gir hver side den forhåndsrendrede
-HTML-en (rask og komplett uten JavaScript), og det gir riktige sidevisninger i GA4 uten oppsett i
-GTM-containeren.
+* **Norsk juridisk kontekst er beholdt.** Ingen tilpasning til britisk eller amerikansk arverett:
+  «does not determine inheritance rights under Norwegian law», «official Norwegian resources»,
+  «not a calculation of inheritance shares under Norwegian law».
+* **Skjermbildene er ikke manipulert.** Den engelske etiketten sier «Screenshot from the demo
+  (Norwegian interface)», og norske knappenavn i `alt`-tekster står i anførselstegn med en engelsk
+  forklaring etter.
+* **Veiviseren er fortsatt norsk.** Den engelske teksten lover ikke engelsk innhold: lenkene heter
+  «Open the guide (in Norwegian)».
+* **Demoen og appen** er på engelsk når brukeren har valgt engelsk; demo-boets eget innhold
+  (gjenstander og begrunnelser) er norsk, slik det står i databasen.
+
+#### Begrensning: engelsk kan ikke indekseres med dagens språkarkitektur
+
+Språket følger kontoen og `hs_lang` i `localStorage`, ikke URL-en, så **begge språk ligger på samme
+adresse**. Konsekvensen:
+
+* `canonical` er den ene adressen, lik for begge språk.
+* **Ingen `hreflang`.** Det ville krevd én adresse per språk, og de finnes ikke. Å legge inn
+  oppdiktede språkadresser ville vært verre enn å la det være.
+* Den forhåndsrendrede HTML-en — versjonen søkemotorene leser — er norsk. Engelsk rendres i
+  nettleseren etter at språkvalget er lest.
+
+**Minste avgrensede løsning hvis engelsk skal kunne indekseres:** gi hver offentlig side en engelsk
+søsteradresse (`/en/`, `/en/how-it-works`, …), legg dem inn i `src/seo/pages.js` med `lang: 'en'`,
+la forhåndsrenderingen rendre dem med engelsk språkvalg, og sett `hreflang` mellom paret. Det er en
+avgrenset endring i `pages.js`, `vitePlugin.js` og `App.jsx` — men det er en endring i rutingen, og
+jeg har ikke gjort den uten at dere har bedt om det.
+
+### 2.5 CSS, mobil og Safari-fallback
+
+* **`color-mix()` har nå statisk fallback.** `--ordfarge` (`#D7BA9A`) og enhetsrammenes
+  `--skall`/`--skallkant`/`--skallmork` får faste verdier rett foran `color-mix()`-varianten.
+  Uttrykket er uendret der `color-mix()` støttes; uten den får man sluttilstandens lyse enheter.
+* **Margene settes uttrykkelig.** `.ak dl, dt, dd, figure, figcaption, blockquote, fieldset` får
+  `margin:0; padding:0` i `site.css` i stedet for å bygge på nettleserens standardverdier — se
+  punkt 6.
+* **`justify-self:start` på e-postlenken** på `/kontakt`: klikkflaten strakte seg over hele spalten
+  selv om teksten er kort.
+
+### 2.6 Samtykkebanneret
+
+Logikken, teksten og de to like tydelige valgene er uendret. Bare plasseringen er flyttet ut av
+komponenten og inn i `index.html` under `.consent-ask`:
+
+* Brede skjermer (≥ 760 px): nederst **til høyre** og smalere (380 px). Før dekket det den første
+  faktakolonnen på «Slik fungerer det» og kantet inn over pauseknappen i heroen.
+* Mens spørsmålet står framme, holdes **den faste demoknappen på mobil** nede
+  (`body:has(.consent-ask) .ak .dock`), så de to aldri dekker hverandre.
+* Siden får bunnmarg mens spørsmålet står framme, så **bunnteksten kan rulles fri**.
 
 ---
 
-## 3. Avvik fra pakken
+## 3. Testresultater
 
-| Avvik | Hvorfor |
-|---|---|
-| `.cross__cap` er en `<div>`, ikke `<figcaption>` | En `figcaption` må være første eller siste barn av en `figure`. I pakken står den utenfor. Utseendet styres av klassen og er uendret. |
-| `overflow-x: clip` i stedet for `hidden` på rotflaten | Pakken setter det på `<body>`. På en `<div>` ville `hidden` gjort flaten til en rulleflate og flyttet den klebrige headeren inn i den. `clip` klipper uten å lage rulleflate. |
-| `overflow-wrap: break-word` lagt til på `.ak` | Ved 135 % tekst på 360 px rant «Brukeropplevelse» ut av teamkolonnen og «eksempelboet» ut av den faste demoknappen. Slår bare inn når et ord ikke får plass. Gjelder også pakken (kontrollert). |
-| `-webkit-backdrop-filter` lagt til på `.dock` | Safari under 18 kjenner bare den prefiksede varianten. |
-| «Åpne veiviseren **på arvklart.no**» → «Åpne veiviseren» | Formuleringen hørte til da sidene var frittstående filer. Nå er vi på arvklart.no. |
-| Bunnteksten bruker `.foot__org` på alle fire sidene | Forsiden i pakken brukte `.foot__note` med en inline fargeoverstyring. Forskjellen er 0,05 rem og `letter-spacing: .01em`. |
-| «English» lagt til i bunnteksten | Språkvalget fantes i dagens bunntekst og skulle ikke fjernes. |
-| `aria-current="page"` fjernet fra lenken til siden man står på i bunnteksten på forsiden | Forsiden lenker ikke til seg selv; den lenken er tatt ut i stedet. |
-| Ubrukt CSS fjernet | `.ki*`, `.quotes*`, `.tabs*`, `.s3__*`, `.faser*`, `.omtopp`, `.vifte`, `.utkast`, `.dragnote`, `.sh--foto`, `.sh--sim`, `.reise__teller` m.fl. hadde ingen markup på de fire sidene. |
-| 18 px mindre luft under faktaraden på `/slik-fungerer-det` | Appens globale reset (`* { margin: 0 }` i `index.html`) nullstiller standardmargen på `<dl>`. I pakkens frittstående fil sto den igjen. |
-
-Alt annet — palett, typografi, rutenett, hårstreker, bevegelse, ordskiftet, produktreisen,
-signaturovergangen, den faste demoknappen, spørsmål og svar, mobilmenyen — er beholdt.
-
-### Målt mot prototypen
-
-Med samme font på begge sider (Karla slått av, så bare oppsettet sammenlignes), 1440×900 og 390×844:
-
-| Side | Avvik i høyde |
-|---|---|
-| Forside, PC | 0 px (hero, signatur, produktreise, team, spørsmål, veiviser, avslutning, bunntekst alle identiske) |
-| Forside, mobil | +1 px (den ekstra «English»-lenken i bunnteksten) |
-| `/slik-fungerer-det`, PC | −18 px (se tabellen over) |
-| `/om-oss`, PC og mobil | 0 px |
-| `/kontakt`, PC og mobil | 0 px |
-
-Med Karla fra Google i stedet for pakkens variable Karla brekker enkelte avsnitt én linje
-annerledes. Det er den samme Karla resten av arvklart.no allerede bruker.
-
----
-
-## 4. Testresultater
-
-Kjørt 19.11.2026 på denne greina.
+### Kjørt nå, på denne greina, etter alle endringene over
 
 | Suite | Resultat |
 |---|---|
 | `npm run build` | OK |
-| `npm test` (enhetstester) | **461 av 461** |
-| `npm run test:e2e` (Chromium) | **293 OK, 0 feil** |
-| `npm run test:db` | **Ikke kjørt** — krever Docker, som ikke finnes i dette miljøet. Endringen rører ikke databasen (ingen migreringer, ingen SQL, ingen policyer), så suiten er ikke berørt. |
+| `npm test` | **472 av 472** |
+| `npm run test:e2e` (Chromium) | **294 OK, 0 feil** |
+| Egen språk- og tilgjengelighetskontroll (33 sjekker) | **33 av 33** |
+| Egen mobil- og samtykkekontroll (67 sjekker) | **66 av 67** — se punkt 5.6 |
+| `npm run test:db` | **Ikke kjørt her** (krever Docker). Kjørte grønt i CI på forrige commit, og denne endringen rører ikke databasen |
 
-### Hva e2e-testene dekker etter endringen
+### Rapportert tidligere, i forrige runde
 
-* Forhåndsrendret HTML uten JavaScript for alle fire sidene: overskrift, hovedinnhold, brødsmule,
-  canonical, lenkene til veiviser, kontakt, personvern og innlogging.
-* Hydrering på forsiden uten at noder byttes ut, uten layoutskift (< 0,01) og uten konsollfeil.
-* Engelsk språkvalg: forsiden vises på norsk med norsk tittel, og innholdet er merket `lang="nb"`.
-* Demo-CTA fra forsiden åpner demo-boet; innlogging fra forsiden ender på `/app`.
-* `/home` → `/` (308), `/veiviser.html` → `/veiviser` (308), ukjente adresser og utkast gir 404.
-* `noindex` på appen, innlogging, invitasjoner og `/konto`; ingen `noindex` på de fem offentlige
-  sidene eller de to nye.
-* Invitasjonslenke, lenke for nytt passord og e-postbekreftelse med økt i adressen virker som før.
-* axe (WCAG 2.2 A/AA) på `/`, `/slik-fungerer-det` og `/om-oss`: ingen alvorlige eller kritiske avvik.
-* 135 % tekst på 360 px: ingen horisontal rulling og ingen kuttet tekst på noen av sidene.
-* Samtykke til statistikk: spørsmålet vises på de nye sidene, ingenting hentes fra Google før valget,
-  og demoen og appen måles aldri.
-* JavaScript før interaktiv: **162 kB gzip** av et budsjett på 175 kB (var 155 kB før).
+De 466 enhetstestene og 293 e2e-sjekkene fra forrige runde er ikke de samme tallene: antallet har
+økt fordi det er lagt til tester for selskapsopplysningene, de rettede påstandene, pauseknappen,
+`color-mix`-fallbacken, oversettelsene og bildene (`test/seo/nettsted.test.js`, 11 tester).
 
-### Egen funksjonell kontroll (18 av 18)
+### Hva kontrollene dekker
 
-Ordskiftet bytter uttrykk og stanser ved redusert bevegelse · overskriftens tilgjengelige navn er
-«Fordel arvegjenstandene med én felles oversikt», uendret ved hvert bytte · `--lift` endrer seg ved
-rulling og står på 1 ved redusert bevegelse · den faste demoknappen på mobil vises etter heroen,
-forsvinner ved demoseksjonen og synkroniserer `aria-hidden` og `tabIndex` · mobilmenyen åpnes, lukkes
-med Escape og gir fokus tilbake · produktreisen byttes med radioknapp og «Neste steg», og går rundt ·
-alle tabulatorstopp på forsiden har synlig fokusring · uten JavaScript: alle fire overskriftene står,
-stegene er klikkbare, «Neste steg» er skjult og demoknappen peker på `/#demo` · portrettene laster.
+* **Engelsk**: alle fire sidene har riktig overskrift, tittel, `lang="en"` på innholdet, én
+  canonical uten språk i adressen, ingen `hreflang`, og ingen norsk hovedtekst igjen. Språkbytte
+  fra bunnteksten gir samme side på det andre språket, overlever oppfriskning og virker ved direkte
+  inngang på undersidene.
+* **Mobil og desktop, 360 / 390 / 1440 px, på begge språk**: ingen avkuttet tekst, ingen horisontal
+  rulling, og demoknappen og «ingen registrering» er synlige i første skjermbilde på forsiden.
+* **Faste elementer**: samtykkespørsmålet dekker ingen kontroll på sju av åtte kombinasjoner (se
+  punkt 5.6), den faste demoknappen og spørsmålet overlapper ikke, og bunnteksten kan rulles fri.
+* **Sporing** (teknisk måling, ikke en juridisk konklusjon): med samtykke lastes
+  `googletagmanager.com` på nøyaktig de seks offentlige sidene og ingen andre. `/logg-inn`,
+  `/nytt-passord`, `/join/…` og 404-siden laster ingenting. `/app`, `/konto` og `/estate/…` uten
+  innlogging sender brukeren til forsiden, og målingen skjer da på forsiden — ikke på en privat
+  rute. Innlogget lastes GTM aldri (`test/e2e/analytics.mjs`).
+* **Eksterne kall fra de offentlige sidene**: `fonts.googleapis.com` og `fonts.gstatic.com`
+  (Karla og Fraunces) i alle samtykketilstander, og `googletagmanager.com` bare etter «Godta».
+  Ingen andre. Bodoni Moda er selvhostet.
 
 ### Ikke testet
 
-* **Safari og fysisk mobil.** Det finnes ingen WebKit i dette miljøet, bare Chromium. Pakkens README
-  sier det samme om prototypen. CSS-en bruker `color-mix()` (Safari 16.2+), `svh` (15.4+), `:has()`
-  (15.4+), `overflow-x: clip` (16+) og `size-adjust` i `@font-face` (16.4+). På eldre Safari vil
-  enhetsrammene i signaturen miste fargene sine, siden de bygger på `color-mix()`. **Dette bør
-  kontrolleres manuelt på en Mac og en iPhone før publisering.**
-* **Vercel-forhåndsvisning.** `scripts/check-seo.mjs <url>` og `scripts/smoke-browser.mjs` kjører mot
-  en ekte utrulling og er ikke kjørt herfra. Etterligningen i `test/e2e/staticServer.mjs` er ikke
-  bevis for hvordan Vercel tolker omskrivinger og hoder.
+* **Safari og fysisk mobil.** Det finnes ingen WebKit i dette miljøet, bare Chromium. Se punkt 7
+  for en manuell sjekkliste.
+* **Vercel-forhåndsvisningen.** Forhåndsvisninger er beskyttet, og jeg har ikke
+  `VERCEL_AUTOMATION_BYPASS_SECRET`; `*.vercel.app` er dessuten utenfor miljøets tillatte nett. Se
+  punkt 5.7.
+* **Pikselavvikene fra forrige runde** (0 px på `/om-oss` og `/kontakt`, +1 px på forsiden mobil,
+  −18 px på `/slik-fungerer-det`) er **seksjonshøyder og layoutmål**, målt med samme font på begge
+  sider. De sier at oppsettet stemmer, ikke at sidene er visuelt identiske: farger, typografi,
+  ombrekking og bevegelse er ikke sammenlignet piksel for piksel. Etter denne runden gjelder tallene
+  dessuten ikke lenger uendret — pauseknappen, den rettede teksten og den engelske versjonen endrer
+  høyder bevisst.
 
 ---
 
-## 5. Uavklarte spørsmål før publisering
+## 4. Avvik fra integrasjonspakken
 
-### Må avklares
+| Avvik | Hvorfor |
+|---|---|
+| Rettet produkttekst (punkt 2.1) | Pakkens tekst stemte ikke med koden |
+| Pause/start for ordskiftet (punkt 2.2) | WCAG 2.2.2, godkjent av dere |
+| Engelsk versjon (punkt 2.4) | Nettstedet er tospråklig |
+| `.cross__cap` er en `<div>`, ikke `<figcaption>` | En `figcaption` må være første eller siste barn av en `figure`. Utseendet er uendret |
+| `overflow-x: clip` i stedet for `hidden` | Pakken setter det på `<body>`. På en `<div>` ville `hidden` gjort flaten til en rulleflate og flyttet den klebrige headeren inn i den |
+| `overflow-wrap: break-word` på `.ak` | Ved 135 % tekst på 360 px rant «Brukeropplevelse» og «eksempelboet» ut av spalten. Gjelder også pakken |
+| `-webkit-backdrop-filter` på `.dock` | Safari under 18 kjenner bare den prefiksede varianten |
+| «Åpne veiviseren **på arvklart.no**» → «Åpne veiviseren» | Formuleringen hørte til da sidene var frittstående filer |
+| Bunnteksten bruker `.foot__org` på alle fire sidene | Forskjellen mot `.foot__note` er 0,05 rem |
+| «English»/«Norsk» i bunnteksten | Språkvalget fantes i dagens bunntekst |
+| Ubrukt CSS fjernet | `.ki*`, `.quotes*`, `.tabs*`, `.s3__*`, `.faser*`, `.omtopp`, `.vifte`, `.utkast` m.fl. hadde ingen markup |
+| 18 px mindre luft under faktaraden på `/slik-fungerer-det` | Margen kom fra nettleserens standard `<dl>`-marg. Den settes nå uttrykkelig til 0 (punkt 6) |
 
-**1. To påstander på `/slik-fungerer-det` er ikke dekket av produktkoden.**
-Teksten er beholdt ordrett fra pakken, slik oppgaven ber om, men den stemmer ikke med koden:
-
-* *«Hvem som velger når, og hvor mange runder, avtaler dere selv»* (Vekslende runder).
-  `src/pages/ConflictPage.jsx:468–492` gir bare startrekkefølgen eller «Tilfeldig rekkefølge».
-  Det finnes ingen måte å sette rekkefølgen manuelt på, og antall runder følger av gjenstandene.
-* *«Galleriet kan filtreres på … hva bare én vil ha, og hva ingen har svart på ennå»* (steg 03).
-  Fanene er Alle / Mine / Ettertraktede / Noen vil ha / Ingen vil ha / Tildelt
-  (`src/pages/EstatePage.jsx:145–152`). Det finnes ingen «bare én»-fane, og «Ingen vil ha» teller
-  gjenstander uten interesser — altså også dem ingen har svart på.
-
-Velg: rett teksten, eller bygg funksjonen. Jeg har ikke skrevet nye formuleringer.
-
-**2. «Alle kan foreslå en verdi» er bare delvis riktig.**
-Står på `/slik-fungerer-det` to steder. I appen går det bare som «Uenig» på et eksisterende
-KI-anslag (`vote_item_value`), én gang per bruker, og bare når gjenstanden har `estimated_value`
-(`src/pages/ItemDetailPage.jsx:265–332`). Uten anslag finnes det ingen måte å foreslå en verdi på.
-
-**3. «Arvklart AS · Org.nr. 938 816 085» i bunnteksten er ikke verifisert.**
-Kontrollsifferet stemmer (mod-11), men brreg.no er utenfor dette miljøets tillatte nett.
-I tillegg: `COMPANY = { name: '', orgnr: '' }` i `src/pages/OtherPages.jsx:151` er tom, så
-personvernerklæringen oppgir ingen behandlingsansvarlig mens bunnteksten gjør det. Bekreft
-organisasjonsnummeret og fyll inn `COMPANY`, ellers bør org.nr. tas ut av bunnteksten.
-
-**4. Rollebetegnelsene på `/om-oss` og forsiden.**
-Pakkens README sier de er foreløpige og skal bekreftes av hver enkelt.
-
-**5. WCAG 2.2.2 (nivå A): ordskiftet i overskriften har ingen pauseknapp.**
-Det starter av seg selv og varer i mer enn fem sekunder. Pakken tok pauseknappen ut etter ønske fra
-teamet, og README-en ber om at det vurderes på nytt. Jeg har bygget det som pakken sier, uten
-pauseknapp, siden det er en synlig designendring. `prefers-reduced-motion` respekteres, og båndet
-stanser når fanen skjules eller heroen rulles ut av bildet, men det er ikke en side-mekanisme etter
-ordlyden i suksesskriteriet. axe fanger ikke 2.2.2.
-
-Vil dere ha en pauseknapp, er endringen liten: eksporter `stopp`/`start` fra `Rotator.jsx` og legg en
-`<button class="ul ul--sub">` under `.hero__micro` som veksler. Si fra, så gjør jeg det.
-
-### Bør avklares
-
-**6. Skjermbildene viser kjente feil i demodataene.**
-«Bestemors gyngestol» (`face0001`) viser en vanlig trestol, og «Sigma akustisk gitar» (`db1836d7`,
-finnes bare i produksjon) ligger under «Elektronikk». Det synes tydeligst i
-`d-tablet.webp` (enhetsgruppen i heroen) og `f-ettertraktet.webp` (steg 03). Demodata skal ikke
-endres i denne oppgaven. Bildene er ærlig merket «Skjermbilde fra demoen», så de viser demoen slik
-den faktisk er — men de bør tas på nytt etter at demodataene er rettet.
-
-**7. Engelsk versjon av de fire sidene.**
-Sidene er bare norske. Jeg har ikke skrevet oversettelser, siden en ukontrollert oversettelse av
-produktpåstander er verre enn ingen. Tre veier: (a) la det stå som nå, (b) oversett og få teksten
-juridisk gjennomgått slik veiviseren venter på (`VITE_GUIDE_EN`), (c) ta «English» ut av de
-offentlige sidene. (a) er det minst forpliktende.
-
-**8. `og:image` finnes ikke.**
-Delingskortene bruker `/hero-bg.jpg` (686 kB), som er et bakgrunnsbilde fra den gamle forsiden og
-ikke passer til det nye designet. Et eget 1200×630-bilde bør lages.
-
-**9. Samtykkebanneret er stilt i appens palett.**
-Det er eksisterende funksjonalitet som oppgaven sier skal bevares, så det er ikke rørt. På de mørke
-sidene står et lyst kort med Fraunces-overskrift midt i Bodoni-designet, og på
-`/slik-fungerer-det` dekker det den første faktakolonnen. Teksten er oppdatert til «de offentlige
-sidene» (den sa «forsiden og veiviseren», som nå ville vært feil), og listen i
-personvernerklæringen er utvidet med de to nye sidene og guidene. `CONSENT_VERSION` er **ikke** økt:
-formål og mottakere er uendret, bare listen over sider er lengre. Si fra hvis dere vil at alle skal
-spørres på nytt.
-
-**10. Tittelseparator.** De fire nye sidene bruker «|» (fra pakken), mens `/personvern` og
-`/veiviser` bruker «—». Bør harmoniseres.
-
-**11. Fraunces lastes på de offentlige sidene** selv om designet ikke bruker den — fordi
-samtykkebanneret gjør det. Løses når punkt 9 løses.
-
-**12. JavaScript-budsjettet er nesten brukt opp:** 162 kB av 175 kB gzip. De fire offentlige sidene
-ligger i hovedfilen fordi de forhåndsrendres og hydreres. Neste offentlige side med mye markup kan
-sprenge budsjettet. Løsningen er egne inngangspunkter per forhåndsrendret side — en større endring
-som hører til for seg.
+Palett, typografi, rutenett, hårstreker, bevegelse, ordskiftet, produktreisen, signaturovergangen,
+den faste demoknappen, spørsmål og svar og mobilmenyen er beholdt.
 
 ---
 
-## 6. Før publisering
+## 5. Hva jeg trenger fra deg
 
-1. Avklar punkt 1–5 over.
-2. Kontroller forhåndsvisningen hos Vercel:
-   ```bash
-   node scripts/check-seo.mjs <forhåndsvisnings-url>
-   ```
-   ```bash
-   node scripts/smoke-browser.mjs <forhåndsvisnings-url>
-   ```
-   Begge krever `VERCEL_AUTOMATION_BYPASS_SECRET`.
-3. Kontroller i Safari på Mac og iPhone (se punkt 4, «Ikke testet»).
-4. Etter produksjonssetting, mot produksjon:
-   ```bash
-   node scripts/check-seo.mjs https://www.arvklart.no --production
-   ```
-5. Meld de to nye adressene inn i Google Search Console. `sitemap.xml` tar dem automatisk.
+### 5.1 Rollebetegnelsene på «Om oss» og forsiden
+
+Pakkens README sier de er foreløpige og skal bekreftes av hver enkelt. De står uendret, nå også på
+engelsk. **Bekreft eller rett hver enkelt:**
+
+| Person | Norsk | Engelsk |
+|---|---|---|
+| Bård Jakobsen Rinnan | Produkt og marked | Product and market |
+| Andrea Hufthammer Vik | Drift og fremdrift | Operations and delivery |
+| Ørjan Westre | Teknologi og økonomi | Technology and finance |
+| Julie Tvedt | Brukeropplevelse og piloter | User experience and pilots |
+
+Jeg har ikke endret ansvarsområdene.
+
+### 5.2 Skjermbilder som må byttes før publisering
+
+Jeg kan ikke ta nye skjermbilder: det krever innlogging i den ekte demoen, og demodata skal ikke
+røres i denne oppgaven. Bildene er kontrollert ett for ett.
+
+**Må byttes — viser «Bestemors gyngestol» med et foto av en vanlig trestol:**
+
+| Fil | Hvor |
+|---|---|
+| `public/nettsted/d-tablet.webp` | Enhetsgruppen i forsidens hero (nettbrett) |
+| `public/nettsted/d-laptop.webp` | Enhetsgruppen i forsidens hero (PC) |
+| `public/nettsted/f-ettertraktet.webp` | «Slik fungerer det», steg 03 — tydeligst her |
+
+**Trenger ikke byttes:** gitarens kategori («Sigma akustisk gitar» under «Elektronikk») er **ikke
+synlig** i noe skjermbilde. Galleriet viser tittel, pris og hvem som ønsker gjenstanden, ikke
+kategori. De øvrige 15 bildene viser ikke feilen.
+
+Rotårsaken er demodataene, ikke bildene: `face0001` heter «Bestemors gyngestol» og beskrives som en
+gyngestol i `supabase/seed/demo_estate.sql:100`, mens fotoet i lagringen viser en vanlig stol. Det
+bryter med repoets egen regel om at demotekstene bare skal beskrive det bildene viser. Rettingen
+hører hjemme i en egen endring — enten nytt foto eller ny tittel.
+
+### 5.3 Engelsk indeksering
+
+Punkt 2.4. Si fra om dere vil ha engelske søsteradresser, så gjør jeg den avgrensede endringen.
+
+### 5.4 Forretningsadressen i personvernerklæringen
+
+Punkt 2.3. Skal `Tertnesgrenden 13, 5113 Tertnes` inn som kontaktopplysning for behandlingsansvarlig?
+
+### 5.5 `CONSENT_VERSION` er ikke økt
+
+Ordlyden i samtykkespørsmålet og listen i personvernerklæringen er rettet (de nevnte fire sider;
+det er nå seks pluss guidene). **Formål, mottakere, lagringstid og samtykkestyring er uendret** —
+teknisk kontrollert over: samme GA4-container, samme samtykkemodus, samme `localStorage`-nøkkel,
+samme sletting av `_ga` ved avslag, samme avgrensning til offentlige sider. Derfor er
+`CONSENT_VERSION` ikke økt, og ingen blir spurt på nytt.
+
+Dette er en teknisk konklusjon, ikke en juridisk. **Vil dere at alle skal spørres på nytt, er det
+én linje.**
+
+### 5.6 Én gjenstående overlapp
+
+På forsiden ved 390 px dekker samtykkespørsmålet de nederste ~29 px av pauseknappen til det er
+besvart. Knappens øvre halvdel er synlig og klikkbar, og den blir helt fri så snart man svarer
+eller ruller ~30 px. Et fast bunnbanner vil alltid ligge over noe nederst i skjermbildet; jeg har
+prioritert at ingen **primær** handling dekkes. Si fra hvis dere heller vil at pauseknappen skal
+ligge over spørsmålet.
+
+### 5.7 Forhåndsvisningen
+
+For at jeg skal kunne kontrollere forhåndsvisningen selv, trenger jeg to ting:
+
+1. `*.vercel.app` (eller den konkrete forhåndsvisningsadressen) åpnet i miljøets nettverksregler.
+2. `VERCEL_AUTOMATION_BYPASS_SECRET` — den kan ikke tas inn gjennom skjemaet for nettverkshemmeligheter,
+   fordi hodet `x-vercel-protection-bypass` ikke er en av de tillatte hodeformene.
+
+Uten begge kan verken `scripts/check-seo.mjs` eller `scripts/smoke-browser.mjs` kjøres herfra.
+**Begge kjøres uansett automatisk i CI** på hver commit (`.github/workflows/seo-preview.yml` og
+`smoke.yml`), med hemmeligheten som allerede ligger i GitHub — resultatene står på PR-en.
+
+---
+
+## 6. CSS-avgrensningen, presist
+
+Påstanden «appen treffes ikke av en eneste regel» gjelder **én vei**.
+
+**Fra de offentlige sidene og ut:** ingen regel i `src/site/site.css` kan treffe utenfor `.ak`.
+Hver eneste selektor i fila begynner med `.ak`, og `test/seo/nettsted.test.js` sjekker det.
+`@font-face` definerer bare familien `Bodoni Moda`, som appen ikke bruker, og de to
+reservefamiliene.
+
+**Inn i de offentlige sidene:** appens globale regler i `index.html` gjelder også inne i `.ak`:
+
+| Regel i `index.html` | Virkning inne i `.ak` |
+|---|---|
+| `*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }` | Nullstiller standardmargene. Merkbar på `<dl>` (faktaraden mistet 18 px) |
+| `html { font-size: 100% }` + `font: -apple-system-body` på iOS | Grunnstørrelsen, som alle `rem`-verdiene bygger på |
+| `:focus-visible { outline: 3px solid #5F6E52 }` | Overstyres av `.ak :focus-visible` (høyere spesifisitet) |
+| `@media (max-width:600px) { input, select, textarea { font-size: max(16px,1rem) } }` | Ingen felt på disse sidene |
+| `body { background:#FBF9F5; font-family:'Karla' }` | Overstyres av `.ak` |
+| `.consent-ask`, `body:has(.consent-ask) .ak …` | Med vilje: plasseringen av samtykkespørsmålet |
+
+Derfor settes marger på `dl`, `dt`, `dd`, `figure`, `figcaption`, `blockquote` og `fieldset`
+uttrykkelig i `site.css`, i stedet for å bygge på nettleserens standardverdier.
+
+**Målt begge veier** på bygget: de offentlige sidene og representative app-, demo- og
+innloggingsvisninger er kontrollert etter endringene, og `npm run test:e2e` dekker `/logg-inn`,
+`/app`, bo-sidene, gjenstandssiden, «Arvinger», «Løsningsmetoder», «Fordelingen», demoreisen på
+mobil og «Min konto» med axe på to bredder, uendret.
+
+---
+
+## 7. Manuell sjekkliste for Safari og fysisk mobil
+
+Kan ikke kjøres herfra (ingen WebKit). Minst Safari 16.2 kreves for fullt uttrykk.
+
+1. **Safari 16.2+ på Mac, 1440 px** — `/`: enhetsgruppen i heroen skal ha lyse rammer som mørkner
+   når du ruller opp igjen (`color-mix()`). Er rammene flate og lyse hele veien, slår fallbacken
+   inn, og Safari er for gammel.
+2. **Hele siden ruller** uten horisontal rulling på alle fire sidene (`overflow-x: clip`).
+3. **Den klebrige headeren** blir stående øverst når du ruller.
+4. **Logoen** vises (CSS-maske, `-webkit-mask`).
+5. **Ordskiftet** i overskriften beveger seg, og pauseknappen stanser det.
+6. **`prefers-reduced-motion`** (Systemvalg → Tilgjengelighet → Skjerm → Reduser bevegelse):
+   overskriften står statisk, pauseknappen er borte, og ingenting er skjult.
+7. **iPhone, Safari**: den faste demoknappen kommer opp etter heroen og forsvinner ved
+   demoseksjonen; `backdrop-filter` gjør den uskarp bak (`-webkit-`-varianten).
+8. **iPhone**: `env(safe-area-inset-bottom)` gir plass under demoknappen på modeller med hjemindikator.
+9. **Språkbytte** i bunnteksten på begge enheter.
+10. **135 % tekst** (Innstillinger → Tilgjengelighet → Skjerm og tekststørrelse): ingen avkuttet tekst.
+
+---
+
+## 8. Mindre forbedringer som kan vente
+
+* **`og:image`** finnes ikke; delingskortene bruker `/hero-bg.jpg` fra den gamle forsiden.
+* **Tittelseparator**: de fire nye sidene bruker «|», `/personvern` og `/veiviser` bruker «—».
+* **Fraunces lastes på de offentlige sidene** selv om designet ikke bruker den — fordi
+  samtykkebanneret gjør det. Forsvinner hvis banneret får markedssidenes typografi.
+* **Selvhosting av Karla.** Pakkens `karla-400-latin.woff2` er en *variabel* font (vekt 300–700,
+  kontrollert i nettleseren) på 15 kB som dekker alle vektene appen bruker. Å selvhoste den ville
+  fjernet begge de eksterne fontkallene for hele nettstedet, men den endrer appens typografi og
+  hører derfor til i en egen endring.
+* **Pakkens `FAQPage`- og `SoftwareApplication`-markering** er ikke tatt med. Google sluttet i 2023
+  å vise FAQ-utdrag for andre enn myndigheter og helseinstitusjoner, og `SoftwareApplication` uten
+  pris eller vurdering gir ingen kjent effekt.
+
+### Må følges med på
+
+**JavaScript-budsjettet er nesten brukt opp: 171 kB av 175 kB gzip.** Den engelske teksten kostet
+9 kB. De fire sidene ligger i hovedfilen fordi de forhåndsrendres og hydreres, og én side til med
+mye tekst sprenger budsjettet. Jeg har **ikke** hevet grensen — den er en bevisst skranke.
+
+Minste avgrensede løsning når det smeller: flytt den lange teksten ut av JavaScript-filene og inn i
+datablokken i den forhåndsrendrede HTML-en, slik guidene allerede gjør (`src/seo/pageData.js`).
+Da teller teksten ikke mot budsjettet, uansett hvor mange sider eller språk som kommer til.

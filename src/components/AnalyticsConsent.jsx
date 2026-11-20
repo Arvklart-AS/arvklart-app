@@ -31,8 +31,10 @@ export default function AnalyticsConsent({ loggedIn }) {
 
   if (consent !== null || loggedIn || !pageFor(pathname)) return null
   return (
-    <section aria-label={L('Informasjonskapsler', 'Cookies')} style={{
-      position: 'fixed', left: '16px', right: '16px', bottom: '16px', zIndex: 10000, maxWidth: '440px',
+    // Plasseringen (fixed, side og bunn) ligger i index.html under «.consent-ask», så den kan
+    // tilpasses skjermbredden og de faste knappene på de offentlige sidene. Logikken og de to like
+    // tydelige valgene er uendret.
+    <section className="consent-ask" aria-label={L('Informasjonskapsler', 'Cookies')} style={{
       background: '#FBF9F5', color: '#3A2F26', border: '1px solid #D9CFC0', borderRadius: '12px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '18px 20px', fontFamily: 'Karla, sans-serif',
     }}>

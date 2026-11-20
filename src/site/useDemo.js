@@ -10,6 +10,9 @@ import { APP_HOME, HOME } from '../lib/routes'
 // Knappen er en lenke til «/#demo» (demoseksjonen på forsiden), så den virker også uten JavaScript.
 // Med JavaScript stopper vi navigeringen og åpner demoen med én gang. Elementtypen er den samme før
 // og etter hydrering, så forhåndsrendret HTML og appen har nøyaktig samme DOM.
+//
+// Demoen og appen er på engelsk når brukeren har valgt engelsk; demo-boets eget innhold
+// (gjenstander og begrunnelser) er norsk, slik det står i databasen.
 export default function useDemo({ loggedIn = false } = {}) {
   const navigate = useNavigate()
   const [busy, setBusy] = useState(false)
@@ -31,10 +34,10 @@ export default function useDemo({ loggedIn = false } = {}) {
     navigate(APP_HOME)
   }
 
-  const label = (idle = 'Prøv demo') => {
-    if (busy) return 'Åpner demo …'
+  const label = (idle) => {
+    if (busy) return L('Åpner demo …', 'Opening the demo …')
     if (loggedIn) return L('Gå til mine bo', 'Go to my estates')
-    return idle
+    return idle || L('Prøv demo', 'Try the demo')
   }
 
   return { busy, error, onClick, label, href: loggedIn ? APP_HOME : `${HOME}#demo` }

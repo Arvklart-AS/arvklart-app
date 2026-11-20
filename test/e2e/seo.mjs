@@ -12,6 +12,7 @@ const check = checker(browser, results)
 // Forsidens overskrift. Uttrykket i båndet skifter, så teksten kontrolleres som det tilgjengelige
 // navnet, som alltid er den samme hele setningen (src/site/Rotator.jsx).
 const H1_NO = H1_NAME
+const H1_EN = 'Divide the belongings with one shared overview'
 // De fire offentlige sidene finnes bare på norsk (src/seo/pages.js). Et engelsk språkvalg gjelder
 // appen, veiviseren og innloggingen; disse sidene vises på norsk uansett.
 const h1Name = async page => (await page.locator('h1').ariaSnapshot()).match(/heading "([^"]+)"/)?.[1]
@@ -101,20 +102,43 @@ await check('Norsk, ikke innlogget: kontaktsiden hydreres uten feil', async page
   assert(await page.title() === 'Kontakt | Arvklart', `tittel: ${await page.title()}`)
 }, { loggedIn: false })
 
-await check('Engelsk språkvalg, ikke innlogget: forsiden vises på norsk med norsk tittel, uten feil', async page => {
-  // De offentlige sidene finnes bare på norsk. Språkvalget gjelder appen, veiviseren og innloggingen.
-  // Da skal tittelen og teksten være den samme norske, ikke en engelsk tittel over norsk innhold.
+await check('Engelsk språkvalg, ikke innlogget: forsiden vises på engelsk, uten feil', async page => {
+  // Den forhåndsrendrede HTML-en er norsk (det søkemotorene leser). Med engelsk språkvalg hydreres
+  // den ikke; appen rendrer siden på engelsk, og den norske teksten er skjult til den er byttet ut.
   const state = await observe(page, { lang: 'en' })
   await page.goto(`${BASE}/`)
-  await page.getByRole('heading', { level: 1, name: H1_NO }).waitFor()
+  await page.getByRole('heading', { level: 1, name: H1_EN }).waitFor()
   await settle(page)
   const s = await state()
   assert(s.prerendered && s.visibility === 'hidden', `synlighet før appen: ${s.visibility}`)
   assert(await page.locator('#root').evaluate(r => getComputedStyle(r).visibility) === 'visible', 'siden er fortsatt skjult')
+  assert(await page.getByText('Fordel arvegjenstandene').count() === 0, 'norsk tekst står igjen')
   noErrors(s)
-  assert(await page.title() === 'Fordeling av innbo ved arv | Arvklart', `tittel: ${await page.title()}`)
-  assert(await page.locator('.ak').getAttribute('lang') === 'nb', 'innholdet er ikke merket som norsk')
+  assert(await page.title() === 'Sharing out household contents in an inheritance | Arvklart', `tittel: ${await page.title()}`)
+  assert(await page.locator('.ak').getAttribute('lang') === 'en', 'innholdet er ikke merket som engelsk')
+  // Begge språk ligger på samme adresse: én canonical, ingen hreflang (det finnes ingen språkadresser)
   assert(JSON.stringify(await canonicals(page)) === JSON.stringify([`${SITE_URL}/`]), 'én canonical')
+  assert(await page.locator('link[rel=alternate][hreflang]').count() === 0, 'hreflang peker på språkadresser som ikke finnes')
+}, { loggedIn: false })
+
+await check('Engelsk: de tre undersidene, språkbytte fra bunnteksten og overgangen til demoen', async page => {
+  const state = await observe(page, { lang: 'en' })
+  for (const [path, h1, tittel] of [
+    ['/slik-fungerer-det', 'How you share out a home with Arvklart', 'How you share out household contents with Arvklart'],
+    ['/om-oss', 'The team behind Arvklart', 'About us | Arvklart'],
+    ['/kontakt', 'What can we help you with?', 'Contact | Arvklart'],
+  ]) {
+    await page.goto(BASE + path)
+    await page.getByRole('heading', { level: 1, name: h1 }).waitFor()
+    assert(await page.title() === tittel, `${path}: tittel ${await page.title()}`)
+    assert(await page.locator('.ak').getAttribute('lang') === 'en', `${path}: feil språkmerking`)
+    assert(JSON.stringify(await canonicals(page)) === JSON.stringify([SITE_URL + path]), `${path}: ${await canonicals(page)}`)
+  }
+  // Språkbytte fra bunnteksten: samme side, nå på norsk
+  await page.getByRole('link', { name: 'Norsk', exact: true }).click()
+  await page.waitForFunction(() => document.querySelector('.ak')?.lang === 'nb')
+  assert(new URL(page.url()).pathname === '/kontakt', `språkbytte flyttet siden til ${page.url()}`)
+  noErrors(await state())
 }, { loggedIn: false })
 
 for (const lang of ['no', 'en']) {

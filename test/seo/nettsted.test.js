@@ -119,3 +119,79 @@ test('hvert produktutsnitt er merket som skjermbilde', () => {
   const sider = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/site/Journey.jsx', 'src/site/Signature.jsx']
   for (const p of sider) assert.match(read(p), /Cap|cap--c|label/, `${p}: mangler etiketter på skjermbildene`)
 })
+
+// ── Selskapsopplysninger og produktpåstander ────────────────────────────────────────────────────
+
+test('behandlingsansvarlig: personvernerklæringen og bunnteksten oppgir det samme', () => {
+  const company = read('src/pages/OtherPages.jsx').match(/const COMPANY = \{ name: '([^']*)', orgnr: '([^']*)' \}/)
+  assert.ok(company, 'fant ikke COMPANY i OtherPages.jsx')
+  const [, navn, orgnr] = company
+  assert.equal(navn, 'Arvklart AS', 'behandlingsansvarlig mangler eller er endret')
+  assert.equal(orgnr, '938 816 085')
+  // Bunnteksten bruker harde mellomrom i tallet
+  const foot = read('src/site/SiteLayout.jsx')
+  assert.ok(foot.includes('Arvklart AS'), 'bunnteksten mangler selskapsnavnet')
+  assert.ok(foot.includes(orgnr.replace(/ /g, '&nbsp;')), `bunnteksten mangler org.nr. ${orgnr}`)
+})
+
+// Formuleringer som ikke stemte med produktkoden, og som ikke skal krype inn igjen.
+// Se docs/ny-offentlig-nettside.md for hva koden faktisk gjør.
+const SIDER = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/pages/AboutPage.jsx',
+  'src/pages/ContactPage.jsx', 'src/site/Journey.jsx', 'src/site/Faq.jsx']
+
+test('produktpåstander: ingen av de uriktige formuleringene står igjen', () => {
+  const tekst = SIDER.map(read).join('\n')
+  for (const [feil, hvorfor] of [
+    [/hvor mange runder, avtaler dere selv/i, 'antall runder følger av gjenstandene, ikke av en avtale'],
+    [/hva bare én vil ha/i, 'det finnes ingen «bare én»-fane i galleriet'],
+    [/hva ingen har svart på ennå/i, '«Ingen vil ha» samler også ubesvarte; det finnes ingen egen fane'],
+    [/Alle kan foreslå en verdi/i, 'verdiforslag går bare som «Uenig» på et eksisterende KI-anslag'],
+    [/Deltakere kan foreslå sin egen verdi/i, 'samme: forutsetter et KI-anslag'],
+    [/Ingen frist i løsningen/i, 'familien kan selv sette datoer på oppgaver; Arvklart setter ingen'],
+  ]) assert.doesNotMatch(tekst, feil, `${feil} — ${hvorfor}`)
+})
+
+test('produktpåstander: de rettede formuleringene står der, på begge språk', () => {
+  const how = read('src/pages/HowItWorksPage.jsx')
+  // Vekslende runder: administrator setter rekkefølgen, og rundene snur
+  assert.match(how, /Administrator setter rekkefølgen/)
+  assert.match(how, /The administrator sets the order/)
+  // Filtrene er de som finnes i EstatePage.jsx
+  assert.match(how, /dine egne svar, på hva flere har sagt ja til/)
+  assert.match(how, /«Ingen vil ha» samler både det alle har sagt nei takk til, og det ingen har rukket å svare på/)
+  // Verdiforslag forutsetter et KI-anslag
+  assert.match(how, /Er det satt et KI-anslag, kan hver deltaker si seg uenig/)
+  assert.match(how, /If an AI estimate has been set, each participant can disagree/)
+})
+
+test('alle fire sidene er oversatt: ingen av dem mangler L()', () => {
+  for (const f of SIDER) {
+    const s = read(f)
+    assert.match(s, /\bL\(/, `${f}: ingen oversettelser`)
+    assert.ok((s.match(/\bL\(/g) || []).length > 5, `${f}: mistenkelig få oversettelser`)
+  }
+  // Rotelementet merkes med gjeldende språk, så engelsk innhold ikke står under lang="nb"
+  assert.match(read('src/site/SiteLayout.jsx'), /lang=\{isEn\(\) \? 'en' : 'nb'\}/)
+})
+
+test('ordskiftet kan stanses (WCAG 2.2.2), og knappen skjules ved redusert bevegelse', () => {
+  const rot = read('src/site/Rotator.jsx')
+  assert.match(rot, /export function RotatorPause/)
+  assert.match(rot, /aria-pressed=\{paused\}/)
+  assert.match(rot, /Pause ordskiftet/)
+  assert.match(rot, /Pause the word animation/)
+  assert.match(read('src/pages/LandingPage.jsx'), /<RotatorPause paused=\{paused\} onToggle=/)
+  const css = read('src/site/site.css')
+  assert.match(css, /\.ak \.ordpause\{/)
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)\{\n\s*\.ak \.ordpause\{display:none\}/)
+})
+
+test('color-mix har statisk fallback, og margene settes uttrykkelig', () => {
+  const css = read('src/site/site.css')
+  // Hver color-mix-deklarasjon skal ha en fast verdi for samme variabel rett foran
+  for (const v of ['--ordfarge', '--skall', '--skallkant', '--skallmork']) {
+    const faste = new RegExp(`${v}:#[0-9A-Fa-f]{6};`)
+    assert.match(css, faste, `${v} mangler fallback uten color-mix()`)
+  }
+  assert.match(css, /\.ak dl,\.ak dt,\.ak dd,\.ak figure/, 'margene settes ikke uttrykkelig')
+})

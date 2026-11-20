@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { L } from '../lib/lang'
 
 // ORDSKIFTET I OVERSKRIFTEN
 // Ett uttrykk skyves ut mot venstre mens det neste kommer inn fra høyre. Resten av overskriften
@@ -6,22 +7,27 @@ import { useEffect, useRef } from 'react'
 //
 // Tre ting er bevisst beholdt:
 //   1. Overskriften har én stabil tilgjengelig tekst. Båndet er aria-hidden, og uttrykket som står
-//      først ligger som visuelt skjult tekst ved siden av. Da leses «Fordel arvegjenstandene med én
-//      felles oversikt» én gang, og ordskiftet annonseres ikke på nytt ved hvert bytte.
+//      først ligger som visuelt skjult tekst ved siden av. Da leses hele setningen én gang, og
+//      ordskiftet annonseres ikke på nytt ved hvert bytte.
 //   2. Plassen til det lengste uttrykket er reservert (inline-grid i CSS), så ingenting i heroen
 //      flytter seg når ordet skifter.
 //   3. Uten JavaScript og med «reduser bevegelse» står den komplette setningen statisk. Klassene
 //      settes bare her, i en effekt, så den forhåndsrendrede HTML-en er den statiske versjonen.
 //
-// MERK (WCAG 2.2.2, nivå A): ordskiftet starter av seg selv og varer i mer enn fem sekunder.
-// Prototypen har ingen pauseknapp – det ble tatt ut etter ønske fra teamet. Se
-// docs/ny-offentlig-nettside.md for hvordan en pauseknapp kan legges inn, og hvorfor den bør vurderes.
+// WCAG 2.2.2 (nivå A): ordskiftet starter av seg selv og varer i mer enn fem sekunder, så det må
+// kunne stanses. RotatorPause under er den mekanismen. Den ligger i heroen, er synlig, har et
+// forståelig navn og sier hvilken tilstand den er i. Ved «reduser bevegelse» er det ingenting å
+// stanse, og knappen skjules i CSS.
 
-export const ORD = ['arvegjenstandene', 'mormors servise', 'pappas platesamling']
+export const ORD = () => [
+  L('arvegjenstandene', 'the belongings'),
+  L('mormors servise', "grandma's china"),
+  L('pappas platesamling', "dad's records"),
+]
 const HVILE = 3400   // tiden et uttrykk blir stående, målt i videoen
 const SKIFT = 560    // selve bevegelsen, målt i videoen
 
-export default function Rotator({ heroId = 'top' }) {
+export default function Rotator({ heroId = 'top', paused = false }) {
   const slot = useRef(null)
 
   useEffect(() => {
@@ -31,9 +37,11 @@ export default function Rotator({ heroId = 'top' }) {
     if (ord.length < 2) return
 
     const mindre = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let i = 0, timer = 0, synlig = true, iBildet = true
+    let i = ord.findIndex(e => e.classList.contains('aktiv'))
+    if (i < 0) i = 0
+    let timer = 0, synlig = true, iBildet = true
 
-    const kanGaa = () => !mindre.matches && synlig && iBildet
+    const kanGaa = () => !paused && !mindre.matches && synlig && iBildet
     const stopp = () => { if (timer) { clearTimeout(timer); timer = 0 } }
 
     const skift = () => {
@@ -67,6 +75,7 @@ export default function Rotator({ heroId = 'top' }) {
         i = 0
         return
       }
+      // På pause blir uttrykket som står, stående – vi hopper ikke tilbake til det første
       if (!ord[i].classList.contains('aktiv')) {
         ord.forEach(e => e.classList.remove('ut', 'aktiv'))
         ord[i].classList.add('aktiv')
@@ -94,16 +103,31 @@ export default function Rotator({ heroId = 'top' }) {
       document.removeEventListener('visibilitychange', onVis)
       mindre.removeEventListener('change', start)
       io?.disconnect()
-      ord.forEach(e => { e.classList.remove('ut', 'aktiv'); e.style.transition = ''; e.style.transform = '' })
     }
-  }, [heroId])
+  }, [heroId, paused])
 
+  const ord = ORD()
   return (
     <>
       <span className="ordslot" aria-hidden="true" ref={slot}>
-        {ORD.map(o => <span className="ordslot__i" key={o}>{o}</span>)}
+        {ord.map(o => <span className="ordslot__i" key={o}>{o}</span>)}
       </span>
-      <span className="visuelt-skjult">{ORD[0]}</span>
+      <span className="visuelt-skjult">{ord[0]}</span>
     </>
+  )
+}
+
+// Pause/start for ordskiftet. Alltid i HTML-en, så heroen ikke flytter seg når JavaScript tar over
+// (CSS gjør den synlig først med «.ak-js», og skjuler den helt ved «reduser bevegelse»).
+export function RotatorPause({ paused, onToggle }) {
+  return (
+    <button type="button" className="ordpause" onClick={onToggle} aria-pressed={paused}>
+      <span className="ordpause__i" aria-hidden="true">
+        {paused
+          ? <svg width="11" height="12" viewBox="0 0 11 12" fill="none"><path d="M1 1.2 10 6l-9 4.8V1.2Z" fill="currentColor" /></svg>
+          : <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><rect x="0.5" y="1" width="3" height="10" rx="1" fill="currentColor" /><rect x="6.5" y="1" width="3" height="10" rx="1" fill="currentColor" /></svg>}
+      </span>
+      {paused ? L('Start ordskiftet', 'Resume the word animation') : L('Pause ordskiftet', 'Pause the word animation')}
+    </button>
   )
 }

@@ -1,3 +1,4 @@
+import { L } from '../lib/lang'
 import { HOME } from '../lib/routes'
 
 // SIDETOPP PÅ UNDERSIDENE
@@ -9,8 +10,8 @@ export default function PageHero({ className = '', crumb, overline, h1, lead, ch
       <div className="rules" aria-hidden="true"><i /></div>
       <div className="wrap">
         <div className="phero__in">
-          <nav className="crumb" aria-label="Du er her">
-            <a href={HOME}>Forsiden</a>{' '}
+          <nav className="crumb" aria-label={L('Du er her', 'You are here')}>
+            <a href={HOME}>{L('Forsiden', 'Home')}</a>{' '}
             <span aria-hidden="true">/</span>{' '}
             <span aria-current="page">{crumb}</span>
           </nav>
