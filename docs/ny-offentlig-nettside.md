@@ -253,6 +253,28 @@ Brødtekst og forklaringer er minst 16 px på 360 og 390 px, uten avkuttet tekst
 rulling, på begge språk. Ingen hel mobilskjerm i en liten telefonramme: `m-dok.webp` er delt i to
 lesbare utsnitt.
 
+### 2.12 Produktfilmen øverst på «Slik fungerer det»
+
+`public/nettsted/produktvideo.mp4` (1920×1080, 1 min 15 sek, 14,7 MB, **uten lydspor**) ligger øverst
+på siden, rett under sidetoppen.
+
+* **Ingen autostart, ingen løkke, ingen lyd.** Den starter bare når noen trykker, så den respekterer
+  både «reduser bevegelse» og databruk. `preload="metadata"` laster bare noen få kilobyte før det.
+* **Plakatbildet** (`produktvideo-plakat.webp`, et bilde fra filmen) har samme format som videoen, og
+  `aspect-ratio:16/9` står i CSS-en, så siden ikke hopper mens den lastes.
+* **Tekstalternativ (WCAG 1.2.1):** filmen er uten lyd, og alt den viser står i tekst i de fire
+  delene under. Det sies uttrykkelig i bildeteksten, og videoen har et beskrivende `aria-label`.
+* CSP-en tillot allerede `media-src 'self'`, så `vercel.json` er ikke endret.
+* `test/e2e/staticServer.mjs` manglet `video/mp4`. Med `nosniff` ville nettleseren nektet å spille
+  av fila. Samme feilklasse som `.webp` og `.woff2` tidligere.
+* **Metadatakontrollen er utvidet til MP4.** `test/seo/nettsted.test.js` leste før bare JPEG, WebP og
+  PNG, og nektet ukjente filtyper. MP4-kontrollen leser **bokstrukturen**, ikke rå bytes: et tekstsøk
+  gjennom 14 MB komprimert video traff boksnavn som `©cmt` og `GPS` ved ren tilfeldighet. «mdat»
+  åpnes aldri. Den ser etter sted (`©xyz`, `loci`, Apples location-nøkkel), kamera (`©mak`, `©mod`),
+  navn og kommentarer (`©nam`, `©cmt`, `©aut`, `©swr`), opptakstidspunkt (`©day`) og XMP. En egen test
+  planter sted og kamera i en syntetisk fil og sjekker at kontrollen finner dem — og at støy inne i
+  «mdat» ikke gir treff. Filen som er lagt inn, har bare encoder-tagger.
+
 ### 2.10 Skjermbildene med gyngestolfeilen
 
 Demoens «Bestemors gyngestol» har et foto av en vanlig trestol. Bildene er **beskåret**, ikke

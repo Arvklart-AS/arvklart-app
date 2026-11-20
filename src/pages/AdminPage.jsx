@@ -15,7 +15,7 @@ export default function AdminPage({ session, profile, onToast }) {
   const navigate = useNavigate()
   const [estate, setEstate] = useState(null)
   const [members, setMembers] = useState([])
-  const [brandColor, setBrandColor] = useState('#3A2F26')
+  const [brandColor, setBrandColor] = useState('#1F221E')
   const [saving, setSaving] = useState(false)
   const [logoFile, setLogoFile] = useState(null)
   const [logoPreview, setLogoPreview] = useState(null)
@@ -34,7 +34,7 @@ export default function AdminPage({ session, profile, onToast }) {
     setEstate(est)
     setMembers(mems || [])
     setLoaded(true)
-    setBrandColor(est?.branding_color || '#3A2F26')
+    setBrandColor(est?.branding_color || '#1F221E')
     setLogoPreview(est?.branding_logo || null)
   }
 

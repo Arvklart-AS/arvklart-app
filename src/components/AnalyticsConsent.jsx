@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { L } from '../lib/lang'
-import { CONSENT_EVENT, canLoadAnalytics, getConsent, hasAuthInUrl, isGtmLoaded, loadGtm, setConsent } from '../lib/analytics'
+import { CONSENT_EVENT, canLoadAnalytics, clearAnalyticsCookies, getConsent, hasAuthInUrl, isGtmLoaded, loadGtm, setConsent } from '../lib/analytics'
 // Registeret over offentlige sider: markedssidene og alle publiserte guider (aldri utkast eller app-sider)
 import { pageFor } from '../seo/registry'
 
@@ -25,8 +25,12 @@ export default function AnalyticsConsent({ loggedIn }) {
   useEffect(() => {
     if (consent === undefined) return
     const allowed = canLoadAnalytics({ consent, page: pageFor(pathname), loggedIn, authInUrl: hasAuthInUrl() })
-    if (allowed) loadGtm()
-    else if (isGtmLoaded()) window.location.reload()
+    if (allowed) { loadGtm(); return }
+    // Avslått: fei bort informasjonskapsler som kan ha rukket å bli skrevet rett før GTM fikk
+    // beskjed, eller av en måling som allerede var på vei. Da er tilbaketrekkingen uavhengig av
+    // timing, i stedet for å virke «som regel».
+    if (consent === 'denied') clearAnalyticsCookies()
+    if (isGtmLoaded()) window.location.reload()
   }, [consent, pathname, loggedIn])
 
   if (consent !== null || loggedIn || !pageFor(pathname)) return null

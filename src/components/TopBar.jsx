@@ -33,7 +33,10 @@ export default function TopBar({ profile, session, estate }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [menuOpen, logoMenuOpen])
 
-  const brandColor = estate?.branding_color || '#3A2F26'
+  // Samme farge som headeren på de offentlige sidene (--natt i src/site/site.css),
+  // så toppen av appen og markedssidene ser like ut. Et bo med egen merkevarefarge
+  // beholder sin (AdminPage → Merkevare).
+  const brandColor = estate?.branding_color || '#1F221E'
   const brandName = estate?.name ? `Arvklart · ${estate.name}` : 'Arvklart'
 
   const isDemo = isDemoSession(session)

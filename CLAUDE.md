@@ -42,7 +42,8 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 
 ## Fargepalett — bruk alltid disse
 ```
-#3A2F26  espresso (primær bakgrunn, topbar)
+#1F221E  natt (toppmenyen i appen og headeren på markedssidene)
+#3A2F26  espresso (primær bakgrunn, knapper, tekst på lyse flater)
 #FBF9F5  snow (side-bakgrunn)
 #E8DFD0  sand (kort, input-bakgrunn)
 #D9CFC0  grense/border
@@ -54,6 +55,11 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 #8B9A7D  sage
 #DCE3D2  tåkesage (subtil bakgrunn)
 ```
+
+Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
+`/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
+av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
+og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
 
 Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` i `index.html` (mørke flater setter lys ring selv). Hvit tekst bare på `#5F6E52` eller mørkere, ikke på `#8B9A7D`.
 

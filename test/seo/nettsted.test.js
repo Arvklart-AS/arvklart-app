@@ -69,6 +69,40 @@ function pngMetadata(buf) {
   return found
 }
 
+// MP4: metadata ligger i «udta»- og «meta»-bokser. Filen leses som bokstruktur, ikke som rå bytes:
+// et tekstsøk gjennom 14 MB komprimert video treffer boksnavn ved ren tilfeldighet. «mdat» (selve
+// videodataene) åpnes aldri. Interessante bokser er sted (©xyz, loci, Apples location-nøkkel),
+// kamera (©mak, ©mod), navn, forfatter og kommentarer (©nam, ©cmt, ©aut, ©swr), opptakstidspunkt
+// (©day) og XMP (uuid-boks).
+const MP4_BEHOLDERE = new Set(['moov', 'trak', 'udta', 'meta', 'ilst', 'mdia', 'minf', 'stbl', 'edts', 'moof', 'traf'])
+const MP4_FOLSOMME = ['\u00a9xyz', '\u00a9mak', '\u00a9mod', '\u00a9nam', '\u00a9cmt', '\u00a9aut', '\u00a9swr', '\u00a9day',
+  'loci', 'gps ', 'gpsa', 'XMP_', 'titl', 'auth', 'dscp', 'perf']
+function mp4Metadata(buf) {
+  assert.equal(buf.subarray(4, 8).toString('latin1'), 'ftyp', 'ikke MP4')
+  const funnet = new Set()
+  const gaa = (fra, til, dybde) => {
+    if (dybde > 8) return
+    for (let i = fra; i + 8 <= til;) {
+      let size = buf.readUInt32BE(i)
+      const type = buf.subarray(i + 4, i + 8).toString('latin1')
+      let innhold = i + 8
+      if (size === 1) { size = Number(buf.readBigUInt64BE(i + 8)); innhold = i + 16 }
+      else if (size === 0) size = til - i
+      if (size < 8 || i + size > til) break
+      if (MP4_FOLSOMME.includes(type)) funnet.add(type)
+      // «meta» er en FullBox: fire byte versjon og flagg før barna
+      if (type === 'meta') gaa(innhold + 4, i + size, dybde + 1)
+      else if (MP4_BEHOLDERE.has(type)) gaa(innhold, i + size, dybde + 1)
+      // Apples stedsnøkkel ligger som tekst i «keys»-boksen
+      else if (type === 'keys' && buf.subarray(innhold, i + size).toString('latin1').includes('com.apple.quicktime.location')) funnet.add('apple-location')
+      else if (type === 'uuid' && buf.subarray(innhold, i + size).toString('latin1').includes('adobe:ns:meta')) funnet.add('XMP')
+      i += size
+    }
+  }
+  gaa(0, buf.length, 0)
+  return [...funnet].sort()
+}
+
 test('nettstedets bilder har ingen EXIF, XMP, IPTC eller kommentarer', () => {
   assert.ok(filer.length >= 18, `fant bare ${filer.length} filer i ${DIR}`)
   for (const f of filer) {
@@ -76,10 +110,30 @@ test('nettstedets bilder har ingen EXIF, XMP, IPTC eller kommentarer', () => {
     const meta = f.endsWith('.jpg') || f.endsWith('.jpeg') ? jpegMetadata(buf)
       : f.endsWith('.webp') ? webpMetadata(buf)
         : f.endsWith('.png') ? pngMetadata(buf)
-          : null
+          : f.endsWith('.mp4') ? mp4Metadata(buf)
+            : null
     assert.ok(meta !== null, `${f}: ukjent filtype – legg til en kontroll før den publiseres`)
     assert.deepEqual(meta, [], `${f} inneholder ${meta.join(', ')}`)
   }
+})
+
+test('kontrollen finner sted og kamera i en MP4 som har det', () => {
+  const boks = (type, data) => {
+    const d = Buffer.from(data, 'latin1')
+    const b = Buffer.alloc(8 + d.length)
+    b.writeUInt32BE(8 + d.length, 0); b.write(type, 4, 'latin1'); d.copy(b, 8)
+    return b
+  }
+  const udta = Buffer.concat([boks('\u00a9xyz', '+59.9-010.7/'), boks('\u00a9mod', 'iPhone 15 Pro')])
+  const med = Buffer.concat([
+    boks('ftyp', 'isom'),
+    boks('moov', Buffer.concat([boks('udta', udta)]).toString('latin1')),
+  ])
+  assert.deepEqual(mp4Metadata(med), ['\u00a9mod', '\u00a9xyz'])
+  // Rå videodata skal aldri gi treff, selv om bytene tilfeldigvis staver et boksnavn
+  const stoy = Buffer.concat([boks('ftyp', 'isom'), boks('mdat', '\u00a9cmt noe GPS tull \u00a9xyz')])
+  assert.deepEqual(mp4Metadata(stoy), [])
+  assert.throws(() => mp4Metadata(Buffer.alloc(16)), /ikke MP4/)
 })
 
 test('kontrollen finner metadata i et bilde som har det', () => {
@@ -93,7 +147,7 @@ test('kontrollen finner metadata i et bilde som har det', () => {
 
 test('hvert bilde sidene bruker finnes, og hver fil er i bruk', () => {
   // filnavnene står enten i src= eller i en liste (portrettene i LandingPage/AboutPage)
-  const brukt = new Set([...kildetekst.matchAll(/['"]([\w.-]+\.(?:webp|jpg|png))['"]/g)].map(m => m[1]))
+  const brukt = new Set([...kildetekst.matchAll(/['"\/]([\w.-]+\.(?:webp|jpg|png|mp4))['"]/g)].map(m => m[1]))
   // logo-maske.png brukes som CSS-maske, ikke som <img>
   const maske = read('src/site/site.css').match(/--logo:url\(\/nettsted\/([\w.-]+)\)/)
   assert.ok(maske, 'logoen hentes ikke fra /nettsted/ i site.css')

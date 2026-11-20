@@ -15,7 +15,7 @@ const vercel = JSON.parse(await readFile(new URL('../../vercel.json', import.met
 const PROD = 'swmuztsejghweqmaogol.supabase.co'
 // X-Content-Type-Options: nosniff gjelder også her, så en type som mangler gjør at nettleseren nekter
 // å vise bildet eller bruke skrifttypen. Nye filtyper på nettstedet må derfor legges inn her.
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.json': 'application/json', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml' }
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.mp4': 'video/mp4', '.json': 'application/json', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml' }
 
 export const matches = (source, path) => new RegExp(`^${source}$`).test(path)
 
