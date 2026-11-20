@@ -215,6 +215,12 @@ havnet under folden. Inne i et bo (`/estate/:id/guide`) og for innloggede er lin
 Språkvalget er ærlig: menyen følger brukerens språk, men veiviserens innhold er norsk, og linjen
 under headeren sier det på engelsk. Ingen oversettelse er lovet.
 
+Byggesteget (`src/seo/veiviserHost.js`) trekker veiviserens egen luft øverst fra 24 til 8 px på
+smale skjermer, **bare i siden** og ikke i iframen: headeren gir allerede skillet mot toppen, og
+det er forskjellen på om startkortets knapp er innenfor første skjermbilde. Knappen slutter nå
+20 px over folden på 390 px; før var den 1 px under i CI, som gjengir skrift litt større enn
+testmiljøet her.
+
 «Kontakt» er lagt i hovedmenyen, som er **den samme listen** på brede skjermer og i mobilmenyen.
 Fem punkter får plass fra 981 px uten overflyt, uten linjebrudd og uten mindre skrift (29 px fra
 siste lenke til «Prøv demo»), så bruddpunktet på 980 px står. Appens og innloggingens header er
