@@ -33,12 +33,17 @@
       /* Brede skjermer: til høyre, der markedssidene har luft, og smalere, så det ikke når inn
          over kontrollene i heroen. Til venstre dekket det faktaraden på «Slik fungerer det». */
       @media (min-width: 760px) { .consent-ask { left: auto; right: 24px; bottom: 24px; max-width: 380px; } }
-      /* Mens spørsmålet står nederst, holdes den faste demoknappen på mobil nede, så de to aldri
-         dekker hverandre (src/site/MobileDock.jsx), og bunnen av siden får plass til å rulles fri
-         (spørsmålet er 214–257 px høyt, avhengig av bredde og språk). */
-      body:has(.consent-ask) .ak .dock { transform: translateY(102%); }
-      body:has(.consent-ask) .ak { padding-bottom: 290px; }
-      @media (min-width: 760px) { body:has(.consent-ask) .ak { padding-bottom: 260px; } }
+      /* Markedssidene (.ak): spørsmålet står øverst, rett under den klebrige headeren
+         (74 px, 62 px under 981 px), ikke nederst. Nederst dekket det i full bredde hele
+         lenkelisten i bunnteksten og pauseknappen i heroen på mobil, og plassen som måtte
+         reserveres for å få dem fri ble et tomt felt under bunnteksten. Øverst dekker det
+         bare innledende tekst, så ingenting trenger å reserveres og den faste demoknappen
+         kan stå framme. z-index under headeren (50), så headeren, den åpne mobilmenyen og
+         «Hopp til innholdet» (999) ligger over. Logikken og de to valgene er uendret.
+         De andre offentlige sidene (/personvern, /guider/…) bruker appens utforming og
+         beholder plasseringen nederst, uendret. */
+      body:has(.ak) .consent-ask { top: 86px; bottom: auto; z-index: 40; }
+      @media (max-width: 979px) { body:has(.ak) .consent-ask { top: 74px; } }
     </style>
     <script src="/seo-early.js"></script>
   </head>

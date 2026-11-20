@@ -16,10 +16,13 @@ import './site.css'
 // «Prøv demo» er alltid en lenke til /#demo, så den virker uten JavaScript. Med JavaScript starter
 // den demoen med én gang (src/site/useDemo.js). Elementtypen endres ikke ved hydrering.
 
+// Samme liste i hovedmenyen på brede skjermer og i mobilmenyen, så «Kontakt» finnes i begge.
+// «Prøv demo» står utenfor listen, som den tydelige hovedhandlingen.
 const NAV = () => [
   { href: '/slik-fungerer-det', label: L('Slik fungerer det', 'How it works') },
   { href: '/veiviser', label: L('Veiviser', 'Guide') },
   { href: '/om-oss', label: L('Om oss', 'About us') },
+  { href: '/kontakt', label: L('Kontakt', 'Contact') },
   { href: '/logg-inn', label: L('Logg inn', 'Log in') },
 ]
 
@@ -62,7 +65,8 @@ export function DemoError({ demo, center = false }) {
   )
 }
 
-function Header({ demo, current, onFront }) {
+// Eksportert: /veiviser bruker den samme headeren (src/pages/GuidePage.jsx), ikke en kopi.
+export function SiteHeader({ demo, current, onFront = false }) {
   const menu = useRef(null)
   useEffect(() => {
     const onKey = (e) => {
@@ -132,7 +136,7 @@ export default function SiteLayout({ current, demo, loggedIn = false, children, 
     <div className={`ak${hydrated ? ' ak-js' : ''}${loggedIn ? ' ak--innlogget' : ''}`} lang={isEn() ? 'en' : 'nb'}>
       {/* Innlogget ligger menyen i TopBar, og «Hopp til innholdet» hører til den */}
       {!loggedIn && <a className="skip" href="#innhold">{L('Hopp til innholdet', 'Skip to content')}</a>}
-      {!loggedIn && <Header demo={demo} current={current} onFront={onFront} />}
+      {!loggedIn && <SiteHeader demo={demo} current={current} onFront={onFront} />}
       <main id="innhold">{children}</main>
       {/* etter <main>: den faste demoknappen på mobil, som ikke er en del av innholdet */}
       {after}

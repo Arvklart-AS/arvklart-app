@@ -12,10 +12,10 @@ import { L } from '../lib/lang'
 // (integrasjonspakkens README, punkt 6.2). Se docs/ny-offentlig-nettside.md.
 
 const FOLK = () => [
-  { bilde: 't-bard.webp', navn: 'Bård Jakobsen Rinnan', rolle: L('Produkt og marked', 'Product and market') },
-  { bilde: 't-andrea.webp', navn: 'Andrea Hufthammer Vik', rolle: L('Drift og fremdrift', 'Operations and delivery') },
-  { bilde: 't-orjan.webp', navn: 'Ørjan Westre', rolle: L('Teknologi og økonomi', 'Technology and finance') },
-  { bilde: 't-julie.webp', navn: 'Julie Tvedt', rolle: L('Brukeropplevelse og piloter', 'User experience and pilots') },
+  { bilde: 't-bard.webp', navn: 'Bård Jakobsen Rinnan', rolle: L('CEO | Produkt og marked', 'CEO | Product and Marketing') },
+  { bilde: 't-andrea.webp', navn: 'Andrea Hufthammer Vik', rolle: L('COO | Drift og fremdrift', 'COO | Operations and Delivery') },
+  { bilde: 't-orjan.webp', navn: 'Ørjan Westre', rolle: L('Teknologi og økonomi', 'Technology and Finance') },
+  { bilde: 't-julie.webp', navn: 'Julie Tvedt', rolle: L('Brukeropplevelse og piloter', 'User Experience and Pilots') },
 ]
 
 export default function AboutPage({ loggedIn = false }) {
@@ -36,18 +36,19 @@ export default function AboutPage({ loggedIn = false }) {
         <div className="wrap">
           <p className="overline">{L('Hvor det begynte', 'Where it started')}</p>
           <div className="opphav">
+            {/* Overskriften er kort, så den ikke gjentar første setning i avsnittet under. */}
             <h2 className="opphav__sitat" id="h2-1">{L(
-              'Ideen til Arvklart kom fra et behov i egen familie.',
-              'The idea for Arvklart came from a need in our own family.',
+              'Slik begynte det.',
+              'How it started.',
             )}</h2>
             <div className="opphav__txt">
               <p className="body">{L(
-                'Da en i familien skulle flytte til en mindre bolig, skulle mange gjenstander finne nye hjem. Familien trengte en felles oversikt over tingene og hvem som ønsket hva.',
-                'When someone in the family was moving to a smaller home, a lot of things needed new homes. The family needed a shared overview of what there was, and of who wanted what.',
+                'Ideen til Arvklart oppsto da familien til Bård skulle fordele gjenstander fra morfaren hans. Familien bodde spredt rundt i landet og trengte en enkel måte å se hva som skulle fordeles, og hvem som ønsket hva. Det ble utgangspunktet for Arvklart: én felles oversikt over gjenstandene og familiens ønsker.',
+                'The idea for Arvklart came about when Bård’s family were sharing out belongings from his grandfather. The family lived in different parts of the country and needed a simple way to see what there was to share out, and who wanted what. That became the starting point for Arvklart: one shared overview of the belongings and of the family’s wishes.',
               )}</p>
               <p className="body">{L(
-                'Gjennom Venture Creation ved NHH ble vi et team og bestemte oss for å utvikle ideen videre. Nå bygger vi Arvklart for familier som skal få oversikt over og fordele innbo og løsøre.',
-                'Through Venture Creation at NHH we became a team and decided to take the idea further. Now we are building Arvklart for families who need an overview of a home’s contents, and a way to share them out.',
+                'Gjennom Venture Creation ved NHH ble vi et team og bestemte oss for å utvikle ideen videre. I dag bygger vi den for familier som står i det samme.',
+                'Through Venture Creation at NHH we became a team and decided to take the idea further. Today we are building it for families in the same situation.',
               )}</p>
             </div>
           </div>

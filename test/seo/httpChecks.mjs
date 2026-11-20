@@ -182,7 +182,7 @@ export async function runHttpChecks(base, { headers = {}, preview = false, fetch
   await check('De nye undersidene uten JavaScript: overskrift, hovedinnhold og brødsmule', async () => {
     for (const [path, h1, tekst] of [
       ['/slik-fungerer-det', 'Slik fordeler dere innbo med <em>Arvklart</em>', 'Seks steg, fulgt gjennom <em>ett</em> oljemaleri'],
-      ['/om-oss', 'Teamet bak <em>Arvklart</em>', 'Ideen til Arvklart kom fra et behov i egen familie.'],
+      ['/om-oss', 'Teamet bak <em>Arvklart</em>', 'Slik begynte det.'],
       ['/kontakt', 'Hva kan vi hjelpe deg <em>med</em>?', 'admin@arvklart.no'],
     ]) {
       const r = await get(path)

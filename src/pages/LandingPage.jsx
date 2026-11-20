@@ -17,11 +17,13 @@ import { HOME } from '../lib/routes'
 // Innlogget vises forsiden bare når appen ber om den («Tilbake til hjemmesiden», LANDING_STATE).
 // Da ligger menyen i TopBar, så sidens egen header er skjult, og demoknappen går til «Mine bo».
 
-const TEAM = [
-  { bilde: 't-bard.webp', navn: 'Bård Jakobsen Rinnan', rolle: L('Produkt og marked', 'Product and market') },
-  { bilde: 't-andrea.webp', navn: 'Andrea Hufthammer Vik', rolle: L('Drift og fremdrift', 'Operations and delivery') },
-  { bilde: 't-orjan.webp', navn: 'Ørjan Westre', rolle: L('Teknologi og økonomi', 'Technology and finance') },
-  { bilde: 't-julie.webp', navn: 'Julie Tvedt', rolle: L('Brukeropplevelse og piloter', 'User experience and pilots') },
+// Kalles ved visning, ikke ved import, så L() leser språket som gjelder nå.
+// Titlene beskriver arbeidsområder, ikke formelle ansvarsområder.
+const TEAM = () => [
+  { bilde: 't-bard.webp', navn: 'Bård Jakobsen Rinnan', rolle: L('CEO | Produkt og marked', 'CEO | Product and Marketing') },
+  { bilde: 't-andrea.webp', navn: 'Andrea Hufthammer Vik', rolle: L('COO | Drift og fremdrift', 'COO | Operations and Delivery') },
+  { bilde: 't-orjan.webp', navn: 'Ørjan Westre', rolle: L('Teknologi og økonomi', 'Technology and Finance') },
+  { bilde: 't-julie.webp', navn: 'Julie Tvedt', rolle: L('Brukeropplevelse og piloter', 'User Experience and Pilots') },
 ]
 
 export default function LandingPage({ loggedIn = false }) {
@@ -95,8 +97,8 @@ export default function LandingPage({ loggedIn = false }) {
               </div>
               <div className="valgfri__t">
                 <p>{L(
-                  'Tar dere et bilde, kan KI foreslå navn, kategori og tilstand, og gi et verdianslag. Dere ser over forslagene og bestemmer hva dere vil bruke. Et verdianslag er ikke en takst.',
-                  'If you take a photo, AI can suggest a name, a category and a condition, and give an estimated value. You look over the suggestions and decide what to use. An estimate is not a professional valuation.',
+                  'Tar dere et bilde, kan KI foreslå navn, kategori og tilstand, og gi et verdianslag. Dere ser over forslagene og bestemmer hva dere vil bruke.',
+                  'If you take a photo, AI can suggest a name, a category and a condition, and give an estimated value. You look over the suggestions and decide what to use.',
                 )}</p>
                 <p><a className="ul ul--sub" href="/slik-fungerer-det">{L(
                   'Les om KI-hjelp og de tre verditallene',
@@ -121,7 +123,7 @@ export default function LandingPage({ loggedIn = false }) {
           )}</p>
 
           <ul className="team">
-            {TEAM.map(p => (
+            {TEAM().map(p => (
               <li key={p.navn}>
                 <div className="portrait portrait--foto">
                   <Img src={p.bilde} w={460} h={575}

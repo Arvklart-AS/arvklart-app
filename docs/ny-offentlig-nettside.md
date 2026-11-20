@@ -246,19 +246,21 @@ den faste demoknappen, spørsmål og svar og mobilmenyen er beholdt.
 
 ## 5. Hva jeg trenger fra deg
 
-### 5.1 Rollebetegnelsene på «Om oss» og forsiden
+### 5.1 Rollebetegnelsene — avklart 20.11.2026
 
-Pakkens README sier de er foreløpige og skal bekreftes av hver enkelt. De står uendret, nå også på
-engelsk. **Bekreft eller rett hver enkelt:**
+Titlene er bekreftet av eier og beskriver **arbeidsområder**, ikke formelle roller eller
+ansvarsområder. De står likt på forsiden (`src/pages/LandingPage.jsx`, `TEAM()`) og på «Om oss»
+(`src/pages/AboutPage.jsx`, `FOLK()`).
 
 | Person | Norsk | Engelsk |
 |---|---|---|
-| Bård Jakobsen Rinnan | Produkt og marked | Product and market |
-| Andrea Hufthammer Vik | Drift og fremdrift | Operations and delivery |
-| Ørjan Westre | Teknologi og økonomi | Technology and finance |
-| Julie Tvedt | Brukeropplevelse og piloter | User experience and pilots |
+| Bård Jakobsen Rinnan | `CEO \| Produkt og marked` | `CEO \| Product and Marketing` |
+| Andrea Hufthammer Vik | `COO \| Drift og fremdrift` | `COO \| Operations and Delivery` |
+| Ørjan Westre | `Teknologi og økonomi` | `Technology and Finance` |
+| Julie Tvedt | `Brukeropplevelse og piloter` | `User Experience and Pilots` |
 
-Jeg har ikke endret ansvarsområdene.
+`TEAM` på forsiden var en konstant som kalte `L()` ved import, så rollene ville stått i det språket
+siden ble lastet i, også etter språkbytte. Den er nå en funksjon, som `FOLK()` på «Om oss».
 
 ### 5.2 Skjermbilder som må byttes før publisering
 
