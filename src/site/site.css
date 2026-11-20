@@ -1630,262 +1630,190 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   }
 }
 /* ============================================================
-   SIDEEGEN KOMPOSISJON
-   Forsiden er bygget rundt hva løsningen viser. Denne siden er
-   bygget rundt hvem som gjør hva. Derfor to baner som møtes,
-   ikke en ny rekke med seksjoner.
+   SIDEEGEN KOMPOSISJON — «Slik fungerer det»
+   Forsiden introduserer verdien. Denne siden viser hvordan
+   verktøyet brukes, i fire deler: én overskrift, én kort
+   forklaring og én stor produktvisning per del. Det som
+   utdyper ligger i ett <details>-felt per del, så hoveddelen
+   kan leses uten ekstra klikk.
    ============================================================ */
-/* ---- sidetopp: tallene fra eksempelboet som grunnlinje ---- */
 .ak .phero--slik{
   border-bottom:1px solid rgba(242,238,230,.1)
 }
-.ak .fakta{
-  display:flex;flex-wrap:wrap;gap:0;margin-top:clamp(22px,3vw,38px);
-  border-top:1px solid var(--rule)
+/* ---- en hoveddel ---- */
+.ak .del__h{
+  display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,2vw,26px);align-items:baseline;
+  margin:clamp(14px,1.6vw,22px) 0 clamp(16px,2vw,26px);max-width:22ch
 }
-.ak .fakta div{
-  flex:1 1 180px;padding:clamp(16px,2vw,24px) clamp(14px,2vw,26px) clamp(16px,2vw,24px) 0;
-  border-right:1px solid var(--rule)
+.ak .del__n{
+  font-family:var(--serif);font-size:clamp(1.6rem,1.1rem + 2vw,3rem);line-height:1;
+  color:var(--accent);font-optical-sizing:none
 }
-.ak .fakta div:last-child{
-  border-right:0
+.ak .del__t{
+  min-width:0
 }
-.ak .fakta dt{
-  font-size:.78rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--messing-lys);margin-bottom:.5em
+.ak .del__lead{
+  max-width:62ch
 }
-.ak .fakta dd{
-  margin:0;font-family:var(--serif);font-size:clamp(1.1rem,.95rem + .6vw,1.5rem);
-  line-height:1.25;color:var(--lin);font-optical-sizing:none
+.ak .del__shot{
+  margin-top:clamp(28px,3.4vw,48px);max-width:900px
 }
-@media (max-width:620px){
-  .ak .fakta div{
-    flex:1 1 100%;border-right:0;border-bottom:1px solid var(--rule);padding-right:0
-  }
-  .ak .fakta div:last-child{
-    border-bottom:0
-  }
+.ak .del__shot--bred{
+  max-width:1100px
 }
-/* ---- to baner som møtes ---- */
-.ak .baner{
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  gap:0;margin-top:clamp(34px,4.2vw,58px);
-  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)
+.ak .del__shot--smal{
+  max-width:620px
 }
-.ak .bane{
-  padding:clamp(22px,2.6vw,34px) clamp(20px,2.4vw,34px) clamp(26px,3vw,40px) 0
+.ak .del__shot .deskframe,.ak .utdyp__shot .deskframe{
+  width:100%
 }
-.ak .bane+.bane{
-  border-left:1px solid var(--rule);padding-left:clamp(20px,2.4vw,34px)
+/* ---- den trinnvise produktvisningen ----
+Fire trinn, byttet med radioknapper og :has(). Ingen automatikk og ingen
+bevegelse som må gå ferdig for at innholdet skal kunne leses: uten JavaScript,
+og uten :has(), står trinn 1 framme. Radioknappen dekker hele trinnknappen sin,
+så fokusringen havner rundt knappen og ingen tabulatorstopp er usynlig. */
+.ak .trinn{
+  margin-top:clamp(28px,3.4vw,48px)
 }
-.ak .bane__h{
-  display:grid;gap:.7em;justify-items:start;margin-bottom:clamp(16px,2vw,24px)
+.ak .trinn__valg{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule)
 }
-.ak .bane__t{
-  font-family:var(--serif);font-size:clamp(1.2rem,1rem + .8vw,1.65rem);
-  line-height:1.2;color:var(--ink);font-optical-sizing:none
+.ak .trinn__valg>li{
+  position:relative;background:var(--ground)
 }
-.ak .bane ol{
-  display:grid;gap:clamp(12px,1.4vw,18px);counter-reset:b
-}
-.ak .bane li{
-  display:grid;grid-template-columns:auto 1fr;gap:.9em;align-items:baseline;
-  color:var(--muted);font-size:1rem;line-height:1.5
-}
-.ak .bane li::before{
-  counter-increment:b;content:counter(b,decimal-leading-zero);
-  font-family:var(--serif);font-size:.95rem;color:var(--accent);font-optical-sizing:none
-}
-.ak .bane b{
-  color:var(--ink);font-weight:600
-}
-/* Sammenføyningen: en full bredde under begge banene. */
-.ak .sammen{
-  border-bottom:1px solid var(--rule);padding:clamp(22px,2.6vw,34px) 0 clamp(26px,3vw,38px)
-}
-.ak .sammen__h{
-  display:grid;gap:.7em;justify-items:start;margin-bottom:clamp(14px,1.8vw,20px)
-}
-.ak .sammen ul{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:clamp(18px,2.4vw,34px)
-}
-.ak .sammen li{
-  color:var(--muted);font-size:1rem;line-height:1.5;
-  border-top:1px solid var(--rule);padding-top:.9em
-}
-.ak .sammen b{
-  display:block;color:var(--ink);font-family:var(--serif);font-weight:400;
-  font-size:1.12rem;margin-bottom:.3em;font-optical-sizing:none
-}
-@media (max-width:860px){
-  .ak .baner{
-    grid-template-columns:1fr
-  }
-  .ak .bane{
-    padding-right:0
-  }
-  .ak .bane+.bane{
-    border-left:0;border-top:1px solid var(--rule);padding-left:0
-  }
-  .ak .sammen ul{
-    grid-template-columns:1fr;gap:0
-  }
-  .ak .sammen li{
-    padding-block:.9em
-  }
-}
-/* ---- det klikkbare eksempelet ---- */
-/* Alle seks radene står alltid med full tekst. Det eneste som skifter
-er hvilket skjermbilde som vises ved siden av. Siden er derfor
-fullt lesbar uten at noen trykker på noe, og uten JavaScript. */
-.ak .gang{
-  margin-top:clamp(30px,3.6vw,50px);display:grid;
-  grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:clamp(28px,4vw,66px);align-items:start
-}
-.ak .gang .rows>li{
-  position:relative
-}
-.ak .gang input{
+.ak .trinn__valg input{
   position:absolute;inset:0;margin:0;appearance:none;background:none;border:0;
   color:transparent;pointer-events:none;font-size:0
 }
-.ak .gang input:focus-visible{
-  outline:2px solid var(--focus);outline-offset:-3px;border-radius:2px
+.ak .trinn__valg input:focus-visible{
+  outline:2px solid var(--focus);outline-offset:-3px
 }
-.ak .gang .row{
-  cursor:pointer;width:100%;text-align:left;padding-right:1em;
-  grid-template-columns:auto 1fr
+.ak .trinn__valg label{
+  display:grid;grid-template-columns:auto 1fr;gap:.7em;align-items:baseline;
+  padding:clamp(14px,1.7vw,22px) clamp(14px,1.6vw,22px);cursor:pointer;height:100%;
+  border-top:2px solid transparent;
+  transition:background var(--t-s) var(--ease),border-color var(--t-s) var(--ease)
 }
-.ak .gang .row__t{
-  color:var(--muted);transition:color var(--t-s) var(--ease)
+.ak .trinn__n{
+  font-family:var(--serif);font-size:1.05rem;color:var(--accent);opacity:.82;font-optical-sizing:none
 }
-.ak .gang .row__d{
+.ak .trinn__k{
+  font-size:1rem;line-height:1.35;color:var(--muted);
   transition:color var(--t-s) var(--ease)
 }
-.ak .gang .row__w{
-  grid-column:2;margin-bottom:.55em
-}
-.ak .gang .row:hover{
-  transform:translateY(-2px)
-}
-.ak .gang .row:hover::before{
-  width:100%
-}
-.ak .gang .row:hover .row__n{
-  opacity:1
-}
-.ak .gang .row:hover .row__t{
-  color:var(--accent)
-}
-.ak .gang .rows>li:has(input:checked) .row::before{
-  width:100%
-}
-.ak .gang .rows>li:has(input:checked) .row{
-  transform:translateY(-2px)
-}
-.ak .gang .rows>li:has(input:checked) .row__n{
-  opacity:1
-}
-.ak .gang .rows>li:has(input:checked) .row__t,.ak .gang .rows>li:has(input:checked) .row__d{
+.ak .trinn__valg label:hover .trinn__k{
   color:var(--ink)
 }
-.ak .gang .rows>li:has(input:checked) .row:hover .row__t{
-  color:var(--accent)
+.ak .trinn__valg>li:has(input:checked) label{
+  border-top-color:var(--accent);background:var(--rule)
 }
-.ak .scene{
-  display:grid;position:relative;position:sticky;top:96px
+.ak .trinn__valg>li:has(input:checked) .trinn__n{
+  opacity:1
 }
-.ak .scene .shotfig{
-  grid-area:1/1;opacity:0;visibility:hidden;translate:0 14px;
+.ak .trinn__valg>li:has(input:checked) .trinn__k{
+  color:var(--ink)
+}
+.ak .trinn__vis{
+  display:grid;margin-top:clamp(22px,2.6vw,36px)
+}
+/* Trinnene ligger oppå hverandre i samme rute, så ruten er like høy som det høyeste.
+Skjermbildene er ulikt formet, så de får en felles høyde og står midtstilt i rammen.
+Da hopper ikke siden når man bytter trinn, og ingen av dem blir liggende i et tomt felt. */
+.ak .trinn__steg .deskframe{
+  display:grid;place-items:center;min-height:clamp(190px,23vw,330px)
+}
+.ak .trinn__steg .deskframe img{
+  max-height:clamp(174px,21vw,314px);width:auto
+}
+/* På smale skjermer gjelder mobilforstørrelsen (--zoom) i stedet: hele bildet skrumpet
+ned ville gitt uleselig skrift. Høydetaket er da av, så ingenting klippes på tvers. */
+@media (max-width:760px){
+  .ak .trinn__steg .deskframe img{
+    max-height:none
+  }
+  .ak .trinn__steg .deskframe{
+    min-height:0
+  }
+}
+.ak .trinn__steg{
+  grid-area:1/1;opacity:0;visibility:hidden;translate:0 10px;
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.8fr);
+  gap:clamp(24px,3.4vw,52px);align-items:start;
   transition:opacity var(--t-m) var(--ease),translate var(--t-m) var(--ease)
 }
-.ak .scene .g1{
+/* standard, også uten :has(): første trinn står framme */
+.ak .trinn__steg.s1{
   opacity:1;visibility:visible;translate:0 0
 }
-/* standard, også uten :has() */
-.ak .gang:has(#g2:checked) .g1,.ak .gang:has(#g3:checked) .g1,.ak .gang:has(#g4:checked) .g1,.ak .gang:has(#g5:checked) .g1,.ak .gang:has(#g6:checked) .g1{
-  opacity:0;visibility:hidden;translate:0 14px
+.ak .trinn:has(#tr2:checked) .s1,.ak .trinn:has(#tr3:checked) .s1,.ak .trinn:has(#tr4:checked) .s1{
+  opacity:0;visibility:hidden;translate:0 10px
 }
-.ak .gang:has(#g2:checked) .g2,.ak .gang:has(#g3:checked) .g3,.ak .gang:has(#g4:checked) .g4,.ak .gang:has(#g5:checked) .g5,.ak .gang:has(#g6:checked) .g6{
+.ak .trinn:has(#tr2:checked) .s2,.ak .trinn:has(#tr3:checked) .s3,.ak .trinn:has(#tr4:checked) .s4{
   opacity:1;visibility:visible;translate:0 0
 }
-.ak .scene .deskframe{
+.ak .trinn__txt{
+  display:grid;gap:clamp(14px,1.8vw,22px)
+}
+.ak .trinn__gjor,.ak .trinn__skjer{
+  color:var(--muted);font-size:1rem;line-height:1.6;max-width:46ch;
+  border-top:1px solid var(--rule);padding-top:clamp(12px,1.4vw,18px)
+}
+.ak .trinn__gjor b,.ak .trinn__skjer b{
+  display:block;color:var(--accent);font-weight:400;font-family:var(--serif);
+  font-size:1.05rem;margin-bottom:.3em;font-optical-sizing:none
+}
+@media (max-width:980px){
+  .ak .trinn__valg{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+  .ak .trinn__steg{
+    grid-template-columns:1fr;gap:22px
+  }
+}
+@media (max-width:460px){
+  .ak .trinn__valg{
+    grid-template-columns:1fr
+  }
+}
+/* ---- utdypingen til en del ---- */
+.ak .utdyp{
+  margin-top:clamp(28px,3.4vw,46px);max-width:1000px;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)
+}
+.ak .utdyp details>summary{
+  list-style:none;cursor:pointer;position:relative;
+  display:grid;grid-template-columns:1fr auto;gap:clamp(18px,2.4vw,34px);
+  align-items:center;padding:clamp(18px,2vw,26px) 0
+}
+.ak .utdyp details>summary::-webkit-details-marker{
+  display:none
+}
+.ak .utdyp details>summary::before{
+  content:'';position:absolute;left:0;top:0;height:1px;width:0;
+  background:var(--accent);transition:width var(--t-l) var(--ease)
+}
+.ak .utdyp details>summary:hover::before,.ak .utdyp details[open]>summary::before{
   width:100%
 }
-.ak .scene .phoneframe{
-  max-width:300px
+.ak .utdyp__q{
+  font-family:var(--serif);font-size:clamp(1.1rem,.95rem + .6vw,1.4rem);
+  line-height:1.25;color:var(--ink);font-optical-sizing:none;
+  transition:color var(--t-s) var(--ease)
 }
-.ak .scene .duo{
-  display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1fr);
-  gap:clamp(12px,1.6vw,20px);align-items:start;width:100%
+.ak .utdyp details>summary:hover .utdyp__q{
+  color:var(--accent)
 }
-@media (max-width:980px){
-  .ak .gang{
-    grid-template-columns:1fr;gap:26px
-  }
-  .ak .gang .rows{
-    order:2
-  }
-  .ak .scene{
-    order:1;position:static
-  }
-  .ak .scene .shotfig{
-    justify-items:stretch
-  }
+.ak .utdyp__a{
+  padding-bottom:clamp(22px,2.4vw,32px);color:var(--muted);font-size:1rem;line-height:1.6
 }
-@media (max-width:520px){
-  .ak .scene .duo{
-    grid-template-columns:1fr
-  }
+.ak .utdyp__a>p{
+  max-width:62ch
 }
-/* ---- metodene, med demoens egne ord ---- */
-.ak .met{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;
-  background:var(--rule);border:1px solid var(--rule);margin-top:clamp(30px,3.6vw,52px)
+.ak .utdyp__shot{
+  margin-top:clamp(20px,2.4vw,32px);max-width:620px
 }
-.ak .met li{
-  background:var(--ground);padding:clamp(20px,2.4vw,32px);display:grid;gap:.6em;align-content:start
-}
-.ak .met__t{
-  font-family:var(--serif);font-size:clamp(1.15rem,1rem + .6vw,1.5rem);
-  line-height:1.2;color:var(--ink);font-optical-sizing:none
-}
-.ak .met__d{
-  color:var(--muted);font-size:1rem;line-height:1.5
-}
-.ak .met__k{
-  font-family:var(--serif);font-style:italic;font-size:.98rem;
-  color:var(--accent);border-top:1px solid var(--rule);padding-top:.8em;margin-top:.3em
-}
-@media (max-width:860px){
-  .ak .met{
-    grid-template-columns:1fr
-  }
-}
-.ak .metgrid{
-  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.72fr);
-  gap:clamp(28px,4vw,62px);align-items:start;margin-top:clamp(30px,3.6vw,52px)
-}
-.ak .metgrid .deskframe{
-  max-width:420px
-}
-@media (max-width:980px){
-  .ak .metgrid{
-    grid-template-columns:1fr;gap:30px
-  }
-}
-/* ---- dokumentasjon ---- */
-.ak .dok{
-  display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1fr);
-  gap:clamp(28px,4vw,66px);align-items:start;margin-top:clamp(28px,3.4vw,48px)
-}
-.ak .dok__txt{
-  display:grid;gap:clamp(16px,2vw,26px);justify-items:start
-}
-.ak .dok .phoneframe{
-  max-width:320px;--ph:clamp(400px,42vw,560px)
-}
+/* ---- definisjonsrekken, brukt i utdypingene ---- */
 .ak .def{
   display:grid;gap:clamp(14px,1.8vw,22px);margin-top:.4em
 }
@@ -1897,32 +1825,14 @@ fullt lesbar uten at noen trykker på noe, og uten JavaScript. */
   margin-bottom:.35em;font-optical-sizing:none
 }
 .ak .def__d{
-  color:var(--muted);font-size:1rem;line-height:1.55;max-width:54ch
+  color:var(--muted);font-size:1rem;line-height:1.55;max-width:60ch
 }
-@media (max-width:980px){
-  .ak .dok{
-    grid-template-columns:1fr;gap:32px
+@media (prefers-reduced-motion: reduce){
+  .ak .trinn__steg{
+    transition:none;translate:none
   }
-}
-/* ---- for den som ikke er vant med data ---- */
-.ak .lett{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:clamp(20px,2.6vw,40px);margin-top:clamp(28px,3.4vw,48px)
-}
-.ak .lett li{
-  border-top:1px solid var(--rule);padding-top:clamp(14px,1.6vw,20px);
-  color:var(--muted);font-size:1rem;line-height:1.55
-}
-.ak .lett b{
-  display:block;font-family:var(--serif);font-weight:400;font-size:1.2rem;
-  color:var(--ink);margin-bottom:.35em;font-optical-sizing:none
-}
-@media (max-width:720px){
-  .ak .lett{
-    grid-template-columns:1fr;gap:0
-  }
-  .ak .lett li{
-    padding-block:clamp(14px,1.6vw,20px)
+  .ak .utdyp details>summary::before{
+    transition:none
   }
 }
 /* ============================================================

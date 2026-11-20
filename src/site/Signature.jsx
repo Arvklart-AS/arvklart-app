@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Img } from './Shot'
+import { L } from '../lib/lang'
 
 // SIGNATUREN — overgangen fra mørke til lys
 //
@@ -9,6 +10,9 @@ import { Img } from './Shot'
 //
 // Enhetsgruppen er tre ekte skjermbilder fra den offentlige demoen, tatt i samme økt. Rammene er
 // tegnet i CSS; skjerminnholdet er uendret. Under 980 px byttes riggen ut med ett telefonbilde.
+//
+// Utsnittene er beskjært, ikke redigert: nettbrettet viser skjemaet «Legg til gjenstand», PC-en
+// oversikten over boet ned til og med filtrene. Demodataene er urørt.
 
 export default function Signature() {
   const cross = useRef(null)
@@ -104,22 +108,31 @@ export default function Signature() {
         <div className="rigg">
           <div className="dev dev--tab">
             <div className="dev__sk">
-              <Img src="d-tablet.webp" w={700} h={933}
-                alt="Skjermbilde fra Arvklart-demoen på nettbrett: gjenstandsgalleriet med gitar, gyngestol, sofa, bokhylle, maleri, vase, gifteringer, halskjede, middagsservise og familiealbum." />
+              <Img src="d-galleri.webp" w={400} h={533}
+                alt={L(
+                  'Skjermbilde fra Arvklart-demoen på nettbrett: gjenstandsgalleriet med bokhylle, oljemaleri, gifteringer, halskjede og familiealbum, med verdi og navn under hvert kort.',
+                  'Screenshot from the Arvklart demo on a tablet (Norwegian interface): the item gallery with a bookcase, an oil painting, wedding rings, a necklace and a family album, with a value and names under each card.',
+                )} />
             </div>
           </div>
           <span className="rigg__gulv" aria-hidden="true" />
           <div className="dev dev--lap">
             <span className="dev__base" aria-hidden="true" />
             <div className="dev__sk">
-              <Img src="d-laptop.webp" w={1280} h={800}
-                alt="Skjermbilde fra Arvklart-demoen på PC: oversikten over Fam. Hansen sitt bo med status for boet, varsel om gjenstander som ikke er besvart, og snarveier til veiviser, arvinger og løsningsmetoder." />
+              <Img src="d-oversikt.webp" w={885} h={553}
+                alt={L(
+                  'Skjermbilde fra Arvklart-demoen på PC: oversikten over Fam. Hansen sitt bo med status for boet, varsel om gjenstander som ikke er besvart, snarveier til veiviser, arvinger og løsningsmetoder, og filtrene over gjenstandene.',
+                  'Screenshot from the Arvklart demo on a computer (Norwegian interface): the overview of the Hansen family estate with the status of the estate, a notice about items not yet answered, shortcuts to the guide, the heirs and the distribution methods, and the filters above the items.',
+                )} />
             </div>
           </div>
           <div className="dev dev--phone">
             <div className="dev__sk">
               <Img src="d-phone.webp" w={470} h={1017}
-                alt="Skjermbilde fra Arvklart-demoen på telefon: «Flere ønsker denne (2)» med begrunnelsene fra Lars Hansen og Kari Hansen om oljemaleriet." />
+                alt={L(
+                  'Skjermbilde fra Arvklart-demoen på telefon: «Flere ønsker denne (2)» med begrunnelsene fra Lars Hansen og Kari Hansen om oljemaleriet.',
+                  'Screenshot from the Arvklart demo on a phone (Norwegian interface): «Flere ønsker denne (2)» (Several want this) with the explanations from Lars Hansen and Kari Hansen about the oil painting.',
+                )} />
             </div>
           </div>
           <div className="rigg__veil" aria-hidden="true" />
@@ -129,7 +142,10 @@ export default function Signature() {
           <div className="frame">
             <div className="frame__win">
               <Img src="m-hero.webp" w={620} h={1342}
-                alt="Skjermbilde fra Arvklart-demoen på mobil: oversikten over Fam. Hansen sitt bo med status for boet og snarveier." />
+                alt={L(
+                  'Skjermbilde fra Arvklart-demoen på mobil: oversikten over Fam. Hansen sitt bo med status for boet og snarveier.',
+                  'Screenshot from the Arvklart demo on a phone (Norwegian interface): the overview of the Hansen family estate with the status of the estate and shortcuts.',
+                )} />
               <div className="frame__veil" aria-hidden="true" />
             </div>
           </div>
@@ -139,8 +155,11 @@ export default function Signature() {
           må være første eller siste barn av en figure. Utseendet styres av klassen og er uendret. */}
       <div className="cross__cap">
         <span className="cap cap--c">
-          <span className="label">Skjermbilde fra demoen</span>
-          <i>Eksempel fra Arvklart: gjenstander og familiens ønsker samlet i samme oversikt.</i>
+          <span className="label">{L('Skjermbilde fra demoen', 'Screenshot from the demo (Norwegian interface)')}</span>
+          <i>{L(
+            'Eksempel fra Arvklart: gjenstander og familiens ønsker samlet i samme oversikt.',
+            'An example from Arvklart: the items and the family’s wishes gathered in one overview.',
+          )}</i>
         </span>
       </div>
     </div>

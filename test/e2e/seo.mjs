@@ -38,7 +38,10 @@ async function observe(page, { lang } = {}) {
   page.on('pageerror', e => errors.push(e.message.slice(0, 200)))
   // Skrifttypene stenges, så bytte av skrift ikke gir layoutskift i målingen
   await page.route(/fonts\.(googleapis|gstatic)\.com/, route => route.abort())
-  if (lang) await page.addInitScript(l => localStorage.setItem('hs_lang', l), lang)
+  // Bare første lasting: skriptet kjører på hver navigering og ville ellers overskrevet et
+  // språkbytte brukeren gjør i testen (toggleLang laster siden på nytt). Språket ligger
+  // i localStorage og følger likevel med til neste side.
+  if (lang) await page.addInitScript(l => { if (localStorage.getItem('hs_lang') === null) localStorage.setItem('hs_lang', l) }, lang)
   await page.addInitScript(() => {
     window.__seo = { removed: 0, visibility: null, h1: null, shift: 0, csp: [] }
     document.addEventListener('securitypolicyviolation', e => window.__seo.csp.push(`${e.violatedDirective} ${e.blockedURI}`))
@@ -65,7 +68,8 @@ await check('Uten JavaScript: forsiden viser overskrift, tekst og lenker', async
   await page.goto(`${BASE}/`)
   assert(await h1Name(page) === H1_NO, `overskriften vises ikke: ${await h1Name(page)}`)
   assert(await page.getByText('Se tingene og hvem som ønsker dem').isVisible(), 'teksten vises ikke')
-  assert(await page.getByRole('link', { name: 'Kontakt', exact: true }).count() === 1, 'lenken til Kontakt mangler')
+  // «Kontakt» står både i hovedmenyen og i bunnmenyen
+  assert(await page.getByRole('link', { name: 'Kontakt', exact: true }).count() === 2, 'lenken til Kontakt mangler i hovedmenyen eller bunnmenyen')
   for (const [path, h1] of [['/kontakt', 'Hva kan vi hjelpe deg med?'], ['/slik-fungerer-det', 'Slik fordeler dere innbo med Arvklart'], ['/om-oss', 'Teamet bak Arvklart']]) {
     await page.goto(BASE + path)
     assert(await h1Name(page) === h1, `${path} er ikke forhåndsrendret: ${await h1Name(page)}`)
@@ -136,10 +140,14 @@ await check('Engelsk: de tre undersidene, språkbytte fra bunnteksten og overgan
   }
   // Språkbytte fra bunnteksten: samme side, nå på norsk
   await page.getByRole('link', { name: 'Norsk', exact: true }).click()
+  await page.waitForFunction(() => localStorage.getItem('hs_lang') === 'no')
   await page.waitForFunction(() => document.querySelector('.ak')?.lang === 'nb')
+  await page.getByRole('heading', { level: 1, name: 'Hva kan vi hjelpe deg med?' }).waitFor()
   assert(new URL(page.url()).pathname === '/kontakt', `språkbytte flyttet siden til ${page.url()}`)
   noErrors(await state())
-}, { loggedIn: false })
+  // resetLang: false — ellers fjerner oppsettet språkvalget igjen når toggleLang laster siden på nytt,
+  // og testen måler bare den forhåndsrendrede norske HTML-en i stedet for selve byttet.
+}, { loggedIn: false, resetLang: false })
 
 for (const lang of ['no', 'en']) {
   await check(`Innlogget (${lang}) åpner «/» (bokmerke): forhåndsrendret tekst skjult, rett til appen på /app`, async page => {

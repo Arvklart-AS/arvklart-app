@@ -158,10 +158,12 @@ test('produktpåstander: de rettede formuleringene står der, på begge språk',
   assert.match(how, /The administrator sets the order/)
   // Filtrene er de som finnes i EstatePage.jsx
   assert.match(how, /dine egne svar, på hva flere har sagt ja til/)
-  assert.match(how, /«Ingen vil ha» samler både det alle har sagt nei takk til, og det ingen har rukket å svare på/)
-  // Verdiforslag forutsetter et KI-anslag
-  assert.match(how, /Er det satt et KI-anslag, kan hver deltaker si seg uenig/)
-  assert.match(how, /If an AI estimate has been set, each participant can disagree/)
+  assert.match(how, /Filteret samler både det alle har sagt nei takk til, og det ingen har rukket å svare på/)
+  // Verdiforslag forutsetter et KI-anslag (vote_item_value), og står slik på begge språk
+  assert.match(how, /Er anslaget satt, kan hver deltaker si seg enig eller foreslå et annet beløp/)
+  assert.match(how, /Once an estimate is set, each participant can agree with it or suggest a different figure/)
+  // Fordelingsverdien settes av administrator (set_agreed_values)
+  assert.match(how, /Fordelingsverdien, som fordelingen regnes ut fra, settes av den som administrerer boet/)
 })
 
 test('alle fire sidene er oversatt: ingen av dem mangler L()', () => {

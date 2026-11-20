@@ -238,15 +238,21 @@ export default function GuidePage({ standalone = false, session = null, onToast 
     await saveInto(estate.id, estate.name)
   }
 
-  const bar = (
+  // «Tilbake» utelått der den offentlige headeren står over: den har både logoen og menyen,
+  // og to navigasjoner over hverandre tok en tredel av første skjermbilde på mobil.
+  const visTilbake = !(inline && !session)
+  const enMerknad = isEn() && !GUIDE_EN
+  const bar = (visTilbake || busy || enMerknad) ? (
       <div style={{ padding: '12px 20px', background: '#FBF9F5', borderBottom: '1px solid #D9CFC0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button onClick={goBack} style={{ background: 'none', border: 'none', color: '#75604B', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
-          {id ? L('← Tilbake til boet', '← Back to the estate') : L('← Tilbake til hjemmesiden', '← Back to the home page')}
-        </button>
+        {visTilbake && (
+          <button onClick={goBack} style={{ background: 'none', border: 'none', color: '#75604B', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+            {id ? L('← Tilbake til boet', '← Back to the estate') : L('← Tilbake til hjemmesiden', '← Back to the home page')}
+          </button>
+        )}
         {busy && <span style={{ fontSize: '0.8125rem', color: '#5F6E52', fontFamily: 'Karla, sans-serif' }}>{L('Lagrer i boet …', 'Saving to the estate …')}</span>}
-        {isEn() && !GUIDE_EN && <span style={{ fontSize: '0.8125rem', color: '#75604B', fontFamily: 'Karla, sans-serif', marginLeft: 'auto' }}>The inheritance guide follows Norwegian law and is only available in Norwegian.</span>}
+        {enMerknad && <span style={{ fontSize: '0.8125rem', color: '#75604B', fontFamily: 'Karla, sans-serif', marginLeft: visTilbake ? 'auto' : 0 }}>The inheritance guide follows Norwegian law and is only available in Norwegian.</span>}
       </div>
-  )
+  ) : null
   const modals = (
     <>
       {modal?.kind === 'auth' && (
