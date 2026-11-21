@@ -36,7 +36,7 @@ await check('Legg til en sammenligning: lagres i ai_analysis.corrections.referen
   await page.getByRole('alert').getByText(/Skriv prisen i kroner/).waitFor()
   assert(sent.length === 0, 'lagret med ugyldig pris')
   await page.getByLabel('Pris i kroner').fill('1 200')
-  await page.getByLabel('Lenke (valgfri)').fill('https://www.finn.no/recommerce/forsale/item/1')
+  await page.getByLabel('Lenke til annonsen').fill('https://www.finn.no/recommerce/forsale/item/1')
   await page.getByRole('button', { name: 'Lagre sammenligningen' }).click()
   await page.getByText('Sammenligningen er lagt til').waitFor()
   const refs = sent[0]?.ai_analysis?.corrections?.references
@@ -127,6 +127,34 @@ await check('Kan være sølv: spørsmålet om stempel på gjenstandssiden, og sv
   assert(sent[0]?.ai_analysis?.corrections?.material?.value === 'Forsølvet (plett)', `feil rettelse: ${JSON.stringify(sent[0])}`)
   assert(sent[0].ai_analysis.ai.identification.material.value === 'Sølv, oksidert', 'AI-forslaget ble endret')
 }, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: brooch }] } })
+
+await check('Lim inn FINN-lenke: annonsenummeret blir tittelen, sporing fjernes, samme annonse avvises, og ingenting hentes fra FINN', async page => {
+  const sent = patches(page)
+  const external = []
+  page.on('request', r => { if (/finn\.no|tradera\.com/.test(new URL(r.url()).hostname)) external.push(r.url()) })
+  await open(page)
+  await page.getByRole('button', { name: 'Legg til en sammenligning' }).click()
+  await page.getByLabel('Lenke til annonsen').fill('Se denne: https://www.finn.no/recommerce/forsale/item/446017411?utm_source=app#bilder')
+  await page.getByText('FINN-annonse 446017411').waitFor()
+  await page.getByLabel('Pris i kroner').fill('2000')
+  await page.getByRole('button', { name: 'Lagre sammenligningen' }).click()
+  await page.getByText('Sammenligningen er lagt til').waitFor()
+  const ref = sent[0]?.ai_analysis?.corrections?.references?.at(-1)
+  assert(ref?.title === 'FINN-annonse 446017411', `feil tittel: ${JSON.stringify(ref)}`)
+  assert(ref.url === 'https://www.finn.no/recommerce/forsale/item/446017411', `sporing ble ikke fjernet: ${ref.url}`)
+  assert(external.length === 0, `Arvklart kontaktet annonsesiden: ${external.join(', ')}`)
+}, withRefs([]))
+
+await check('Lim inn samme FINN-annonse som allerede er lagt inn: melding, ingenting lagres', async page => {
+  const sent = patches(page)
+  await open(page)
+  await page.getByRole('button', { name: 'Legg til en sammenligning' }).click()
+  await page.getByLabel('Lenke til annonsen').fill('https://m.finn.no/bap/forsale/ad.html?finnkode=446017411')
+  await page.getByLabel('Pris i kroner').fill('2500')
+  await page.getByRole('button', { name: 'Lagre sammenligningen' }).click()
+  await page.getByRole('alert').getByText('Denne annonsen er allerede lagt inn.').waitFor()
+  assert(sent.length === 0, 'duplikatet ble lagret')
+}, withRefs([{ id: 'r1', title: 'FINN-annonse 446017411', price: 2000, price_type: 'sold_price', url: 'https://www.finn.no/recommerce/forsale/item/446017411', date: null, by: UID, at: '2026-11-21T00:00:00Z' }]))
 
 await browser.close()
 console.log(results.join('\n'))

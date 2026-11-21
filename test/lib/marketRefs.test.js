@@ -1,7 +1,7 @@
 // Familiens egne sammenligninger (src/lib/marketRefs.js): validering, lagring i ai_analysis og søkefrasen.
 import { test, describe } from 'node:test'
 import assert from 'node:assert/strict'
-import { emptyRecord, familyReferences, marketQuery, searchLinks, withReference, withoutReference, MAX_REFERENCES } from '../../src/lib/marketRefs.js'
+import { emptyRecord, familyReferences, marketQuery, parseListingUrl, searchLinks, withReference, withoutReference, MAX_REFERENCES } from '../../src/lib/marketRefs.js'
 
 const AT = '2026-10-09T12:00:00.000Z'
 const ok = { title: ' Figgjo Lotte, FINN ', price: '1 200 kr', price_type: 'sold_price', url: 'https://www.finn.no/1', date: '2026-09-14' }
@@ -21,16 +21,53 @@ describe('sammenligninger', () => {
     assert.equal(familyReferences(record)[0].date, null)
   })
   test('manglende tittel, pris 0 eller tekst, ukjent type, rar lenke og for mange gir en melding', () => {
-    for (const bad of [{ title: '' }, { price: '0' }, { price: 'mye' }, { price_type: 'estimate' }, { url: 'javascript:alert(1)' }, { date: '14.09.2026' }])
+    for (const bad of [{ title: '', url: '' }, { price: '0' }, { price: 'mye' }, { price_type: 'estimate' }, { url: 'javascript:alert(1)' }, { date: '14.09.2026' }])
       assert.ok(withReference(null, { ...ok, ...bad }, 'u1').error, JSON.stringify(bad))
     let rec = null
-    for (let i = 0; i < MAX_REFERENCES; i++) rec = withReference(rec, ok, 'u1', { id: `r${i}` }).record
-    assert.ok(withReference(rec, ok, 'u1').error)
+    for (let i = 0; i < MAX_REFERENCES; i++) rec = withReference(rec, { ...ok, url: `https://www.finn.no/recommerce/forsale/item/10000${i}` }, 'u1', { id: `r${i}` }).record
+    assert.equal(familyReferences(rec).length, MAX_REFERENCES)
+    assert.ok(withReference(rec, { ...ok, url: '' }, 'u1').error)
   })
   test('fjerning tar bare den ene', () => {
     let rec = withReference(null, ok, 'u1', { id: 'a' }).record
-    rec = withReference(rec, ok, 'u1', { id: 'b' }).record
+    rec = withReference(rec, { ...ok, url: 'https://www.finn.no/recommerce/forsale/item/222222' }, 'u1', { id: 'b' }).record
     assert.deepEqual(familyReferences(withoutReference(rec, 'a')).map(r => r.id), ['b'])
+  })
+})
+
+describe('lenker limt inn (leses som tekst, åpnes aldri)', () => {
+  test('FINN: annonsenummeret fra de vanlige formene, uten sporing og #', () => {
+    const cases = [
+      ['https://www.finn.no/recommerce/forsale/item/446017411', 'https://www.finn.no/recommerce/forsale/item/446017411'],
+      ['Se denne: https://www.finn.no/recommerce/forsale/item/446017411?utm_source=app&utm_medium=share#bilder.', 'https://www.finn.no/recommerce/forsale/item/446017411'],
+      ['https://m.finn.no/bap/forsale/ad.html?finnkode=123456789&fbclid=abc', 'https://m.finn.no/bap/forsale/ad.html?finnkode=123456789'],
+      ['https://www.finn.no/446017411', 'https://www.finn.no/446017411'],
+    ]
+    for (const [text, url] of cases) {
+      const r = parseListingUrl(text)
+      assert.equal(r.provider, 'finn', text)
+      assert.equal(r.url, url, text)
+      assert.match(r.label, /^FINN-annonse \d+$/, text)
+    }
+  })
+  test('Tradera og andre sider', () => {
+    assert.deepEqual(parseListingUrl('https://www.tradera.com/item/341/612345678/solvskje'), { url: 'https://www.tradera.com/item/341/612345678/solvskje', provider: 'tradera', code: '612345678', label: 'Tradera-annonse 612345678' })
+    assert.deepEqual(parseListingUrl('https://www.blomqvist.no/auksjon/1?gclid=x'), { url: 'https://www.blomqvist.no/auksjon/1', provider: 'other', code: null, label: 'blomqvist.no' })
+  })
+  test('ikke en lenke: null', () => {
+    for (const t of ['', 'javascript:alert(1)', 'data:text/html,x', 'finn.no/446017411', 'ftp://finn.no/1', null]) assert.equal(parseListingUrl(t), null, String(t))
+  })
+  test('uten tittel brukes annonsenummeret, og lenken lagres uten sporing', () => {
+    const { record } = withReference(null, { title: '', price: '2000', price_type: 'sold_price', url: 'Se denne: https://www.finn.no/recommerce/forsale/item/446017411?utm_source=x' }, 'u1', { at: AT, id: 'r1' })
+    const [ref] = familyReferences(record)
+    assert.equal(ref.title, 'FINN-annonse 446017411')
+    assert.equal(ref.url, 'https://www.finn.no/recommerce/forsale/item/446017411')
+  })
+  test('samme annonse to ganger avvises, også med en annen form av lenken', () => {
+    const rec = withReference(null, { ...ok, url: 'https://www.finn.no/recommerce/forsale/item/446017411' }, 'u1', { id: 'a' }).record
+    for (const url of ['https://www.finn.no/recommerce/forsale/item/446017411?utm_source=x', 'https://m.finn.no/bap/forsale/ad.html?finnkode=446017411'])
+      assert.match(withReference(rec, { ...ok, url }, 'u1').error, /allerede lagt inn/, url)
+    assert.ok(withReference(rec, { ...ok, url: 'https://www.finn.no/recommerce/forsale/item/999999' }, 'u1').record, 'en annen annonse')
   })
 })
 
