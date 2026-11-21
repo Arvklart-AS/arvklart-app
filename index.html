@@ -26,6 +26,24 @@
       .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
       /* Forhåndsrendret norsk side skjules for engelsk og innloggede til appen har tatt over (public/seo-early.js) */
       html.pr-client #root[data-prerendered] { visibility: hidden; }
+      /* Samtykkespørsmålet (src/components/AnalyticsConsent.jsx). Plasseringen ligger her, ikke i
+         komponenten, så den kan ta hensyn til skjermbredden og til de faste knappene på de
+         offentlige sidene. Innholdet og de to valgene er uendret. */
+      .consent-ask { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 10000; max-width: 440px; }
+      /* Brede skjermer: til høyre, der markedssidene har luft, og smalere, så det ikke når inn
+         over kontrollene i heroen. Til venstre dekket det faktaraden på «Slik fungerer det». */
+      @media (min-width: 760px) { .consent-ask { left: auto; right: 24px; bottom: 24px; max-width: 380px; } }
+      /* Markedssidene (.ak): spørsmålet står øverst, rett under den klebrige headeren
+         (74 px, 62 px under 981 px), ikke nederst. Nederst dekket det i full bredde hele
+         lenkelisten i bunnteksten og pauseknappen i heroen på mobil, og plassen som måtte
+         reserveres for å få dem fri ble et tomt felt under bunnteksten. Øverst dekker det
+         bare innledende tekst, så ingenting trenger å reserveres og den faste demoknappen
+         kan stå framme. z-index under headeren (50), så headeren, den åpne mobilmenyen og
+         «Hopp til innholdet» (999) ligger over. Logikken og de to valgene er uendret.
+         De andre offentlige sidene (/personvern, /guider/…) bruker appens utforming og
+         beholder plasseringen nederst, uendret. */
+      body:has(.ak) .consent-ask { top: 86px; bottom: auto; z-index: 40; }
+      @media (max-width: 979px) { body:has(.ak) .consent-ask { top: 74px; } }
     </style>
     <script src="/seo-early.js"></script>
   </head>

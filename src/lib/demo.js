@@ -1,4 +1,4 @@
-// Demokontoen som «Test ut demo» logger inn på. Passordet ligger ikke i appen; edge-funksjonen
+// Demokontoen som «Prøv demo» logger inn på. Passordet ligger ikke i appen; edge-funksjonen
 // demo-login nullstiller demo-boet og returnerer en økt.
 import { supabase } from './supabase'
 import { L } from './lang'

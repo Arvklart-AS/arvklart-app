@@ -45,6 +45,21 @@ describe('demoinnholdet', () => {
     assert.doesNotMatch(read('src/pages/LandingPage.jsx'), /eiketresbord/i)
   })
 
+  test('gyngestolen: bildet viser en gyngestol, og teksten dikter ikke opp treslag, alder eller opphav', () => {
+    const stol = seedItem('face0001')
+    assert.match(stol, /'Bestemors gyngestol'/)
+    // Den gamle beskrivelsen var diktet opp: eiketre, 1960-tallet, laget av bestefar Per, blomstermønster
+    assert.doesNotMatch(stol, /eiketre|eik\b|1960|bestefar Per|blomstermønster/i)
+    assert.match(stol, /mørklakkert tre med dreide spiler/)
+    // Det gamle bildet viste en vanlig stol uten gyngemeier og skal ikke være i bruk
+    assert.match(stol, /demo__face0001_gyngestol\.jpg/)
+    assert.doesNotMatch(stol, /demo__face0001\.jpg/)
+    assert.ok(!readdirSync(new URL('supabase/seed/demo-images/', root)).includes('face0001.jpg'),
+      'det gamle bildet av en vanlig stol ligger fortsatt i repoet')
+    // Begrunnelsene handler om minner, ikke om materiale eller alder
+    for (const w of resetWishes.filter(w => w.item === 'face0001')) assert.doesNotMatch(w.reason, /eik|1960|blomster/i, w.reason)
+  })
+
   test('serviset har ingen oppdiktet antall deler, produsent eller modell', () => {
     const servise = seedItem('face0009')
     assert.match(servise, /'Middagsservise'/)
@@ -76,13 +91,18 @@ describe('demoinnholdet', () => {
     }
   })
 
-  test('banneret sier hvem den besøkende er, og forsiden viser utgangspunktet, ikke en ferdig fordeling', () => {
+  test('banneret sier hvem den besøkende er, og de offentlige sidene viser utgangspunktet, ikke en ferdig fordeling', () => {
     assert.match(read('src/App.jsx'), /Du er Mona, en av tre arvinger og administrator; Kari og Lars har allerede svart\./)
-    const landing = read('src/pages/LandingPage.jsx')
-    const at = landing.indexOf('className="demo-mockup"')
-    const mock = landing.slice(at, landing.indexOf('</section>', at))
-    assert.match(mock, /10 gjenstander · 3 arvinger/)
-    assert.doesNotMatch(mock, /Tildelt|ble enige|Avklart|eiketresbord|Erik/, 'illustrasjonen viser noe nullstillingen fjerner eller som ikke finnes i demoen')
+    // Tallene om eksempelboet står to steder på de offentlige sidene og må stemme med demoen
+    assert.match(read('src/pages/HowItWorksPage.jsx'), /3 arvinger og 10 gjenstander/)
+    assert.match(read('src/pages/ContactPage.jsx'), /tre arvinger og ti gjenstander/)
+    // Forsiden og produktreisen illustrerer demoen med skjermbilder. Teksten rundt dem skal ikke
+    // påstå en ferdig fordeling, og ikke nevne noe nullstillingen fjerner eller som ikke finnes.
+    for (const f of ['src/pages/LandingPage.jsx', 'src/site/Journey.jsx']) {
+      assert.doesNotMatch(read(f), /Tildelt|ble enige|eiketresbord|Erik/, `${f}: viser noe nullstillingen fjerner eller som ikke finnes i demoen`)
+    }
+    // Hvert produktutsnitt er merket som skjermbilde (redelighetskravet i integrasjonspakken)
+    assert.match(read('src/site/Shot.jsx'), /Skjermbilde fra Arvklart.*Skjermbilde fra demoen/s)
   })
 
   test('seed og nullstilling har de samme ønsketekstene', () => {

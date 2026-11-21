@@ -129,6 +129,10 @@ export async function veiviserHostParts(root = process.cwd()) {
     'html:not(.vv-off) #root .app-shell { min-height: 0 !important; }',
     // Engelsk og innloggede: skjult til appen har rendret (som #root[data-prerendered], public/seo-early.js)
     `html.pr-client ${SCOPE} { visibility: hidden; }`,
+    // I siden står den felles offentlige headeren over veiviseren og gir skillet mot toppen, så
+    // veiviserens egen luft øverst er ikke nødvendig i tillegg. På mobil er det forskjellen på om
+    // startkortets knapp er innenfor første skjermbilde. Gjelder bare her, ikke i iframen.
+    `@media (max-width: 760px) { ${SCOPE} > :first-child { padding-top: 8px; } }`,
   ].join('\n')
   return {
     head: `${fonts}\n    <style id="veiviser-css">\n${hostCss}\n    </style>`,
