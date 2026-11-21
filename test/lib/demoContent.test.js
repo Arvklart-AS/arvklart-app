@@ -45,6 +45,21 @@ describe('demoinnholdet', () => {
     assert.doesNotMatch(read('src/pages/LandingPage.jsx'), /eiketresbord/i)
   })
 
+  test('gyngestolen: bildet viser en gyngestol, og teksten dikter ikke opp treslag, alder eller opphav', () => {
+    const stol = seedItem('face0001')
+    assert.match(stol, /'Bestemors gyngestol'/)
+    // Den gamle beskrivelsen var diktet opp: eiketre, 1960-tallet, laget av bestefar Per, blomstermønster
+    assert.doesNotMatch(stol, /eiketre|eik\b|1960|bestefar Per|blomstermønster/i)
+    assert.match(stol, /mørklakkert tre med dreide spiler/)
+    // Det gamle bildet viste en vanlig stol uten gyngemeier og skal ikke være i bruk
+    assert.match(stol, /demo__face0001_gyngestol\.jpg/)
+    assert.doesNotMatch(stol, /demo__face0001\.jpg/)
+    assert.ok(!readdirSync(new URL('supabase/seed/demo-images/', root)).includes('face0001.jpg'),
+      'det gamle bildet av en vanlig stol ligger fortsatt i repoet')
+    // Begrunnelsene handler om minner, ikke om materiale eller alder
+    for (const w of resetWishes.filter(w => w.item === 'face0001')) assert.doesNotMatch(w.reason, /eik|1960|blomster/i, w.reason)
+  })
+
   test('serviset har ingen oppdiktet antall deler, produsent eller modell', () => {
     const servise = seedItem('face0009')
     assert.match(servise, /'Middagsservise'/)

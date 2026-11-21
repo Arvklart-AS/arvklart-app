@@ -9,7 +9,6 @@ Bildene til gjenstandene i `seed/demo_estate.sql`, lagret i repoet så demoen ik
 
 | Fil | Unsplash-bilde |
 |---|---|
-| `face0001.jpg` | `photo-1506439773649-6e0eb8cfb237` |
 | `face0002.jpg` | `photo-1555041469-a586c61ea9bc` |
 | `face0003.jpg` | `photo-1481627834876-b7833e8f5570` |
 | `face0004.jpg` | `photo-1579783902614-a3fb3927b6a5` |
@@ -17,7 +16,10 @@ Bildene til gjenstandene i `seed/demo_estate.sql`, lagret i repoet så demoen ik
 | `face0008.jpg` | `photo-1593305841991-05c297ba4575` |
 | `face0010.jpg` | `photo-1560472354-b33ff0c44a43` |
 | `face0012.jpg` | `photo-1558618666-fcd25c85cd64` |
+| `face0001_gyngestol.jpg` | Familiens eget bilde av gyngestolen, gitt til demoen av Bård 21.11.2026. Skalert til 600 px og lagret på nytt uten metadata (ingen EXIF/GPS, XMP, ICC eller kommentarer). Ingen personer eller private detaljer. Erstatter `face0001.jpg`, som viste en vanlig stol uten gyngemeier |
 | `db1836d7.jpg` | Familiens eget bilde av gitaren, gitt til demoen av Bård 2026-11-09. Skalert til 600 px og lagret på nytt uten metadata (ingen EXIF/GPS, XMP, ICC eller kommentarer). Ingen personer eller private detaljer. |
+
+**Gyngestolen (`face0001`, «Bestemors gyngestol»):** bildet lastes opp som `deed0001-…/demo__face0001_gyngestol.jpg`, altså et **nytt** navn. Det gamle `demo__face0001.jpg` ligger igjen i bøtten og røres ikke: opplastingsskriptet overskriver aldri, og et nytt navn unngår dessuten at Smart CDN serverer det gamle bildet fra hurtigbufferen (se `APPLIED.md`, 20261014). `20261121_demo_gyngestol.sql` kobler bildet til gjenstanden bare når fila finnes i bøtten, så last opp først og kjør migreringen etterpå.
 
 Gjenstandene `face0005`, `face0007`, `face0009` og `face0011` har ikke bilde: Unsplash-bildene de pekte på, finnes ikke lenger (404) eller viste noe annet.
 
