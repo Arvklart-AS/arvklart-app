@@ -37,7 +37,7 @@ export default function EstatesPage({ session, profile, onToast }) {
     const { data, error } = await createEstate({
       name: newName.trim(), description: newDesc.trim(),
       owner_id: session.user.id, invite_code: genCode(),
-      branding_color: '#3A2F26', status: 'active',
+      branding_color: '#1F221E', status: 'active',
     })
     if (error) { onToast(L('Kunne ikke opprette boet: ', 'Could not create the estate: ') + error.message, 'error'); setCreating(false); return }
     const { error: memberError } = await supabase.from('estate_members').insert({ estate_id: data.id, user_id: session.user.id, role: 'admin' })
@@ -123,7 +123,7 @@ export default function EstatesPage({ session, profile, onToast }) {
               onMouseEnter={ev=>{ ev.currentTarget.style.transform='translateY(-2px)'; ev.currentTarget.style.boxShadow='0 8px 28px rgba(0,0,0,0.09)' }}
               onMouseLeave={ev=>{ ev.currentTarget.style.transform='none'; ev.currentTarget.style.boxShadow='none' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'10px' }}>
-                  <div style={{ width:'42px', height:'42px', borderRadius:'10px', background: est?.branding_color || '#3A2F26', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <div style={{ width:'42px', height:'42px', borderRadius:'10px', background: est?.branding_color || '#1F221E', display:'flex', alignItems:'center', justifyContent:'center' }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBF9F5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 3v18M7 21h10M5 7h4M15 7h4M5 7L2.5 12a2.5 2.5 0 0 0 5 0L5 7zM19 7l-2.5 5a2.5 2.5 0 0 0 5 0L19 7z"/>
                     </svg>

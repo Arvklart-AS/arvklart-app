@@ -115,7 +115,7 @@ await check('Norsk, ikke innlogget: hydrering uten feil, startkortet blinker ikk
   await ready(page)
   assert(await page.evaluate(() => window.__loading) === false, '«Laster veiviseren …» ble vist')
   assert(await page.locator('iframe').count() === 0, 'iframe')
-  assert(await page.locator('#root').getByRole('button', { name: '← Tilbake til hjemmesiden' }).isVisible(), 'linjen øverst')
+  assert(await page.locator('#root .hdr').isVisible(), 'den offentlige headeren øverst')
   assert(await page.title() === 'Arveveiviser: fra dødsfall til fordelt bo — Arvklart', `tittel: ${await page.title()}`)
   assert(errors.length === 0, `feil: ${errors.join(' | ')}`)
 }, { loggedIn: false })
@@ -142,7 +142,7 @@ await check('Spørsmålene: start, svar, neste og tilbake, varsel uten svar, og 
   assert(await page.evaluate(k => JSON.parse(localStorage.getItem(k) || 'null')?.answers?.role, STORE) === 'survivor', 'svaret ble ikke lagret')
 }, { loggedIn: false })
 
-await check('Fasene, ordlisten, gravferdssjekken, lenkene og «Tilbake til hjemmesiden»; tilbake i nettleseren viser veiviseren igjen', async page => {
+await check('Fasene, ordlisten, gravferdssjekken, lenkene og logoen til forsiden; tilbake i nettleseren viser veiviseren igjen', async page => {
   await page.goto(`${BASE}/veiviser`)
   await ready(page)
   const head = page.locator('#veiviser .phase-head').first()
@@ -171,7 +171,8 @@ await check('Fasene, ordlisten, gravferdssjekken, lenkene og «Tilbake til hjemm
   await page.waitForURL(`${BASE}/veiviser`)
   assert(await page.evaluate(() => !document.getElementById('veiviser').hidden), 'veiviseren vises ikke igjen')
   await page.getByText('Trolig rett på et redusert beløp').waitFor()
-  await page.locator('#root').getByRole('button', { name: '← Tilbake til hjemmesiden' }).click()
+  // Logoen i den felles headeren fører til forsiden, der «Tilbake til hjemmesiden» gjorde det før
+  await page.locator('#root .hdr .brand').click()
   await page.waitForURL(`${BASE}/`)
 }, { loggedIn: false })
 
@@ -192,13 +193,23 @@ await check('Mobil: startkortet står i første skjermbilde', async page => {
   assert(start && start.y + start.height <= 844, `Start-knappen er under første skjermbilde: ${JSON.stringify(start)}`)
 }, { loggedIn: false })
 
-await check('Linjen øverst blir stående når man blar (som over iframen), på mobil', async page => {
+// Den offentlige headeren er den samme komponenten som på de andre sidene (src/site/SiteLayout.jsx),
+// og erstatter «Tilbake til hjemmesiden» på /veiviser: logoen og menyen fører samme vei.
+await check('Felles offentlig header: blir stående øverst når man blar, og har Kontakt i menyen', async page => {
   await page.goto(`${BASE}/veiviser`)
   await ready(page)
+  assert(await page.locator('#root .hdr').count() === 1, 'den offentlige headeren mangler')
+  assert(await page.locator('#root').getByRole('button', { name: '← Tilbake til hjemmesiden' }).count() === 0,
+    'b\u00e5de header og «Tilbake»-linje')
+  await page.locator('.menu > summary').click()
+  for (const navn of ['Slik fungerer det', 'Veiviser', 'Om oss', 'Kontakt', 'Logg inn']) {
+    assert(await page.locator('.menu__panel a', { hasText: new RegExp(`^${navn}$`) }).count() === 1, `${navn} mangler i menyen`)
+  }
+  await page.keyboard.press('Escape')
   await page.evaluate(() => window.scrollTo(0, 2000))
   await page.waitForTimeout(200)
-  const top = await page.locator('#root').getByRole('button', { name: '← Tilbake til hjemmesiden' }).boundingBox()
-  assert(top && top.y >= 0 && top.y < 60, `linjen er ikke synlig øverst: ${JSON.stringify(top)}`)
+  const hdr = await page.locator('#root .hdr').boundingBox()
+  assert(hdr && hdr.y >= 0 && hdr.y < 10, `headeren er ikke synlig \u00f8verst: ${JSON.stringify(hdr)}`)
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'vannrett rulling')
 }, { loggedIn: false })
 

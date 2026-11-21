@@ -106,7 +106,27 @@ await check('Spennet er hovedtallet: AI-anslag på vanlig innbo vises som «fra�
   await page.getByRole('button', { name: /Anslå verdi/ }).click()
   await page.getByText(/400.*–.*1\s?100/).first().waitFor()
   await page.getByText('Sannsynlig spenn', { exact: false }).waitFor()
+  assert(await page.getByText(/sikkerhet/i).count() === 0, '«sikkerhet» vises fortsatt')
 })
+
+// Sølja fra kalibreringen: bildeanalysen sa «Sølv, oksidert»
+const brooch = { v: 2, meta: {}, review: {}, corrections: {}, valuation: null, ai: {
+  suggestion: { title: 'Sølje', description: 'Bunadsølje.', category: null, category_key: 'jewelry_watches', confidence: 'medium' },
+  identification: { object_type: { value: 'Sølje', basis: 'observed', evidence: '' }, brand: { value: 'Sylvsmidja', basis: 'probable', evidence: '' }, manufacturer: null, model: null, variant: null,
+    material: { value: 'Sølv, oksidert', basis: 'probable', evidence: '' }, colour: null, period: null, designer_or_artist: null, model_number: null },
+  unknown: [], marks: [], size_class: 'small', condition_suggestion: 'good', condition_observations: [], condition_not_visible: [], condition_confidence: 'low',
+  multiple_items: { detected: false, count: null, note: null }, photo_suggestions: [], search_query: 'Sylvsmidja sølje',
+} }
+
+await check('Kan være sølv: spørsmålet om stempel på gjenstandssiden, og svaret lagres som familiens rettelse', async page => {
+  const sent = patches(page)
+  await open(page)
+  await page.getByRole('heading', { name: 'Er det ekte sølv?' }).waitFor()
+  await page.getByRole('button', { name: 'Forsølvet eller plett' }).click()
+  for (let i = 0; i < 50 && !sent.length; i++) await page.waitForTimeout(100)
+  assert(sent[0]?.ai_analysis?.corrections?.material?.value === 'Forsølvet (plett)', `feil rettelse: ${JSON.stringify(sent[0])}`)
+  assert(sent[0].ai_analysis.ai.identification.material.value === 'Sølv, oksidert', 'AI-forslaget ble endret')
+}, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: brooch }] } })
 
 await browser.close()
 console.log(results.join('\n'))

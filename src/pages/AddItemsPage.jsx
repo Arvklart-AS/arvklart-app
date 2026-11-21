@@ -19,7 +19,8 @@ import AnalysisDetails from '../components/AnalysisDetails'
 import AiCorrectionsForm from '../components/AiCorrectionsForm'
 import { withCorrections } from '../lib/aiCorrections'
 import CameraCapture from '../components/CameraCapture'
-import { appraiseText, formatRange, suggestText, valueAdvice } from '../lib/valueAdvice'
+import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
+import MetalQuestion from '../components/MetalQuestion'
 
 const MAX_ITEMS = 20
 const MAX_PHOTOS = 5
@@ -474,10 +475,10 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
         if (insufficient) { update(d.key, { estimating: false, estimateMissing: insufficient.missing }); return }
         if (!estimate.likely) throw new Error('no estimate')
         // Usikker kategori eller høyt beløp som ren AI-gjetning: ikke noe tall, verdien står tom (ukjent)
-        const advice = valueAdvice(estimate.valuation)
+        const advice = valueAdvice(estimate.valuation, d.analysis)
         if (advice === 'instead') {
           // Står et tidligere AI-tall i feltet, tømmes det (ellers ville det blitt lagret som familiens egen verdi)
-          update(d.key, cur => ({ estimating: false, estimateMissing: null, estimate: null, appraise: appraiseText(estimate.valuation), value: cur.estimate && String(cur.value) === String(cur.estimate.value) ? '' : cur.value }))
+          update(d.key, cur => ({ estimating: false, estimateMissing: null, estimate: null, appraise: appraiseText(estimate.valuation, d.analysis), value: cur.estimate && String(cur.value) === String(cur.estimate.value) ? '' : cur.value }))
           return
         }
         update(d.key, cur => ({
@@ -705,6 +706,7 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px', fontSize: '0.9375rem', color: '#3A2F26' }}>
             <span style={{ flex: '1 1 220px', lineHeight: 1.5 }}>
               {L('Vil du ha et grovt verdianslag? Verdien er valgfri og bare veiledende.', 'Would you like a rough value estimate? The value is optional and for guidance only.')}
+              <span style={{ display: 'block', fontSize: '0.8125rem', color: MUTED }}>{L('Anslaget blir sikrere når materiale, stempel, merke og modell er lagt inn (Rett opplysningene på kortet).', 'The estimate is more reliable when material, hallmark, brand and model have been added (Correct the details on the card).')}</span>
               <span style={{ display: 'block', fontSize: '0.8125rem', color: MUTED }}>{L(`Bruker ${n} AI-forsøk.`, `Uses ${n} AI attempts.`)}</span>
             </span>
             <button onClick={() => estimateValues()} style={{ ...smallBtn, background: '#fff', color: '#3A2F26', fontWeight: '600' }}>
@@ -996,6 +998,8 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
     if (next) onChange(aiValue ? { analysis: next, estimate: null, estimateMissing: null, appraise: null, value: '' } : { analysis: next, estimate: null, estimateMissing: null, appraise: null })
   }
   const multiple = ai ? multipleItemsText(ai) : ''
+  // Kan være sølv eller gull: spør om stempel og vekt (svaret lagres som rettelse av materialet, som saveFix)
+  const metal = preciousMetal(d.analysis)
   const fieldNames = { title: L('navn', 'name'), categoryId: L('kategori', 'category'), condition: L('tilstand', 'condition'), description: L('beskrivelse', 'description') }
   const aiFields = Object.keys(fieldNames).filter(f => d.aiFilled?.[f] !== undefined && d[f] === d.aiFilled[f]).map(f => fieldNames[f])
   const photoTip = !disabled && d.photos.length < MAX_PHOTOS ? ai?.photo_suggestions?.[0]?.reason : null
@@ -1010,7 +1014,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
           {L('Veiledende AI-anslag, ikke en dokumentert markedsverdi', 'Indicative AI estimate, not a documented market value')}
           {d.estimate.low && d.estimate.high ? <>{'. '}<strong style={{ color: '#3A2F26' }}>{L('Sannsynlig spenn', 'Likely range')}: {formatRange(d.estimate.low, d.estimate.high)}</strong></> : ''}
           {'. '}{L('Du kan endre eller tømme feltet.', 'You can change or clear the field.')}
-          {d.estimate.advice === 'suggest' && <> {suggestText(d.estimate.valuation)}</>}
+          {d.estimate.advice === 'suggest' && <> {suggestText(d.estimate.valuation, d.analysis)}</>}
         </div>
       )}
     </div>
@@ -1072,6 +1076,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
           {multiple}{d.photos.length > 1 ? ` ${L('Du kan også dele opp kortet nedenfor.', 'You can also split the card below.')}` : ''}
         </p>
       )}
+      {metal && !metal.answered && !disabled && <MetalQuestion metal={metal} idPrefix={`metal-${d.key}`} onAnswer={text => saveFix({ material: text })} />}
       {(d.estimate || d.estimating) && valueField}
       {d.appraise && !d.estimate && !d.estimating && (
         <div role="status" style={{ fontSize: '0.8125rem', color: '#5C4530', background: '#fff', border: '2px solid #A97C3F', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>

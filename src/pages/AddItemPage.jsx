@@ -8,7 +8,9 @@ import { formatNOK } from '../lib/format'
 import { L, isEn } from '../lib/lang'
 import { categoryLabel } from '../lib/categories'
 import { aiErrorMessage, analyzeItemPhotos, callEdgeFunction, valuationRecord } from '../lib/itemAi'
-import { appraiseText, formatRange, suggestText, valueAdvice } from '../lib/valueAdvice'
+import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
+import { withCorrections } from '../lib/aiCorrections'
+import MetalQuestion from '../components/MetalQuestion'
 import { aiAnalysisRecord, aiSuggestion, applyAiSuggestion } from '../lib/itemAiHelpers'
 import { CONDITION_OPTIONS, multipleItemsText } from '../lib/analysisView'
 import AnalysisDetails from '../components/AnalysisDetails'
@@ -152,7 +154,7 @@ export default function AddItemPage({ session, profile, onToast, isDemo }) {
         likely_nok: d.summary?.likely_nok ?? d.likely_nok,
         reasoning: d.market?.reasoning ?? d.reasoning,
         confidence: d.market?.confidence ?? d.confidence,
-        valuation: valuationRecord(d),
+        valuation: valuationRecord(d, analysis),
       })
     } catch (e) {
       handleAiError(e, L('Verdiestimering feilet', 'Value estimate failed'))
@@ -162,8 +164,14 @@ export default function AddItemPage({ session, profile, onToast, isDemo }) {
   }
 
   // Uten markedsdata er AI-anslaget en gjetning: for usikre kategorier og høye beløp vises ikke noe tall (valueAdvice)
-  const advice = aiEstimate ? valueAdvice(aiEstimate.valuation) : 'none'
-  const appraise = advice === 'instead' ? appraiseText(aiEstimate.valuation) : null
+  const advice = aiEstimate ? valueAdvice(aiEstimate.valuation, analysis) : 'none'
+  const appraise = advice === 'instead' ? appraiseText(aiEstimate.valuation, analysis) : null
+  // Kan være sølv eller gull: svaret lagres som familiens rettelse av materialet og gjør et tidligere anslag utdatert
+  const metal = preciousMetal(analysis)
+  const answerMetal = text => {
+    const next = withCorrections(analysis, { material: text }, session.user.id)
+    if (next) { setAnalysis(next); setAiEstimate(null); setEstimateMissing(null) }
+  }
 
   const save = async () => {
     if (isDemo) { setDemoBlocked(true); return }
@@ -435,6 +443,12 @@ export default function AddItemPage({ session, profile, onToast, isDemo }) {
         </div>
 
         {/* Verdiestimat-knapp */}
+        {metal && !metal.answered && <MetalQuestion metal={metal} idPrefix="additem-metal" onAnswer={answerMetal} />}
+        {title.trim() && !consentFor && !aiEstimate && (
+          <p style={{ fontSize: '0.8125rem', color: '#75604B', lineHeight: 1.5, margin: 0 }}>
+            {L('Anslaget blir sikrere når materiale, stempel, merke og modell står i beskrivelsen.', 'The estimate is more reliable when material, hallmark, brand and model are in the description.')}
+          </p>
+        )}
         {consentFor === 'estimate' && <AiConsent onCancel={() => setConsentFor(null)} onAccept={() => { giveAiConsent(); setAiConsented(true); setConsentFor(null); getValueEstimate() }} />}
 
         {title.trim() && !consentFor && (
@@ -473,7 +487,7 @@ export default function AddItemPage({ session, profile, onToast, isDemo }) {
             <div style={{ fontSize: '0.8125rem', color: '#3A5A30', marginBottom: '12px' }}>
               {L('Sannsynlig spenn', 'Likely range')}{aiEstimate.likely_nok ? L(` · lagres som ${formatNOK(aiEstimate.likely_nok)}`, ` · saved as ${formatNOK(aiEstimate.likely_nok)}`) : ''}
             </div>
-            {advice === 'suggest' && <p style={{ fontSize: '0.8125rem', color: '#3A2F26', fontWeight: 600, lineHeight: '1.5', margin: '0 0 8px' }}>{suggestText(aiEstimate.valuation)}</p>}
+            {advice === 'suggest' && <p style={{ fontSize: '0.8125rem', color: '#3A2F26', fontWeight: 600, lineHeight: '1.5', margin: '0 0 8px' }}>{suggestText(aiEstimate.valuation, analysis)}</p>}
             {aiEstimate.reasoning && <p style={{ fontSize: '0.75rem', color: '#5C4530', lineHeight: '1.5', marginBottom: '8px' }}>{aiEstimate.reasoning}</p>}
 
             {/* Voting */}
