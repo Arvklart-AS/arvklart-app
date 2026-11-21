@@ -4,7 +4,7 @@ import { L, locale } from '../lib/lang'
 import { formatNOK } from '../lib/format'
 import { hasAiConsent, giveAiConsent } from '../lib/aiConsent'
 import { aiErrorMessage, requestItemEstimate, valuationRecord } from '../lib/itemAi'
-import { PRICE_TYPES, emptyRecord, familyReferences, marketQuery, priceTypeLabel, searchLinks, withReference, withoutReference } from '../lib/marketRefs'
+import { PRICE_TYPES, emptyRecord, familyReferences, marketQuery, parseListingUrl, priceTypeLabel, searchLinks, withReference, withoutReference } from '../lib/marketRefs'
 import { AiConsent } from './AiDialogs'
 import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
 import { withCorrections } from '../lib/aiCorrections'
@@ -97,6 +97,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
     onChanged()
   }
 
+  const listing = adding ? parseListingUrl(form.url) : null
   const isMarket = estimate?.method === 'market_sold' || estimate?.method === 'market_asking'
   // Priser familien selv har lagt inn, presenteres aldri som uavhengig bekreftede salgspriser
   const familyReported = isMarket && (estimate?.uncertainty?.reasons?.includes('family_reported') || (estimate?.references || []).some(r => r.used && !r.verified))
@@ -154,8 +155,21 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
         )}
         {canEdit && (adding ? (
           <form onSubmit={addReference} style={{ display: 'grid', gap: '10px', background: '#fff', border: '1px solid #E8DFD0', borderRadius: '8px', padding: '12px' }}>
-            <label htmlFor="ref-title" style={label}>{L('Hva er det?', 'What is it?')}
-              <input id="ref-title" value={form.title} maxLength={120} onChange={ev => setForm(f => ({ ...f, title: ev.target.value }))} placeholder={L('F.eks. «Figgjo Lotte tallerken, FINN»', 'E.g. «Figgjo Lotte plate, FINN»')} style={input} />
+            <p style={small}>
+              {L('Åpne en tilsvarende annonse (knappene over), kopier lenken og lim den inn her. Skriv så prisen du ser.',
+                'Open a similar listing (the buttons above), copy the link and paste it here. Then enter the price you see.')}
+            </p>
+            {/* Lenken leses bare som tekst (parseListingUrl): Arvklart åpner aldri annonsen og henter ingenting fra den */}
+            <label htmlFor="ref-url" style={label}>{L('Lenke til annonsen (lim inn, valgfri)', 'Link to the listing (paste, optional)')}
+              <input id="ref-url" type="text" inputMode="url" autoComplete="off" value={form.url} onChange={ev => setForm(f => ({ ...f, url: ev.target.value }))} placeholder="https://www.finn.no/…" style={input} />
+            </label>
+            {listing && (
+              <p role="status" style={{ ...small, color: '#3A5A30' }}>
+                <strong>{listing.label}</strong> · {L('Arvklart åpner ikke annonsen. Skriv prisen du ser.', 'Arvklart does not open the listing. Enter the price you see.')}
+              </p>
+            )}
+            <label htmlFor="ref-title" style={label}>{listing ? L('Hva er det? (valgfritt)', 'What is it? (optional)') : L('Hva er det?', 'What is it?')}
+              <input id="ref-title" value={form.title} maxLength={120} onChange={ev => setForm(f => ({ ...f, title: ev.target.value }))} placeholder={listing ? listing.label : L('F.eks. «Figgjo Lotte tallerken, FINN»', 'E.g. «Figgjo Lotte plate, FINN»')} style={input} />
             </label>
             <label htmlFor="ref-type" style={label}>{L('Pristype', 'Price type')}
               <select id="ref-type" value={form.price_type} onChange={ev => setForm(f => ({ ...f, price_type: ev.target.value }))} style={input}>
@@ -164,9 +178,6 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
             </label>
             <label htmlFor="ref-price" style={label}>{L('Pris i kroner', 'Price in NOK')}
               <input id="ref-price" value={form.price} inputMode="numeric" onChange={ev => setForm(f => ({ ...f, price: ev.target.value }))} style={input} />
-            </label>
-            <label htmlFor="ref-url" style={label}>{L('Lenke (valgfri)', 'Link (optional)')}
-              <input id="ref-url" type="url" value={form.url} onChange={ev => setForm(f => ({ ...f, url: ev.target.value }))} placeholder="https://" style={input} />
             </label>
             <label htmlFor="ref-date" style={label}>{L('Dato (valgfri)', 'Date (optional)')}
               <input id="ref-date" type="date" value={form.date} onChange={ev => setForm(f => ({ ...f, date: ev.target.value }))} style={input} />
