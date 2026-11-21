@@ -140,7 +140,7 @@ Give status, low_nok, likely_nok and high_nok as whole NOK amounts (low ≤ like
   const response = { status: 'ok', method: 'model', estimate: { low: final.low, likely: final.likely, high: final.high }, confidence: final.confidence, basis }
   return {
     status: 'ok', estimate: response.estimate, model_estimate: { low: r.value.low, likely: r.value.likely, high: r.value.high, confidence: r.value.confidence },
-    confidence: final.confidence, reasons: final.uncertainty.reasons, basis, advice: valueAdvice(response), reasoning: r.value.reasoning, meta: r.meta,
+    confidence: final.confidence, reasons: final.uncertainty.reasons, basis, advice: valueAdvice(response, analysis ? { v: 2, ai: analysis } : null), reasoning: r.value.reasoning, meta: r.meta,
   }
 }
 
