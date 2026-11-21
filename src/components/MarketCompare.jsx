@@ -6,13 +6,14 @@ import { hasAiConsent, giveAiConsent } from '../lib/aiConsent'
 import { aiErrorMessage, requestItemEstimate, valuationRecord } from '../lib/itemAi'
 import { PRICE_TYPES, emptyRecord, familyReferences, marketQuery, priceTypeLabel, searchLinks, withReference, withoutReference } from '../lib/marketRefs'
 import { AiConsent } from './AiDialogs'
-import { appraiseText, formatRange, suggestText, valueAdvice } from '../lib/valueAdvice'
+import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
+import { withCorrections } from '../lib/aiCorrections'
+import MetalQuestion from './MetalQuestion'
 
 const small = { fontSize: '0.8125rem', color: '#5C4530', lineHeight: 1.6, margin: 0 }
 const btn = { padding: '10px 14px', minHeight: '44px', borderRadius: '8px', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', cursor: 'pointer', background: 'none', border: '1px solid #D9CFC0', color: '#5C4530' }
 const input = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', border: '1px solid #9A8B78', borderRadius: '8px', background: '#fff', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif', color: '#3A2F26', minHeight: '44px' }
 const label = { display: 'grid', gap: '4px', fontSize: '0.8125rem', fontWeight: 600, color: '#3A2F26' }
-const confidenceText = c => ({ high: L('høy', 'high'), medium: L('middels', 'medium'), low: L('lav', 'low') }[c] || '')
 const dateText = d => (d ? new Date(`${d}T12:00:00`).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' }) : '')
 
 // «Sammenlign med markedet» på gjenstandssiden: søkelenker brukeren kan åpne selv, familiens egne
@@ -63,6 +64,15 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
     onChanged()
   }
 
+  // Kan være sølv eller gull: svaret lagres som familiens rettelse av materialet (som «Rett opplysningene»)
+  const metal = preciousMetal(item.ai_analysis)
+  const answerMetal = async text => {
+    const { error } = await saveAnalysis(rec => withCorrections(rec, { material: text }, userId) || rec)
+    if (error) { onToast(L('Kunne ikke lagre. Prøv igjen.', 'Could not save. Please try again.'), 'error'); return }
+    setEstimate(null)
+    onChanged()
+  }
+
   const runEstimate = async (consented = hasAiConsent()) => {
     if (!consented) { setAskConsent(true); return }
     setBusy(true)
@@ -77,7 +87,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
   const applyEstimate = async () => {
     const d = estimate
     setBusy(true)
-    const { error } = await saveAnalysis(rec => ({ ...rec, valuation: valuationRecord(d) }), {
+    const { error } = await saveAnalysis(rec => ({ ...rec, valuation: valuationRecord(d, rec) }), {
       estimated_value: d.estimate.likely, estimate_reasoning: (d.explanation || d.reasoning || '').slice(0, 1000) || null, estimate_confidence: d.confidence,
     })
     setBusy(false)
@@ -92,8 +102,8 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
   const familyReported = isMarket && (estimate?.uncertainty?.reasons?.includes('family_reported') || (estimate?.references || []).some(r => r.used && !r.verified))
   const e = estimate?.status === 'ok' ? estimate.estimate : null
   // Uten markedsdata er AI-anslaget en gjetning: for usikre kategorier og høye beløp vises ikke noe tall (valueAdvice)
-  const advice = e ? valueAdvice(estimate) : 'none'
-  const appraise = advice === 'instead' ? appraiseText(estimate) : null
+  const advice = e ? valueAdvice(estimate, item.ai_analysis) : 'none'
+  const appraise = advice === 'instead' ? appraiseText(estimate, item.ai_analysis) : null
 
   return (
     <details style={{ marginBottom: '24px', background: '#FBF9F5', border: '1px solid #E8DFD0', borderRadius: '10px', padding: '0 14px' }}>
@@ -138,6 +148,10 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
           </ul>
         )}
 
+        {canEdit && metal && !metal.answered && <MetalQuestion metal={metal} idPrefix="market-metal" onAnswer={answerMetal} disabled={busy} />}
+        {canEdit && !adding && !estimate && (
+          <p style={small}>{L('AI-anslaget blir sikrere når materiale, stempel, merke og modell er lagt inn under «Rett opplysningene».', 'The AI estimate is more reliable when material, hallmark, brand and model have been added under «Correct the details».')}</p>
+        )}
         {canEdit && (adding ? (
           <form onSubmit={addReference} style={{ display: 'grid', gap: '10px', background: '#fff', border: '1px solid #E8DFD0', borderRadius: '8px', padding: '12px' }}>
             <label htmlFor="ref-title" style={label}>{L('Hva er det?', 'What is it?')}
@@ -205,9 +219,8 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
                 : estimate.range_kind === 'p25_p75'
                   ? L('Halvparten av treffene ligger her', 'Half of the hits are in this range')
                   : L('Sannsynlig spenn', 'Likely range')}
-              {' · '}{L('sikkerhet', 'confidence')}: {confidenceText(estimate.confidence)}
             </div>
-            {advice === 'suggest' && <p style={{ ...small, fontWeight: 600 }}>{suggestText(estimate)}</p>}
+            {advice === 'suggest' && <p style={{ ...small, fontWeight: 600 }}>{suggestText(estimate, item.ai_analysis)}</p>}
             {(estimate.explanation || estimate.reasoning) && <p style={small}>{estimate.explanation || estimate.reasoning}</p>}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button onClick={applyEstimate} disabled={busy} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none' }}>{L(`Bruk ${formatNOK(e.likely)} som verdi`, `Use ${formatNOK(e.likely)} as the value`)}</button>

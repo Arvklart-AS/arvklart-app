@@ -420,6 +420,40 @@ await run('E5: kunst som AI-gjetning gir «få den vurdert», ikke noe tall; ver
   await ctx.close()
 })
 
+// Sølvbestikket fra kalibreringen: AI-en kalte det «forsølvet metall», og anslaget ble 12 ganger for lavt
+const silverReply = n => v2Reply(n, {
+  suggestion: { title: 'Kakespade', description: 'Kakespade i sølvfarget metall.', category: 'Møbler', category_key: 'kitchen_porcelain', confidence: 'medium' },
+  identification: { object_type: F('Kakespade', 'observed'), brand: null, manufacturer: null, model: null, variant: null, material: F('Forsølvet metall', 'probable', 'Sølvfarget overflate'),
+    colour: null, period: null, designer_or_artist: null, model_number: null },
+  marks: [],
+})
+
+await run('E6: kan være sølv: ikke noe AI-tall, spørsmålet om stempel og vekt, og svaret lagres som familiens rettelse', async () => {
+  const { ctx, page, calls } = await setup(browser, { v2: n => silverReply(n), estimateReply: () => estimateV2 })
+  await openCamera(page)
+  await shoot(page)
+  await page.getByRole('button', { name: 'Ferdig' }).click()
+  await page.getByRole('button', { name: 'Analyser med AI (1)' }).click()
+  await page.getByRole('heading', { name: 'Er det ekte sølv?' }).waitFor()
+  await page.getByRole('button', { name: 'Anslå verdi for alle (1)' }).click()
+  await page.getByText('Sølv eller forsølvet? Det avgjør verdien', { exact: false }).waitFor()
+  assert.equal(await page.getByText('Veiledende AI-anslag, ikke en dokumentert markedsverdi', { exact: false }).count(), 0, 'AI-tallet ble vist for mulig sølv')
+  await page.getByRole('button', { name: 'Sølv, med stempel' }).click()
+  await page.getByLabel(/Hva står det i stempelet/).fill('830S')
+  await page.getByLabel(/Vekt i gram/).fill('166')
+  await page.getByRole('button', { name: 'Lagre', exact: true }).click()
+  await page.getByRole('heading', { name: 'Er det ekte sølv?' }).waitFor({ state: 'detached' })
+  // Det gamle rådet er utdatert når familien har svart; et nytt anslag kan bes om
+  await page.getByRole('button', { name: 'Anslå verdi (AI)' }).waitFor()
+  await page.getByRole('button', { name: 'Godkjenn og lagre alle (1)' }).click()
+  await page.getByText('✓ 1 gjenstand lagt til i boet').waitFor()
+  const body = calls.insertBodies[0]
+  assert.equal(body.ai_analysis.corrections.material.value, 'Sølv 830S, 166 g')
+  assert.equal(body.ai_analysis.ai.identification.material.value, 'Forsølvet metall', 'AI-forslaget ble endret')
+  assert.equal(body.estimated_value, null)
+  await ctx.close()
+})
+
 await run('E4: for lite informasjon gir ingen verdi (aldri 0 kr), men tips; «Anslå verdi for alle» hopper over kortet etterpå', async () => {
   const { ctx, page, calls } = await setup(browser, { estimateReply: () => ({ v: 2, status: 'insufficient', estimate: null, missing: ['Et mer presist navn', 'Et bilde av stempelet'], reasoning: '' }) })
   await openCamera(page)
