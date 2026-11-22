@@ -13,7 +13,7 @@ import MarketCompare from '../components/MarketCompare'
 import ItemHistory from '../components/ItemHistory'
 import AgreedValue from '../components/AgreedValue'
 import { withCorrections } from '../lib/aiCorrections'
-import { formatRange } from '../lib/valueAdvice'
+import { formatRange, withheldFor } from '../lib/valueAdvice'
 import { assignItems, unassignItem } from '../lib/assignments'
 import { recipientsOf, recipientOf, isUnconfirmedAssignment } from '../lib/recipients'
 import { pendingMembersFor } from '../lib/estateProgress'
@@ -158,7 +158,7 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
   const undoPass = () => run(() => removePass(itemId, session.user.id), L('Angret', 'Undone'), L('Kunne ikke angre. Prøv igjen.', 'Could not undo. Please try again.'))
 
   // Stemmen lagres av databasen (vote_item_value): én stemme per person, og ingen kan endre andres
-  const handleEstimateVote = async (vote, suggested) => {
+  const handleEstimateVote = async (vote, suggested, okText = L('Stemme registrert', 'Vote registered')) => {
     if (busy) return
     const suggestedValue = parseNOK(suggested)
     if (vote === 'disagree' && suggested && suggestedValue === null) { onToast(L('Skriv estimatet som et beløp, f.eks. 1500', 'Enter the estimate as an amount, e.g. 1500'), 'error'); return }
@@ -166,7 +166,7 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
     const { data, error } = await supabase.rpc('vote_item_value', { p_item: itemId, p_vote: vote, p_value: vote === 'disagree' ? suggestedValue : null })
     setBusy(false)
     if (error) { onToast(L('Kunne ikke lagre stemmen. Prøv igjen.', 'Could not save your vote. Please try again.'), 'error'); return }
-    if (data?.ok) onToast(L('Stemme registrert', 'Vote registered'))
+    if (data?.ok) onToast(okText)
     load()
   }
 
@@ -339,6 +339,46 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
                 <div style={{ fontSize:'0.75rem', color:'#5C4530' }}>{L('Du har stemt.', 'You have voted.')}</div>
               )}
             </div>
+          )
+        })()}
+        {/* AI-en gir ikke tall for kunst, smykker, sølv og gull (valueAdvice): arvingene kan likevel foreslå en verdi.
+            Lagres med vote_item_value som et forslag (teller som «Uenig» i databasen); administrator setter fordelingsverdien. */}
+        {!item.estimated_value && (withheldFor(item.ai_analysis) || (item.value_suggestions || []).length > 0) && (() => {
+          const hasVoted = (item.value_voter_ids || []).includes(session.user.id)
+          const suggestions = item.value_suggestions || []
+          const submit = e => {
+            e.preventDefault()
+            if (parseNOK(suggestedValue) === null) { onToast(L('Skriv forslaget som et beløp, f.eks. 3900', 'Enter the suggestion as an amount, e.g. 3900'), 'error'); return }
+            handleEstimateVote('disagree', suggestedValue, L('Forslaget ditt er registrert', 'Your suggestion has been registered'))
+            setSuggestedValue('')
+          }
+          return (
+            <section aria-labelledby="suggest-value-title" style={{ background:'#FBF9F5', border:'1px solid #D9CFC0', borderRadius:'10px', padding:'14px', marginBottom:'12px' }}>
+              <h2 id="suggest-value-title" style={{ fontSize:'0.875rem', color:'#3A2F26', fontWeight:'600', margin:'0 0 4px' }}>{L('Hva er den verdt?', 'What is it worth?')}</h2>
+              <p style={{ fontSize:'0.8125rem', color:'#5C4530', lineHeight:'1.5', margin:'0 0 8px' }}>
+                {L('AI-en gir ikke et tall for kunst, smykker, sølv og gull, fordi den ofte bommer der. Har du en formening, et takstbeløp eller en solgt pris, kan du foreslå en verdi. Administrator setter fordelingsverdien.',
+                  'The AI does not give a figure for art, jewellery, silver and gold, because it is often far off there. If you have an idea, an appraisal or a sold price, you can suggest a value. The administrator sets the distribution value.')}
+              </p>
+              {suggestions.length > 0 && (
+                <div style={{ fontSize:'0.8125rem', color:'#5C4530', marginBottom:'8px' }}>
+                  {suggestions.map((s, i) => <div key={i}>{s.name} {L('foreslår', 'suggests')} {formatNOK(s.value)}</div>)}
+                </div>
+              )}
+              {isDemo ? null : hasVoted ? (
+                <p style={{ fontSize:'0.8125rem', color:'#5C4530', margin:0 }}>{L('Du har foreslått en verdi.', 'You have suggested a value.')}</p>
+              ) : (
+                <form onSubmit={submit} style={{ display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'flex-end' }}>
+                  <label htmlFor="suggest-value" style={{ display:'grid', gap:'4px', fontSize:'0.8125rem', fontWeight:600, color:'#3A2F26', flex:'1 1 180px' }}>
+                    {L('Ditt forslag i kroner', 'Your suggestion in NOK')}
+                    <input id="suggest-value" inputMode="numeric" value={suggestedValue} onChange={e => setSuggestedValue(e.target.value)} autoComplete="off"
+                      style={{ minHeight:'44px', padding:'8px 12px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.9375rem', background:'#fff', color:'#3A2F26', fontFamily:'Karla, sans-serif', boxSizing:'border-box', width:'100%' }} />
+                  </label>
+                  <button type="submit" disabled={busy} style={{ minHeight:'44px', padding:'10px 16px', background:'#5F6E52', color:'#fff', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+                    {L('Foreslå verdi', 'Suggest value')}
+                  </button>
+                </form>
+              )}
+            </section>
           )
         })()}
         {item.description && <p style={{ color:'#5C4530', lineHeight:'1.8', marginBottom:'24px', fontSize:'0.9375rem' }}>{item.description}</p>}

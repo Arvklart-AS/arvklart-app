@@ -65,6 +65,11 @@ export function preciousMetal(record) {
   return null
 }
 
+// AI-en gir ikke tall for denne gjenstanden, ut fra vurderingen alene: mulig sølv eller gull, eller kunst, smykker/ur
+// og samleobjekter. Brukes på gjenstandssiden, så arvingene kan foreslå en verdi selv der AI-tallet holdes tilbake.
+export const withheldFor = record =>
+  !!preciousMetal(record) || APPRAISE_CATEGORIES.includes(record?.ai?.suggestion?.category_key)
+
 export function valueAdvice(x, record = null) {
   if (!x || (x.status && x.status !== 'ok')) return 'none'
   const likely = Number(x.estimate?.likely)

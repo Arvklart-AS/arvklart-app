@@ -2,7 +2,7 @@
 // Tilfellene for sølv og gull er det bildeanalysen faktisk svarte i kalibreringen (eval/, 2026-11-19).
 import { test, describe } from 'node:test'
 import assert from 'node:assert/strict'
-import { valueAdvice, appraiseText, suggestText, formatRange, preciousMetal, APPRAISE_ABOVE_NOK } from '../../src/lib/valueAdvice.js'
+import { valueAdvice, appraiseText, suggestText, formatRange, preciousMetal, withheldFor, APPRAISE_ABOVE_NOK } from '../../src/lib/valueAdvice.js'
 
 // Svar fra estimate-value v3 (også formen til valuationRecord)
 const est = ({ likely = 500, method = 'model', key = 'furniture', specificity = 'generic', confidence = 'medium', status = 'ok' } = {}) => ({
@@ -106,6 +106,20 @@ describe('preciousMetal', () => {
   test('uten vurdering: ingenting', () => {
     assert.equal(preciousMetal(null), null)
     assert.equal(preciousMetal({ v: 2, ai: null }), null)
+  })
+})
+
+describe('withheldFor: AI-tallet holdes tilbake, arvingene kan foreslå verdi', () => {
+  const withKey = (category_key, material = null) => ({ ...rec({ material }), ai: { ...rec({ material }).ai, suggestion: { category_key } } })
+  test('sølv, gull og de usikre kategoriene', () => {
+    assert.equal(withheldFor(brooch), true)
+    assert.equal(withheldFor(goldRing), true)
+    for (const key of ['art', 'jewelry_watches', 'collectibles']) assert.equal(withheldFor(withKey(key)), true, key)
+  })
+  test('vanlig innbo og gjenstander uten vurdering: nei', () => {
+    assert.equal(withheldFor(withKey('furniture', 'Eik')), false)
+    assert.equal(withheldFor(null), false)
+    assert.equal(withheldFor({ v: 2, ai: null }), false)
   })
 })
 

@@ -128,6 +128,34 @@ await check('Kan være sølv: spørsmålet om stempel på gjenstandssiden, og sv
   assert(sent[0].ai_analysis.ai.identification.material.value === 'Sølv, oksidert', 'AI-forslaget ble endret')
 }, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: brooch }] } })
 
+// Uten AI-tall (sølv, kunst, smykker) kan arvingene likevel foreslå en verdi; sølja fra kalibreringen
+const votes = page => {
+  const bodies = []
+  page.on('request', r => { if (r.url().includes('/rest/v1/rpc/vote_item_value')) bodies.push(JSON.parse(r.postData() || '{}')) })
+  return bodies
+}
+const noValue = analysis => ({ fixtures: { items: [{ ...FIXTURES.items[0], estimated_value: null, ai_analysis: analysis }], estate_members: [{ ...FIXTURES.estate_members[0], role: 'member' }] },
+  rpc: { vote_item_value: { status: 200, body: { ok: true } } } })
+
+await check('Hva er den verdt?: arvingen kan foreslå en verdi på sølv uten AI-tall; tomt beløp sender ingenting', async page => {
+  const sent = votes(page)
+  await page.goto(`${BASE}/estate/${EST}/item/${ITEM}`)
+  await page.getByRole('heading', { name: 'Hva er den verdt?' }).waitFor()
+  await page.getByRole('button', { name: 'Foreslå verdi' }).click()
+  await page.getByText('Skriv forslaget som et beløp', { exact: false }).waitFor()
+  assert(sent.length === 0, 'tomt forslag ble sendt')
+  await page.getByLabel('Ditt forslag i kroner').fill('3 900')
+  await page.getByRole('button', { name: 'Foreslå verdi' }).click()
+  await page.getByText('Forslaget ditt er registrert').waitFor()
+  assert(sent[0]?.p_vote === 'disagree' && sent[0]?.p_value === 3900, `feil forslag: ${JSON.stringify(sent[0])}`)
+}, noValue(brooch))
+
+await check('Hva er den verdt?: vises ikke for vanlig innbo uten AI-tall', async page => {
+  await page.goto(`${BASE}/estate/${EST}/item/${ITEM}`)
+  await page.getByText('Gyngestol').first().waitFor()
+  assert(await page.getByRole('heading', { name: 'Hva er den verdt?' }).count() === 0, 'boksen vises for vanlig innbo')
+}, noValue({ ...brooch, ai: { ...brooch.ai, suggestion: { ...brooch.ai.suggestion, category_key: 'furniture' }, identification: { ...brooch.ai.identification, brand: null, material: { value: 'Eik', basis: 'probable', evidence: '' } } } }))
+
 await browser.close()
 console.log(results.join('\n'))
 process.exit(results.some(r => r.startsWith('FAIL')) ? 1 : 0)
