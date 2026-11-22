@@ -42,14 +42,14 @@ export default function DecidersPanel({ estateId, heirs, members, userId, userEm
     return true
   }
 
-  const small = { fontSize: '0.8125rem', color: '#5C4530', lineHeight: 1.6, margin: 0 }
-  const btn = { minHeight: '40px', padding: '6px 12px', background: '#fff', border: '1px solid #9A8B78', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', color: '#3A2F26' }
-  const field = { minHeight: '44px', padding: '8px 10px', border: '1px solid #9A8B78', borderRadius: '8px', fontFamily: 'Karla, sans-serif', fontSize: '0.875rem', width: '100%', boxSizing: 'border-box' }
+  const small = { fontSize: '0.8125rem', color: '#F2EEE6', lineHeight: 1.6, margin: 0 }
+  const btn = { minHeight: '40px', padding: '6px 12px', background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '999px', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', color: '#F2EEE6' }
+  const field = { minHeight: '44px', padding: '8px 10px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontFamily: 'Karla, sans-serif', fontSize: '0.875rem', width: '100%', boxSizing: 'border-box' }
   if (!heirs.length) return null
 
   return (
-    <section aria-labelledby="deciders-title" style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '20px', marginTop: '24px', fontFamily: 'Karla, sans-serif' }}>
-      <h2 id="deciders-title" style={{ fontFamily: 'Fraunces, serif', fontSize: '1.125rem', fontWeight: 400, color: '#3A2F26', margin: '0 0 6px' }}>{L('Hvem godkjenner fordelingen', 'Who approves the distribution')}</h2>
+    <section aria-labelledby="deciders-title" style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '20px', marginTop: '24px', fontFamily: 'Karla, sans-serif' }}>
+      <h2 id="deciders-title" style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.125rem', fontWeight: 400, color: '#F2EEE6', margin: '0 0 6px' }}>{L('Hvem godkjenner fordelingen', 'Who approves the distribution')}</h2>
       <p style={{ ...small, marginBottom: '14px' }}>
         {L('Fordelingen er godkjent først når alle beslutningstakerne har godkjent den – selv, eller via en representant som en annen beslutningstaker har bekreftet. En arving uten konto må inviteres eller ha en bekreftet representant; ellers signeres protokollen på papir. Fullmakter og vergemål registreres og bekreftes av familien selv; Arvklart kontrollerer dem ikke juridisk.',
           'The distribution is approved only when all decision-makers have approved it – themselves, or via a representative another decision-maker has confirmed. An heir without an account must be invited or have a confirmed representative; otherwise the record is signed on paper. Powers of attorney and guardianships are registered and confirmed by the family; Arvklart does not check them legally.')}
@@ -62,10 +62,10 @@ export default function DecidersPanel({ estateId, heirs, members, userId, userEm
           const canRevoke = r && (isAdmin || r.user_id === userId || self) && !isDemo
           const canConfirmRemoval = h.exclusion_requested_by && h.exclusion_requested_by !== userId && (iAmDecider || self) && !isDemo
           return (
-            <li key={h.id} style={{ background: '#FBF9F5', border: '1px solid #E8DFD0', borderRadius: '10px', padding: '12px' }}>
+            <li key={h.id} style={{ background: '#1F221E', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '10px', padding: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
-                <strong style={{ fontSize: '0.875rem', color: '#3A2F26' }}>{h.name}</strong>
-                <span style={{ ...small, color: h.must_approve ? '#3A5A30' : '#75604B' }}>{h.must_approve ? L('Skal godkjenne', 'Approves') : L('Godkjenner ikke', 'Does not approve')}</span>
+                <strong style={{ fontSize: '0.875rem', color: '#F2EEE6' }}>{h.name}</strong>
+                <span style={{ ...small, color: h.must_approve ? '#9DAA8C' : '#B9B4A8' }}>{h.must_approve ? L('Skal godkjenne', 'Approves') : L('Godkjenner ikke', 'Does not approve')}</span>
               </div>
               <p style={small}>{h.user_id ? L('Har konto i Arvklart (koblet da arvingen ble med)', 'Has an Arvklart account (linked when the heir joined)') : L('Har ikke blitt med ennå', 'Has not joined yet')}</p>
               {!h.user_id && !iAmLinked && !isDemo && isMine(h) && myRows.length === 1 && inviteCode && (
@@ -75,14 +75,14 @@ export default function DecidersPanel({ estateId, heirs, members, userId, userEm
                 </div>
               )}
               {!h.user_id && !iAmLinked && isMine(h) && myRows.length > 1 && (
-                <p style={{ ...small, color: '#8A4B2A' }}>{L('E-posten din står på flere arvinger, så Arvklart kan ikke vite hvem av dem du er. Rett e-posten på arvingen som ikke er deg, eller registrer en representant.', 'Your email is on several heirs, so Arvklart cannot tell which of them you are. Correct the email on the heir who is not you, or register a representative.')}</p>
+                <p style={{ ...small, color: '#C79A6B' }}>{L('E-posten din står på flere arvinger, så Arvklart kan ikke vite hvem av dem du er. Rett e-posten på arvingen som ikke er deg, eller registrer en representant.', 'Your email is on several heirs, so Arvklart cannot tell which of them you are. Correct the email on the heir who is not you, or register a representative.')}</p>
               )}
-              {h.exclusion_requested_by && <p style={{ ...small, color: '#8A4B2A' }}>{L(`Det er bedt om at ${h.name} ikke skal godkjenne: «${h.exclusion_reason}». Gjelder først når en annen beslutningstaker bekrefter.`, `It has been requested that ${h.name} should not approve: «${h.exclusion_reason}». Takes effect only when another decision-maker confirms.`)}</p>}
+              {h.exclusion_requested_by && <p style={{ ...small, color: '#C79A6B' }}>{L(`Det er bedt om at ${h.name} ikke skal godkjenne: «${h.exclusion_reason}». Gjelder først når en annen beslutningstaker bekrefter.`, `It has been requested that ${h.name} should not approve: «${h.exclusion_reason}». Takes effect only when another decision-maker confirms.`)}</p>}
               <p style={small}>{receivesItems(h) ? L('Kan få gjenstander', 'Can receive items') : L('Får ikke gjenstander', 'Does not receive items')}
                 {isAdmin && !isDemo && <>{' · '}<button onClick={() => run(() => supabase.rpc('set_receives_items', { p_heir: h.id, p_value: !receivesItems(h) }), receivesItems(h) ? L(`${h.name} får ikke gjenstander`, `${h.name} does not receive items`) : L(`${h.name} kan få gjenstander`, `${h.name} can receive items`))} disabled={busy}
-                  style={{ background: 'none', border: 'none', padding: 0, color: '#3A2F26', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif' }}>{L('Endre', 'Change')}</button></>}
+                  style={{ background: 'none', border: 'none', padding: 0, color: '#C79A6B', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif' }}>{L('Endre', 'Change')}</button></>}
               </p>
-              {r && !r.user_id && <p style={{ ...small, color: '#8A4B2A' }}>{L('Representantens konto er slettet. Representasjonen er bevart i historikken, men kan ikke brukes.', 'The representative\'s account has been deleted. The representation is kept in the history, but cannot be used.')}</p>}
+              {r && !r.user_id && <p style={{ ...small, color: '#C79A6B' }}>{L('Representantens konto er slettet. Representasjonen er bevart i historikken, men kan ikke brukes.', 'The representative\'s account has been deleted. The representation is kept in the history, but cannot be used.')}</p>}
               {r && r.user_id && <p style={small}>{L(`${nameOf(r.user_id)} er registrert som ${r.kind === 'verge' ? 'verge' : 'fullmektig'} (${r.basis}). `, `${nameOf(r.user_id)} is registered as ${r.kind === 'verge' ? 'guardian' : 'proxy'} (${r.basis}). `)}
                 <strong>{r.verified_at ? L('Bekreftet av en annen beslutningstaker i Arvklart.', 'Confirmed by another decision-maker in Arvklart.') : L('Ubekreftet – kan ikke svare før en annen beslutningstaker bekrefter.', 'Unconfirmed – cannot respond until another decision-maker confirms.')}</strong>
                 {r.verified_at && L(' Bekreftelsen betyr at familien godtar representasjonen. Arvklart har ikke kontrollert fullmakten eller vergemålet juridisk.', ' The confirmation means the family accepts the representation. Arvklart has not checked the power of attorney or guardianship legally.')}</p>}
@@ -102,7 +102,7 @@ export default function DecidersPanel({ estateId, heirs, members, userId, userEm
                   <label htmlFor={`ex-${h.id}`} style={{ ...small, fontWeight: 600 }}>{L('Begrunnelse (vises for alle)', 'Reason (visible to everyone)')}</label>
                   <input id={`ex-${h.id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={500} style={field} />
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button disabled={busy || reason.trim().length < 3} onClick={() => run(() => setMustApprove(h.id, false, reason), asking.mode === 'self' ? L('Du godkjenner ikke fordelingen', 'You do not approve the distribution') : L('Forespørselen er registrert. En annen beslutningstaker må bekrefte.', 'The request is registered. Another decision-maker must confirm.'))} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none' }}>{L('Lagre', 'Save')}</button>
+                    <button disabled={busy || reason.trim().length < 3} onClick={() => run(() => setMustApprove(h.id, false, reason), asking.mode === 'self' ? L('Du godkjenner ikke fordelingen', 'You do not approve the distribution') : L('Forespørselen er registrert. En annen beslutningstaker må bekrefte.', 'The request is registered. Another decision-maker must confirm.'))} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none' }}>{L('Lagre', 'Save')}</button>
                     <button onClick={() => setAsking(null)} style={btn}>{L('Avbryt', 'Cancel')}</button>
                   </div>
                 </div>
@@ -122,9 +122,9 @@ export default function DecidersPanel({ estateId, heirs, members, userId, userEm
                   <label htmlFor={`rep-basis-${h.id}`} style={{ ...small, fontWeight: 600 }}>{L('Grunnlag (f.eks. skriftlig fullmakt datert …, eller vergemål)', 'Basis (e.g. written power of attorney dated …, or guardianship)')}</label>
                   <input id={`rep-basis-${h.id}`} value={rep.basis} onChange={e => setRep(r0 => ({ ...r0, basis: e.target.value }))} maxLength={1000} style={field} />
                   <p style={small}>{L('Ved mindreårige, interessekonflikt eller usikker fullmakt kan det være nødvendig med særskilt avklaring, for eksempel verge oppnevnt av statsforvalteren. Familiens bekreftelse i Arvklart er ikke en juridisk kontroll.', 'For minors, conflicts of interest or uncertain authority, a separate clarification may be needed, for example a guardian appointed by the county governor. The family\'s confirmation in Arvklart is not a legal check.')}</p>
-                  {rep.user === userId && <p style={{ ...small, color: '#8A4B2A' }}>{L('Du registrerer deg selv som representant. Det vises for alle og må bekreftes av en annen beslutningstaker.', 'You are registering yourself as representative. This is visible to everyone and must be confirmed by another decision-maker.')}</p>}
+                  {rep.user === userId && <p style={{ ...small, color: '#C79A6B' }}>{L('Du registrerer deg selv som representant. Det vises for alle og må bekreftes av en annen beslutningstaker.', 'You are registering yourself as representative. This is visible to everyone and must be confirmed by another decision-maker.')}</p>}
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button disabled={busy || !rep.user || rep.basis.trim().length < 10} onClick={() => run(() => addRepresentative(h.id, rep.user, rep.kind, rep.basis), L('Representanten er registrert. En annen beslutningstaker må bekrefte.', 'The representative is registered. Another decision-maker must confirm.'))} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none' }}>{L('Registrer', 'Register')}</button>
+                    <button disabled={busy || !rep.user || rep.basis.trim().length < 10} onClick={() => run(() => addRepresentative(h.id, rep.user, rep.kind, rep.basis), L('Representanten er registrert. En annen beslutningstaker må bekrefte.', 'The representative is registered. Another decision-maker must confirm.'))} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none' }}>{L('Registrer', 'Register')}</button>
                     <button onClick={() => setAdding(null)} style={btn}>{L('Avbryt', 'Cancel')}</button>
                   </div>
                 </div>

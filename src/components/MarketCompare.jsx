@@ -10,10 +10,10 @@ import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } fr
 import { withCorrections } from '../lib/aiCorrections'
 import MetalQuestion from './MetalQuestion'
 
-const small = { fontSize: '0.8125rem', color: '#5C4530', lineHeight: 1.6, margin: 0 }
-const btn = { padding: '10px 14px', minHeight: '44px', borderRadius: '8px', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', cursor: 'pointer', background: 'none', border: '1px solid #D9CFC0', color: '#5C4530' }
-const input = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', border: '1px solid #9A8B78', borderRadius: '8px', background: '#fff', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif', color: '#3A2F26', minHeight: '44px' }
-const label = { display: 'grid', gap: '4px', fontSize: '0.8125rem', fontWeight: 600, color: '#3A2F26' }
+const small = { fontSize: '0.8125rem', color: '#F2EEE6', lineHeight: 1.6, margin: 0 }
+const btn = { padding: '10px 14px', minHeight: '44px', borderRadius: '999px', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', cursor: 'pointer', background: 'none', border: '1px solid rgba(242, 238, 230, 0.14)', color: '#F2EEE6' }
+const input = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', background: '#272A25', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif', color: '#F2EEE6', minHeight: '44px' }
+const label = { display: 'grid', gap: '4px', fontSize: '0.8125rem', fontWeight: 600, color: '#F2EEE6' }
 const dateText = d => (d ? new Date(`${d}T12:00:00`).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' }) : '')
 
 // «Sammenlign med markedet» på gjenstandssiden: søkelenker brukeren kan åpne selv, familiens egne
@@ -106,8 +106,8 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
   const appraise = advice === 'instead' ? appraiseText(estimate, item.ai_analysis) : null
 
   return (
-    <details style={{ marginBottom: '24px', background: '#FBF9F5', border: '1px solid #E8DFD0', borderRadius: '10px', padding: '0 14px' }}>
-      <summary style={{ cursor: 'pointer', fontSize: '0.875rem', color: '#5C4530', padding: '12px 0', minHeight: '44px', boxSizing: 'border-box' }}>
+    <details style={{ marginBottom: '24px', background: '#1F221E', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '10px', padding: '0 14px' }}>
+      <summary style={{ cursor: 'pointer', fontSize: '0.875rem', color: '#F2EEE6', padding: '12px 0', minHeight: '44px', boxSizing: 'border-box' }}>
         {L('Sammenlign med markedet', 'Compare with the market')}{refs.length ? ` · ${refs.length}` : ''}
       </summary>
       <div style={{ paddingBottom: '14px', display: 'grid', gap: '12px', fontFamily: 'Karla, sans-serif' }}>
@@ -116,7 +116,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
             'The most reliable way to a value: look up similar items that have actually sold, and add three or more. The value is then based on what you found, not on an AI guess.')}
         </p>
         {refs.length > 0 && refs.length < 3 && (
-          <p style={{ ...small, color: '#3A5A30', fontWeight: 600 }}>
+          <p style={{ ...small, color: '#9DAA8C', fontWeight: 600 }}>
             {L(`${refs.length} av 3 lagt inn. Legg inn ${3 - refs.length} til, så bygger verdien på deres egne funn.`,
               `${refs.length} of 3 added. Add ${3 - refs.length} more and the value is based on what you found.`)}
           </p>
@@ -126,7 +126,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {links.map(l => (
               <a key={l.provider} href={l.url} target="_blank" rel="noopener noreferrer" aria-label={`${l.label} ${L('(åpnes i ny fane)', '(opens in a new tab)')}`}
-                style={{ ...btn, display: 'inline-flex', alignItems: 'center', textDecoration: 'none', color: '#3A2F26' }}>
+                style={{ ...btn, display: 'inline-flex', alignItems: 'center', textDecoration: 'none', color: '#F2EEE6' }}>
                 {l.label}<span aria-hidden="true">&nbsp;↗</span>
               </a>
             ))}
@@ -136,13 +136,13 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
         {refs.length > 0 && (
           <ul style={{ ...small, listStyle: 'none', padding: 0, display: 'grid', gap: '8px' }}>
             {refs.map(r => (
-              <li key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: '#fff', border: '1px solid #E8DFD0', borderRadius: '8px', padding: '8px 10px' }}>
+              <li key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '8px', padding: '8px 10px' }}>
                 <span style={{ flex: '1 1 200px' }}>
-                  {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#3A2F26' }}>{r.title}</a> : <span style={{ color: '#3A2F26' }}>{r.title}</span>}
+                  {r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#F2EEE6' }}>{r.title}</a> : <span style={{ color: '#F2EEE6' }}>{r.title}</span>}
                   <br />{priceTypeLabel(r.price_type)} {formatNOK(r.price)}{r.date ? ` · ${dateText(r.date)}` : ''}
-                  <span style={{ color: '#75604B' }}> · {L('oppgitt av familien', 'reported by the family')}</span>
+                  <span style={{ color: '#B9B4A8' }}> · {L('oppgitt av familien', 'reported by the family')}</span>
                 </span>
-                {canEdit && <button onClick={() => removeReference(r.id)} disabled={busy} aria-label={L(`Fjern «${r.title}»`, `Remove «${r.title}»`)} style={{ ...btn, color: '#8A4B2A' }}>{L('Fjern', 'Remove')}</button>}
+                {canEdit && <button onClick={() => removeReference(r.id)} disabled={busy} aria-label={L(`Fjern «${r.title}»`, `Remove «${r.title}»`)} style={{ ...btn, color: '#C79A6B' }}>{L('Fjern', 'Remove')}</button>}
               </li>
             ))}
           </ul>
@@ -153,7 +153,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
           <p style={small}>{L('AI-anslaget blir sikrere når materiale, stempel, merke og modell er lagt inn under «Rett opplysningene».', 'The AI estimate is more reliable when material, hallmark, brand and model have been added under «Correct the details».')}</p>
         )}
         {canEdit && (adding ? (
-          <form onSubmit={addReference} style={{ display: 'grid', gap: '10px', background: '#fff', border: '1px solid #E8DFD0', borderRadius: '8px', padding: '12px' }}>
+          <form onSubmit={addReference} style={{ display: 'grid', gap: '10px', background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '8px', padding: '12px' }}>
             <label htmlFor="ref-title" style={label}>{L('Hva er det?', 'What is it?')}
               <input id="ref-title" value={form.title} maxLength={120} onChange={ev => setForm(f => ({ ...f, title: ev.target.value }))} placeholder={L('F.eks. «Figgjo Lotte tallerken, FINN»', 'E.g. «Figgjo Lotte plate, FINN»')} style={input} />
             </label>
@@ -171,15 +171,15 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
             <label htmlFor="ref-date" style={label}>{L('Dato (valgfri)', 'Date (optional)')}
               <input id="ref-date" type="date" value={form.date} onChange={ev => setForm(f => ({ ...f, date: ev.target.value }))} style={input} />
             </label>
-            {formError && <p role="alert" style={{ ...small, color: '#8A4B2A' }}>{formError}</p>}
+            {formError && <p role="alert" style={{ ...small, color: '#C79A6B' }}>{formError}</p>}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button type="submit" disabled={busy} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none' }}>{L('Lagre sammenligningen', 'Save comparison')}</button>
+              <button type="submit" disabled={busy} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none' }}>{L('Lagre sammenligningen', 'Save comparison')}</button>
               <button type="button" onClick={() => { setAdding(false); setFormError('') }} style={btn}>{L('Avbryt', 'Cancel')}</button>
             </div>
           </form>
         ) : (
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button onClick={() => setAdding(true)} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none', fontWeight: 600 }}>{L('Legg til en sammenligning', 'Add a comparison')}</button>
+            <button onClick={() => setAdding(true)} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none', fontWeight: 600 }}>{L('Legg til en sammenligning', 'Add a comparison')}</button>
             <button onClick={() => runEstimate()} disabled={busy} style={btn}>
               {busy && !estimate ? L('Anslår…', 'Estimating…') : refs.length >= 3 ? L('Anslå verdi ut fra sammenligningene', 'Estimate value from the comparisons') : L('Anslå verdi med AI (grovt)', 'Estimate value with AI (rough)')}
             </button>
@@ -189,31 +189,31 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
         {askConsent && <AiConsent onCancel={() => setAskConsent(false)} onAccept={() => { giveAiConsent(); setAskConsent(false); runEstimate(true) }} />}
 
         {estimate?.status === 'insufficient' && (
-          <p role="status" style={{ ...small, background: '#fff', border: '1px solid #E8DFD0', borderRadius: '8px', padding: '10px' }}>
+          <p role="status" style={{ ...small, background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '8px', padding: '10px' }}>
             {L('For lite informasjon til å anslå verdi.', 'Too little information to estimate a value.')}
             {estimate.missing?.length > 0 && <> {L('Dette kan hjelpe', 'This could help')}: {estimate.missing.join('; ')}.</>}
           </p>
         )}
         {appraise && (
-          <div role="status" style={{ background: '#fff', border: '2px solid #A97C3F', borderRadius: '10px', padding: '12px 14px', display: 'grid', gap: '8px' }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: '1.125rem', color: '#3A2F26' }}>{appraise.title}</div>
+          <div role="status" style={{ background: '#30342D', border: '2px solid #C79A6B', borderRadius: '10px', padding: '12px 14px', display: 'grid', gap: '8px' }}>
+            <div style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.25rem', color: '#F2EEE6' }}>{appraise.title}</div>
             <p style={small}>{appraise.body}</p>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {canEdit && !adding && <button onClick={() => { setEstimate(null); setAdding(true) }} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none' }}>{L('Legg inn en solgt pris', 'Add a sold price')}</button>}
+              {canEdit && !adding && <button onClick={() => { setEstimate(null); setAdding(true) }} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none', fontWeight: 600 }}>{L('Legg inn en solgt pris', 'Add a sold price')}</button>}
               <button onClick={() => setEstimate(null)} style={btn}>{L('Lukk', 'Close')}</button>
             </div>
           </div>
         )}
         {e && !appraise && (
-          <div role="status" style={{ background: '#DCE3D2', border: '1px solid #B8C8A8', borderRadius: '10px', padding: '12px 14px', display: 'grid', gap: '6px' }}>
-            <div style={{ fontSize: '0.75rem', color: '#3A5A30', fontWeight: 600 }}>
+          <div role="status" style={{ background: '#30342D', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '10px', padding: '12px 14px', display: 'grid', gap: '6px' }}>
+            <div style={{ fontSize: '0.75rem', color: '#9DAA8C', fontWeight: 600 }}>
               {!isMarket ? L('Veiledende AI-anslag, ikke en dokumentert markedsverdi', 'Indicative AI estimate, not a documented market value')
                 : familyReported ? L('Anslag ut fra priser familien har oppgitt (ikke bekreftet av en kilde)', 'Estimate from prices reported by the family (not confirmed by a source)')
                   : L('Anslag ut fra sammenligningene', 'Estimate from the comparisons')}
             </div>
             {/* Spennet er hovedtallet: ett tall alene gir et inntrykk av presisjon anslaget ikke har */}
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: '1.375rem', color: '#3A2F26' }}>{formatRange(e.low, e.high)}</div>
-            <div style={{ ...small, color: '#3A5A30' }}>
+            <div style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.375rem', color: '#F2EEE6' }}>{formatRange(e.low, e.high)}</div>
+            <div style={{ ...small, color: '#9DAA8C' }}>
               {estimate.range_kind === 'hits'
                 ? L(`Spenn i ${estimate.stats?.n_used} treff`, `Range in ${estimate.stats?.n_used} hits`)
                 : estimate.range_kind === 'p25_p75'
@@ -223,7 +223,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
             {advice === 'suggest' && <p style={{ ...small, fontWeight: 600 }}>{suggestText(estimate, item.ai_analysis)}</p>}
             {(estimate.explanation || estimate.reasoning) && <p style={small}>{estimate.explanation || estimate.reasoning}</p>}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button onClick={applyEstimate} disabled={busy} style={{ ...btn, background: '#5F6E52', color: '#fff', border: 'none' }}>{L(`Bruk ${formatNOK(e.likely)} som verdi`, `Use ${formatNOK(e.likely)} as the value`)}</button>
+              <button onClick={applyEstimate} disabled={busy} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none' }}>{L(`Bruk ${formatNOK(e.likely)} som verdi`, `Use ${formatNOK(e.likely)} as the value`)}</button>
               <button onClick={() => setEstimate(null)} style={btn}>{L('Lukk', 'Close')}</button>
             </div>
           </div>

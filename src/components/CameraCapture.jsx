@@ -117,7 +117,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
   const pill = (primary, disabled) => ({
     minHeight: '48px', padding: '12px 18px', borderRadius: '24px', border: 'none', fontSize: '0.9375rem', fontWeight: '500',
     fontFamily: 'Karla, sans-serif', cursor: disabled ? 'not-allowed' : 'pointer',
-    background: primary ? '#FBF9F5' : 'rgba(255,255,255,0.16)', color: primary ? '#3A2F26' : '#fff',
+    background: primary ? '#F5F2EB' : 'rgba(255,255,255,0.16)', color: primary ? '#1F2326' : '#fff',
     opacity: disabled ? 0.4 : 1,
   })
 
@@ -154,7 +154,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
       {multi && (
         <div aria-live="polite" style={{
           margin: '0 16px 8px', padding: '8px 12px', borderRadius: '10px', fontSize: '0.875rem', textAlign: 'center',
-          background: multi.sameItem ? '#5F6E52' : 'rgba(255,255,255,0.1)', color: '#fff', fontWeight: multi.sameItem ? '500' : '400',
+          background: multi.sameItem ? '#2F4A43' : 'rgba(255,255,255,0.1)', color: '#fff', fontWeight: multi.sameItem ? '500' : '400',
         }}>{nextShotText}</div>
       )}
 
@@ -169,7 +169,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
         {multi?.sameItem && status === 'live' && !blocked && (
           <div aria-hidden="true" style={{
             position: 'absolute', top: '14px', left: '14px', padding: '6px 12px', borderRadius: '10px',
-            background: '#DCE3D2', color: '#3A2F26', fontSize: '0.875rem', fontWeight: '600',
+            background: '#EAE5DA', color: '#1F2326', fontSize: '0.875rem', fontWeight: '600',
           }}>{L(`▣ Samme gjenstand (${multi.itemNumber}) · bilde ${Math.min(photos.length + 1, maxPhotos)} av ${maxPhotos}`, `▣ Same item (${multi.itemNumber}) · photo ${Math.min(photos.length + 1, maxPhotos)} of ${maxPhotos}`)}</div>
         )}
         {newItem && (
@@ -178,10 +178,10 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
             borderRadius: '16px', background: 'rgba(95,110,82,0.92)', fontSize: '1.375rem', fontFamily: "'Fraunces', serif", whiteSpace: 'nowrap',
           }}>{L(`Gjenstand ${newItem} ✓`, `Item ${newItem} ✓`)}</div>
         )}
-        {status === 'starting' && <p style={{ color: '#D9CFC0', fontSize: '0.875rem' }}>{L('Starter kameraet…', 'Starting the camera…')}</p>}
+        {status === 'starting' && <p style={{ color: '#CFC8BA', fontSize: '0.875rem' }}>{L('Starter kameraet…', 'Starting the camera…')}</p>}
         {status === 'unavailable' && (
           <div style={{ maxWidth: '340px', padding: '24px', textAlign: 'center' }}>
-            <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, marginBottom: '18px', color: '#E8DFD0' }}>
+            <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, marginBottom: '18px', color: '#EAE5DA' }}>
               {L('Fikk ikke tilgang til kameraet her. Du kan bruke kamera-appen eller velge bilder i stedet.',
                  'Could not access the camera here. You can use the camera app or choose photos instead.')}
             </p>
@@ -202,7 +202,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
             {blockedText}
           </div>
         )}
-        {multi?.sameItem && <div aria-hidden="true" style={{ position: 'absolute', inset: 0, borderRadius: '14px', boxShadow: 'inset 0 0 0 5px #DCE3D2', pointerEvents: 'none' }} />}
+        {multi?.sameItem && <div aria-hidden="true" style={{ position: 'absolute', inset: 0, borderRadius: '14px', boxShadow: 'inset 0 0 0 5px #CFC8BA', pointerEvents: 'none' }} />}
         {undo && (
           <button onClick={undo.onUndo} style={{ ...pill(true), position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}>
             {undo.text} · <u>{L('Angre', 'Undo')}</u>
@@ -213,7 +213,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
       {/* Bilder av gjenstanden som fotograferes nå, med sletting */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px 0', minHeight: '64px', overflowX: 'auto' }}>
         {multi && photos.length > 0 && (
-          <span style={{ fontSize: '0.75rem', color: '#D9CFC0', flexShrink: 0 }}>{L(`Gjenstand ${multi.itemNumber}`, `Item ${multi.itemNumber}`)}</span>
+          <span style={{ fontSize: '0.75rem', color: '#CFC8BA', flexShrink: 0 }}>{L(`Gjenstand ${multi.itemNumber}`, `Item ${multi.itemNumber}`)}</span>
         )}
         {photos.map((src, i) => (
           <div key={src} style={{ position: 'relative', flexShrink: 0 }}>
@@ -221,7 +221,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
             {onRemovePhoto && (
               <button onClick={() => onRemovePhoto(i)} aria-label={L(`Slett bilde ${i + 1}`, `Delete photo ${i + 1}`)} style={{
                 position: 'absolute', top: '-10px', right: '-10px', width: '32px', height: '32px', borderRadius: '50%', padding: 0,
-                border: '2px solid #000', background: '#FBF9F5', color: '#3A2F26', fontSize: '1rem', lineHeight: 1, cursor: 'pointer',
+                border: '2px solid #000', background: '#F5F2EB', color: '#1F2326', fontSize: '1rem', lineHeight: 1, cursor: 'pointer',
               }}>×</button>
             )}
           </div>
@@ -255,7 +255,7 @@ export default function CameraCapture({ photos, maxPhotos = 5, onCapture, onClos
         </div>
         <button ref={shutterRef} onClick={shoot} disabled={status !== 'live' || blocked} aria-label={L('Ta bilde', 'Take photo')} style={{
           width: '76px', height: '76px', borderRadius: '50%', border: '4px solid #fff', padding: 0,
-          background: status === 'live' && !blocked ? '#FBF9F5' : 'rgba(255,255,255,0.25)',
+          background: status === 'live' && !blocked ? '#F5F2EB' : 'rgba(255,255,255,0.25)',
           boxShadow: 'inset 0 0 0 3px #000', cursor: status === 'live' && !blocked ? 'pointer' : 'not-allowed',
         }} />
         <div />
