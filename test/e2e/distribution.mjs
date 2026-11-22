@@ -556,7 +556,7 @@ await check('Demo: administrator kan prøve «Tildel alle som bare én ønsker»
   await page.getByText(/Du ser på en/).waitFor()
   await page.getByRole('button', { name: 'Tildel 1 gjenstand som bare én ønsker' }).click()
   const dialog = page.getByRole('dialog', { name: 'Tildel det bare én ønsker' })
-  await dialog.getByText('Klokke → Kari').waitFor()
+  await dialog.getByRole('listitem').filter({ hasText: 'Klokke' }).getByText(/Til\s+Kari/).waitFor()
   await dialog.getByRole('button', { name: 'Tildel 1' }).click()
   await page.getByText('1 gjenstand tildelt').waitFor()
   const a = rpc.find(c => c.name === 'assign_items')
