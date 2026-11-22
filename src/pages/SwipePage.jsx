@@ -279,7 +279,8 @@ export default function SwipePage({ session, profile, onToast }) {
 
           {/* Info */}
           <div style={{ padding:'20px' }}>
-            <h2 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.25rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'6px' }}>{currentItem.title}</h2>
+            {/* Fast linjehøyde: Bodoni Moda har høyere standard linjehøyde enn den gamle skriften, og kortet har akkurat plass */}
+            <h2 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.25rem', lineHeight:1.2, fontWeight:'400', color:'#F2EEE6', marginBottom:'6px' }}>{currentItem.title}</h2>
             <div style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'8px' }}>
               <span style={{ fontSize:'0.75rem', color:'#B9B4A8', background:'#30342D', padding:'3px 10px', borderRadius:'20px' }}>
                 {currentItem.categories?.emoji} {categoryLabel(currentItem.categories?.label) || L('Annet', 'Other')}
