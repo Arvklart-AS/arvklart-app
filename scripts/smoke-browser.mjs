@@ -136,14 +136,17 @@ await check('Demo: åpner demo-boet, og navigering i boet virker', async page =>
   const estate = new URL(page.url()).pathname
   await page.waitForLoadState('networkidle').catch(() => {})
   await notBroken(page)
-  // Gjenstandssiden: kortene i listen er klikkbare; bildet på første kort åpner gjenstanden
-  const card = page.locator('img[alt]:not([alt="Arvklart"])').first()
-  if (await card.count()) {
-    await card.click()
-    await page.waitForURL(/\/item\/[0-9a-f-]{36}$/, { timeout: 15000 })
-    await page.waitForLoadState('networkidle').catch(() => {})
-    await notBroken(page)
-  } else notes.push('ingen gjenstand med bilde i demo-boet; gjenstandssiden ble ikke åpnet')
+  // Gjenstandene ligger på sin egen side (/estate/:id/gjenstander), ikke på oversikten. Sjekken gikk
+  // stille over da oversikten ble bygget om: den lette etter et bilde på oversikten og fant ingen.
+  await page.goto(`${BASE}${estate}/gjenstander`)
+  await page.waitForLoadState('networkidle').catch(() => {})
+  await notBroken(page)
+  const card = page.locator('.bo-kort a[href*="/item/"]').first()
+  assert(await card.count() > 0, 'fant ingen gjenstandskort på /gjenstander')
+  await card.click()
+  await page.waitForURL(/\/item\/[0-9a-f-]{36}$/, { timeout: 15000 })
+  await page.waitForLoadState('networkidle').catch(() => {})
+  await notBroken(page)
   for (const sub of ['swipe', 'heirs', 'conflicts', 'fordeling', 'status']) {
     await page.goto(`${BASE}${estate}/${sub}`)
     await page.waitForLoadState('networkidle').catch(() => {})
