@@ -129,14 +129,14 @@ export default function DocumentVaultPage({ session, onToast }) {
 
   return (
     <div style={{ maxWidth:'900px', margin:'0 auto', padding:'28px 16px', fontFamily:'Karla, sans-serif' }}>
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#75604B', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#575B5E', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
 
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'28px', flexWrap:'wrap', gap:'12px' }}>
         <div>
-          <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.625rem', fontWeight:'400', color:'#3A2F26', marginBottom:'4px' }}>{L('Dokumenthvelv', 'Document vault')}</h1>
-          <p style={{ color:'#75604B', fontSize:'0.875rem' }}>{L('Lagre og del viktige dokumenter trygt', 'Store and share important documents securely')}</p>
+          <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.625rem', fontWeight:'400', color:'#1F2326', marginBottom:'4px' }}>{L('Dokumenthvelv', 'Document vault')}</h1>
+          <p style={{ color:'#575B5E', fontSize:'0.875rem' }}>{L('Lagre og del viktige dokumenter trygt', 'Store and share important documents securely')}</p>
         </div>
-        <button onClick={() => fileRef.current.click()} style={{ padding:'9px 18px', background:'#3A2F26', color:'#FBF9F5', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+        <button onClick={() => fileRef.current.click()} style={{ padding:'9px 18px', background:'#2F4A43', color:'#F5F2EB', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
           {L('Last opp fil', 'Upload file')}
         </button>
         <input ref={fileRef} type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.txt,.xls,.xlsx" onChange={e => handleFiles(e.target.files)} style={{ display:'none' }} />
@@ -144,13 +144,13 @@ export default function DocumentVaultPage({ session, onToast }) {
 
       {/* Opplastingsfremdrift */}
       {uploading && (
-        <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'10px', padding:'16px 20px', marginBottom:'20px' }}>
+        <div style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'10px', padding:'16px 20px', marginBottom:'20px' }}>
           <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'8px' }}>
-            <span style={{ fontSize:'0.875rem', color:'#3A2F26' }}>{L('Laster opp…', 'Uploading…')}</span>
-            <span style={{ fontSize:'0.875rem', color:'#5F6E52' }}>{uploadProgress}%</span>
+            <span style={{ fontSize:'0.875rem', color:'#1F2326' }}>{L('Laster opp…', 'Uploading…')}</span>
+            <span style={{ fontSize:'0.875rem', color:'#2F4A43' }}>{uploadProgress}%</span>
           </div>
-          <div style={{ height:'6px', background:'#E8DFD0', borderRadius:'3px', overflow:'hidden' }}>
-            <div style={{ height:'100%', width:`${uploadProgress}%`, background:'#5F6E52', borderRadius:'3px', transition:'width 0.3s ease' }} />
+          <div style={{ height:'6px', background:'#EAE5DA', borderRadius:'3px', overflow:'hidden' }}>
+            <div style={{ height:'100%', width:`${uploadProgress}%`, background:'#2F4A43', borderRadius:'3px', transition:'width 0.3s ease' }} />
           </div>
         </div>
       )}
@@ -161,15 +161,15 @@ export default function DocumentVaultPage({ session, onToast }) {
         onDragLeave={() => setDragOver(false)}
         onDrop={e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
         style={{
-          border:`2px dashed ${dragOver?'#5F6E52':'#D9CFC0'}`,
+          border:`2px dashed ${dragOver?'#2F4A43':'#CFC8BA'}`,
           borderRadius:'12px', padding:'24px', textAlign:'center',
-          background: dragOver?'#DCE3D2':'#FBF9F5',
+          background: dragOver?'#EAE5DA':'#F5F2EB',
           marginBottom:'24px', cursor:'pointer', transition:'all 0.2s',
         }}
         onClick={() => fileRef.current.click()}
       >
-        <div style={{ fontSize:'0.875rem', color:'#75604B', marginBottom:'4px' }}>{L('Slipp filer her eller klikk for å laste opp', 'Drop files here or click to upload')}</div>
-        <div style={{ fontSize:'0.75rem', color:'#75604B' }}>{L('PDF, Word, Excel og bilder støttes', 'PDF, Word, Excel and images are supported')}</div>
+        <div style={{ fontSize:'0.875rem', color:'#575B5E', marginBottom:'4px' }}>{L('Slipp filer her eller klikk for å laste opp', 'Drop files here or click to upload')}</div>
+        <div style={{ fontSize:'0.75rem', color:'#575B5E' }}>{L('PDF, Word, Excel og bilder støttes', 'PDF, Word, Excel and images are supported')}</div>
       </div>
 
       {/* Mobil: mappene som en vannrett rad i stedet for en høy liste */}
@@ -177,32 +177,32 @@ export default function DocumentVaultPage({ session, onToast }) {
         .doc-folders { flex-basis: 100% !important; }
         .doc-folder-list { display: flex; gap: 6px; overflow-x: auto !important; scrollbar-width: none; background: none !important; border: none !important; border-radius: 0 !important; }
         .doc-folder-list::-webkit-scrollbar { display: none; }
-        .doc-folder { width: auto !important; flex-shrink: 0; gap: 8px; white-space: nowrap; padding: 8px 14px !important; border: 1px solid #D9CFC0 !important; border-radius: 999px; }
+        .doc-folder { width: auto !important; flex-shrink: 0; gap: 8px; white-space: nowrap; padding: 8px 14px !important; border: 1px solid #CFC8BA !important; border-radius: 999px; }
       }`}</style>
       <div style={{ display:'flex', flexWrap:'wrap', gap:'20px', alignItems:'flex-start' }}>
         {/* Mappevalg */}
         <div className="doc-folders" style={{ flex:'1 1 200px', maxWidth:'100%' }}>
-          <div className="doc-folder-list" style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'12px', overflow:'hidden' }}>
+          <div className="doc-folder-list" style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'12px', overflow:'hidden' }}>
             <button className="doc-folder" onClick={() => setActiveFolder('all')} style={{
-              width:'100%', padding:'12px 16px', background:activeFolder==='all'?'#E8DFD0':'none',
-              border:'none', borderBottom:'1px solid #E8DFD0', textAlign:'left', cursor:'pointer',
-              fontSize:'0.875rem', color:'#3A2F26', fontFamily:'Karla, sans-serif',
+              width:'100%', padding:'12px 16px', background:activeFolder==='all'?'#EAE5DA':'none',
+              border:'none', borderBottom:'1px solid #CFC8BA', textAlign:'left', cursor:'pointer',
+              fontSize:'0.875rem', color:'#1F2326', fontFamily:'Karla, sans-serif',
               display:'flex', justifyContent:'space-between', alignItems:'center',
             }}>
               <span>{L('Alle dokumenter', 'All documents')}</span>
-              <span style={{ fontSize:'0.75rem', color:'#75604B', background:'#FBF9F5', padding:'1px 7px', borderRadius:'20px' }}>{docs.length}</span>
+              <span style={{ fontSize:'0.75rem', color:'#575B5E', background:'#F5F2EB', padding:'1px 7px', borderRadius:'20px' }}>{docs.length}</span>
             </button>
             {FOLDER_TYPES.map((folder, i) => (
               <button key={folder.id} className="doc-folder" onClick={() => setActiveFolder(folder.id)} style={{
                 width:'100%', padding:'11px 16px',
-                background:activeFolder===folder.id?'#E8DFD0':'none',
-                border:'none', borderBottom:i < FOLDER_TYPES.length-1?'1px solid #FBF9F5':'none',
-                textAlign:'left', cursor:'pointer', fontSize:'0.8125rem', color:'#3A2F26',
+                background:activeFolder===folder.id?'#EAE5DA':'none',
+                border:'none', borderBottom:i < FOLDER_TYPES.length-1?'1px solid #F5F2EB':'none',
+                textAlign:'left', cursor:'pointer', fontSize:'0.8125rem', color:'#1F2326',
                 fontFamily:'Karla, sans-serif', display:'flex', justifyContent:'space-between', alignItems:'center',
               }}>
                 <span>{folder.label}</span>
                 {countByFolder[folder.id] > 0 && (
-                  <span style={{ fontSize:'0.6875rem', color:'#75604B', background:'#FBF9F5', padding:'1px 6px', borderRadius:'20px' }}>{countByFolder[folder.id]}</span>
+                  <span style={{ fontSize:'0.6875rem', color:'#575B5E', background:'#F5F2EB', padding:'1px 6px', borderRadius:'20px' }}>{countByFolder[folder.id]}</span>
                 )}
               </button>
             ))}
@@ -212,7 +212,7 @@ export default function DocumentVaultPage({ session, onToast }) {
         {/* Dokumentliste */}
         <div style={{ flex:'3 1 320px', minWidth:0 }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'60px 20px', color:'#75604B' }}>
+            <div style={{ textAlign:'center', padding:'60px 20px', color:'#575B5E' }}>
               <p>{activeFolder==='all'?L('Ingen dokumenter i hvelvet ennå.','No documents in the vault yet.'):L('Ingen dokumenter i denne mappen ennå.','No documents in this folder yet.')}</p>
             </div>
           ) : (
@@ -232,12 +232,12 @@ export default function DocumentVaultPage({ session, onToast }) {
       {/* Bekreft sletting */}
       {confirmDoc && (
         <Modal onClose={() => setConfirmDoc(null)} labelledBy="delete-doc-title">
-            <h3 id="delete-doc-title" style={{ fontFamily:'Fraunces, serif', fontSize:'1.125rem', fontWeight:'400', color:'#3A2F26', marginBottom:'8px' }}>{L('Slett dokument', 'Delete document')}</h3>
-            <p style={{ fontSize:'0.875rem', color:'#5C4530', marginBottom:'6px' }}>«{confirmDoc.name}»</p>
-            <p style={{ fontSize:'0.8125rem', color:'#75604B', marginBottom:'24px' }}>{L('Kan ikke angres.', 'This cannot be undone.')}</p>
+            <h3 id="delete-doc-title" style={{ fontFamily:'Fraunces, serif', fontSize:'1.125rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Slett dokument', 'Delete document')}</h3>
+            <p style={{ fontSize:'0.875rem', color:'#1F2326', marginBottom:'6px' }}>«{confirmDoc.name}»</p>
+            <p style={{ fontSize:'0.8125rem', color:'#575B5E', marginBottom:'24px' }}>{L('Kan ikke angres.', 'This cannot be undone.')}</p>
             <div style={{ display:'flex', gap:'10px' }}>
-              <button onClick={() => setConfirmDoc(null)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid #D9CFC0', borderRadius:'8px', cursor:'pointer', color:'#5C4530', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
-              <button onClick={() => deleteDoc(confirmDoc)} style={{ flex:1, padding:'11px', background:'#8B3A3A', color:'#fff', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Slett', 'Delete')}</button>
+              <button onClick={() => setConfirmDoc(null)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid #CFC8BA', borderRadius:'8px', cursor:'pointer', color:'#1F2326', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+              <button onClick={() => deleteDoc(confirmDoc)} style={{ flex:1, padding:'11px', background:'#9A3B2E', color:'#fff', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Slett', 'Delete')}</button>
             </div>
         </Modal>
       )}
@@ -247,19 +247,19 @@ export default function DocumentVaultPage({ session, onToast }) {
         <Modal onClose={() => setPreview(null)} labelledBy="preview-doc-title" maxWidth={560} overlay="rgba(0,0,0,0.6)">
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'20px' }}>
               <div>
-                <h3 id="preview-doc-title" style={{ fontFamily:'Fraunces, serif', fontSize:'1.125rem', fontWeight:'400', color:'#3A2F26', marginBottom:'4px', overflowWrap:'anywhere' }}>{preview.name}</h3>
-                <p style={{ fontSize:'0.8125rem', color:'#75604B' }}>{L('Lastet opp av', 'Uploaded by')} {preview.uploader?.display_name || L('et tidligere medlem', 'a former member')} · {new Date(preview.created_at).toLocaleDateString(locale())}</p>
+                <h3 id="preview-doc-title" style={{ fontFamily:'Fraunces, serif', fontSize:'1.125rem', fontWeight:'400', color:'#1F2326', marginBottom:'4px', overflowWrap:'anywhere' }}>{preview.name}</h3>
+                <p style={{ fontSize:'0.8125rem', color:'#575B5E' }}>{L('Lastet opp av', 'Uploaded by')} {preview.uploader?.display_name || L('et tidligere medlem', 'a former member')} · {new Date(preview.created_at).toLocaleDateString(locale())}</p>
               </div>
-              <button onClick={() => setPreview(null)} aria-label={L('Lukk', 'Close')} style={{ background:'none', border:'none', fontSize:'1.5rem', color:'#75604B', cursor:'pointer', minWidth:'44px', minHeight:'44px' }}>×</button>
+              <button onClick={() => setPreview(null)} aria-label={L('Lukk', 'Close')} style={{ background:'none', border:'none', fontSize:'1.5rem', color:'#575B5E', cursor:'pointer', minWidth:'44px', minHeight:'44px' }}>×</button>
             </div>
             {preview.file_type?.startsWith('image/') && previewUrl && (
               <img src={previewUrl} alt={preview.name} style={{ width:'100%', borderRadius:'8px', marginBottom:'16px' }} />
             )}
             <div style={{ display:'flex', gap:'10px' }}>
-              <button onClick={() => openInNewTab(preview, false)} style={{ flex:1, padding:'11px', background:'#3A2F26', color:'#FBF9F5', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+              <button onClick={() => openInNewTab(preview, false)} style={{ flex:1, padding:'11px', background:'#2F4A43', color:'#F5F2EB', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
                 {L('Åpne', 'Open')}
               </button>
-              <button onClick={() => setPreview(null)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid #D9CFC0', borderRadius:'8px', cursor:'pointer', color:'#5C4530', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Lukk', 'Close')}</button>
+              <button onClick={() => setPreview(null)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid #CFC8BA', borderRadius:'8px', cursor:'pointer', color:'#1F2326', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Lukk', 'Close')}</button>
             </div>
         </Modal>
       )}
@@ -272,11 +272,11 @@ function DocRow({ doc, session, myRole, onDelete, onMove, onPreview, onDownload 
   const folder = FOLDER_TYPES.find(f => f.id === doc.folder) || FOLDER_TYPES[FOLDER_TYPES.length - 1]
 
   return (
-    <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'10px', padding:'14px 16px', display:'flex', alignItems:'center', gap:'12px' }}>
+    <div style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'10px', padding:'14px 16px', display:'flex', alignItems:'center', gap:'12px' }}>
       <div style={{ width:'8px', height:'40px', borderRadius:'4px', background:folder.color, flexShrink:0 }} />
       <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ fontSize:'0.875rem', color:'#3A2F26', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{doc.name}</div>
-        <div style={{ fontSize:'0.75rem', color:'#75604B', marginTop:'2px', display:'flex', gap:'8px', alignItems:'center' }}>
+        <div style={{ fontSize:'0.875rem', color:'#1F2326', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{doc.name}</div>
+        <div style={{ fontSize:'0.75rem', color:'#575B5E', marginTop:'2px', display:'flex', gap:'8px', alignItems:'center' }}>
           <span>{doc.uploader?.display_name || L('Tidligere medlem', 'Former member')}</span>
           <span>·</span>
           <span>{formatSize(doc.file_size)}</span>
@@ -286,18 +286,18 @@ function DocRow({ doc, session, myRole, onDelete, onMove, onPreview, onDownload 
       </div>
 
       <div style={{ display:'flex', alignItems:'center', gap:'6px', flexShrink:0 }}>
-        <span style={{ fontSize:'0.6875rem', background:'#FBF9F5', color:'#5C4530', padding:'2px 8px', borderRadius:'20px' }}>{folder.label}</span>
+        <span style={{ fontSize:'0.6875rem', background:'#F5F2EB', color:'#1F2326', padding:'2px 8px', borderRadius:'20px' }}>{folder.label}</span>
 
-        <button onClick={onPreview} title={L('Forhåndsvis', 'Preview')} style={{ background:'none', border:'1px solid #D9CFC0', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#5C4530' }}>{L('Vis', 'View')}</button>
+        <button onClick={onPreview} title={L('Forhåndsvis', 'Preview')} style={{ background:'none', border:'1px solid #CFC8BA', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#1F2326' }}>{L('Vis', 'View')}</button>
 
-        <button onClick={onDownload} title={L('Last ned', 'Download')} style={{ background:'none', border:'1px solid #D9CFC0', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#5C4530' }}>↓</button>
+        <button onClick={onDownload} title={L('Last ned', 'Download')} style={{ background:'none', border:'1px solid #CFC8BA', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#1F2326' }}>↓</button>
 
         <div style={{ position:'relative' }}>
-          <button onClick={() => setShowMove(!showMove)} title={L('Flytt til mappe', 'Move to folder')} style={{ background:'none', border:'1px solid #D9CFC0', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#5C4530' }}>{L('Flytt', 'Move')}</button>
+          <button onClick={() => setShowMove(!showMove)} title={L('Flytt til mappe', 'Move to folder')} style={{ background:'none', border:'1px solid #CFC8BA', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#1F2326' }}>{L('Flytt', 'Move')}</button>
           {showMove && (
-            <div style={{ position:'absolute', right:0, top:'34px', background:'#fff', border:'1px solid #D9CFC0', borderRadius:'10px', minWidth:'180px', boxShadow:'0 8px 24px rgba(0,0,0,0.12)', zIndex:50, overflow:'hidden' }}>
+            <div style={{ position:'absolute', right:0, top:'34px', background:'#fff', border:'1px solid #CFC8BA', borderRadius:'10px', minWidth:'180px', boxShadow:'0 8px 24px rgba(0,0,0,0.12)', zIndex:50, overflow:'hidden' }}>
               {FOLDER_TYPES.map(f => (
-                <button key={f.id} onClick={() => { onMove(f.id); setShowMove(false) }} style={{ display:'block', width:'100%', padding:'9px 14px', background:doc.folder===f.id?'#E8DFD0':'none', border:'none', textAlign:'left', cursor:'pointer', fontSize:'0.8125rem', color:'#3A2F26', fontFamily:'Karla, sans-serif' }}>
+                <button key={f.id} onClick={() => { onMove(f.id); setShowMove(false) }} style={{ display:'block', width:'100%', padding:'9px 14px', background:doc.folder===f.id?'#EAE5DA':'none', border:'none', textAlign:'left', cursor:'pointer', fontSize:'0.8125rem', color:'#1F2326', fontFamily:'Karla, sans-serif' }}>
                   {f.label}
                 </button>
               ))}
@@ -306,7 +306,7 @@ function DocRow({ doc, session, myRole, onDelete, onMove, onPreview, onDownload 
         </div>
 
         {(myRole === 'admin' || doc.uploaded_by === session.user.id) && (
-          <button onClick={onDelete} title={L('Slett', 'Delete')} style={{ background:'none', border:'1px solid #D9CFC0', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#8B3A3A' }}>×</button>
+          <button onClick={onDelete} title={L('Slett', 'Delete')} style={{ background:'none', border:'1px solid #CFC8BA', padding:'5px 9px', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', color:'#9A3B2E' }}>×</button>
         )}
       </div>
     </div>

@@ -13,20 +13,20 @@ export default function Toasts({ success, errors = [], onDismiss }) {
     }}>
       <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
       {errors.map(e => (
-        <div key={e.id} role="alert" style={{ ...box, background: '#8B3A3A', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 6px 6px 18px' }}>
+        <div key={e.id} role="alert" style={{ ...box, background: '#9A3B2E', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 6px 6px 18px' }}>
           <span style={{ flex: 1 }}>{e.msg}</span>
           <button onClick={() => onDismiss(e.id)} aria-label={L('Lukk feilmeldingen', 'Close the error message')} style={{
-            minWidth: '44px', minHeight: '44px', background: 'none', border: 'none', color: '#FBF9F5',
+            minWidth: '44px', minHeight: '44px', background: 'none', border: 'none', color: '#F5F2EB',
             fontSize: '1.25rem', lineHeight: 1, cursor: 'pointer', borderRadius: '8px',
           }}>×</button>
         </div>
       ))}
-      {success && <div role="status" style={{ ...box, background: '#3A2F26', padding: '11px 28px' }}>{success.msg}</div>}
+      {success && <div role="status" style={{ ...box, background: '#2F4A43', padding: '11px 28px' }}>{success.msg}</div>}
     </div>
   )
 }
 
 const box = {
-  color: '#FBF9F5', borderRadius: '10px', fontSize: '0.9375rem', boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+  color: '#F5F2EB', borderRadius: '10px', fontSize: '0.9375rem', boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
   textAlign: 'center', lineHeight: 1.45, animation: 'fadeUp 0.2s ease', maxWidth: '100%',
 }

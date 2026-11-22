@@ -41,29 +41,28 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - `scripts/smoke-browser.mjs` (`.github/workflows/smoke.yml`) er en røyktest i ekte nettleser mot forhåndsvisningen og produksjonen: forsiden, `/home`, `/app` uten innlogging, innlogging med feil passord, nytt passord, invitasjon, veiviseren (i siden, uten iframe; `/veiviser.html` gir 308), personvern og demoen med navigering i demo-boet. Ingen ekte kontoer; den rapporterer bare
 
 ## Fargepalett — bruk alltid disse
+Fargene er fra «Fargepalett.pdf» (designsystemet «Arvklart» → Farger). Appen bruker **produktpaletten (lys)**:
 ```
 #1F221E  natt (toppmenyen i appen og headeren på markedssidene)
-#3A2F26  espresso (primær bakgrunn, knapper, tekst på lyse flater)
-#FBF9F5  snow (side-bakgrunn)
-#E8DFD0  sand (kort, input-bakgrunn)
-#D9CFC0  grense/border
-#75604B  mørk latte (sekundær tekst; 5,7:1 på snow, 4,5:1 på sand)
-#9C8267  latte (bare ikoner, diagramflater og dekor; for lys som tekst)
-#9A8B78  feltkant (input/select/textarea; 3,3:1 mot hvit)
-#5C4530  valnøtt (primær tekst i lys kontekst)
-#5F6E52  mørk sage (suksess, aksent)
-#8B9A7D  sage
-#DCE3D2  tåkesage (subtil bakgrunn)
+#F5F2EB  papir (side-bakgrunn)
+#EAE5DA  kalk (sidefelt, valgt rad, rolige bokser og felt)
+#1F2326  blekk (primærtekst)
+#575B5E  skifer (sekundærtekst, og kanten på input/select/textarea: 6,6:1 mot hvit)
+#2F4A43  granskog (merkefarge: knapper, knappekanter, aktivt steg, suksess, fokusring)
+#8A5A34  messing (lenker, små aksenter og advarsler)
+#CFC8BA  strek (hårstreker og kanter; bare pynt, aldri tekst eller feltkant)
+#9A3B2E  rust (feilmeldinger og sletting)
 ```
+Hvitt (`#fff`) brukes fortsatt på kort og felt oppå papir. Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) bruker samme lyse palett. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
 
 Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
 `/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
 av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
 og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
 
-Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` i `index.html` (mørke flater setter lys ring selv). Hvit tekst bare på `#5F6E52` eller mørkere, ikke på `#8B9A7D`.
+Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` i `index.html` (granskog; mørke flater setter lys ring selv). Hvit tekst på granskog, messing og rust holder 4,5:1.
 
-**Unntak: bo-sidene er mørke.** Oversikten i boet (`/estate/:id`) og gjenstandslisten (`/estate/:id/gjenstander`) bruker den mørke paletten (Natt `#1F221E` som bakgrunn, Lin `#F2EEE6` tekst, Lin dempet `#B9B4A8`, Mose `#9DAA8C` aksent og fokusring, Granskog `#2F4A43`, Jord `#3A3129`, Messing lys `#C79A6B` høyst én gang per skjerm, Rust lys `#E08A7A` for sletting). Fargene står i `src/lib/estateTheme.js` (liten, brukes av `App.jsx`) og CSS-en i `src/lib/estateThemeCss.js` (klasser med prefiks `bo-`, avgrenset til `.bo-mork`; hover, `<details>` og mobiloppsett krever CSS). Sidene løypene leder til (sveip, fordeling, gjenstandssiden osv.) er fortsatt lyse.
+**Unntak: bo-oversikten er mørk.** Oversikten i boet (`/estate/:id`) og gjenstandslisten (`/estate/:id/gjenstander`) bruker landingssidens mørke palett (Natt `#1F221E` som bakgrunn, Lin `#F2EEE6` tekst, Lin dempet `#B9B4A8`, Mose `#9DAA8C` aksent og fokusring, Granskog `#2F4A43`, Jord `#3A3129`, Messing lys `#C79A6B` høyst én gang per skjerm, Rust lys `#E08A7A` for sletting). Fargene står i `src/lib/estateTheme.js` (liten, brukes av `App.jsx`) og CSS-en i `src/lib/estateThemeCss.js` (klasser med prefiks `bo-`, avgrenset til `.bo-mork`; hover, `<details>` og mobiloppsett krever CSS). Sidene de leder til (sveip, fordeling, gjenstandssiden osv.) bruker produktpaletten over.
 
 ## Typografi
 - `fontFamily: 'Karla, sans-serif'` — brødtekst og UI

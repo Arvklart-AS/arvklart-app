@@ -5,7 +5,7 @@ import { L } from '../lib/lang'
 
 // Fargene på lys bakgrunn (gjenstandssiden, sveiping) og på mørk (gjenstandslisten, se estateTheme.js)
 const TONES = {
-  light: { text: '#5C4530', strong: '#3A2F26', muted: '#75604B', link: '#5F6E52', danger: '#8B3A3A', field: '#fff', fieldBorder: '#9A8B78', primaryBg: '#3A2F26', primaryText: '#FBF9F5', secondaryBg: '#fff' },
+  light: { text: '#1F2326', strong: '#1F2326', muted: '#575B5E', link: '#2F4A43', danger: '#9A3B2E', field: '#fff', fieldBorder: '#575B5E', primaryBg: '#2F4A43', primaryText: '#F5F2EB', secondaryBg: '#fff' },
   dark: { text: '#B9B4A8', strong: '#F2EEE6', muted: '#B9B4A8', link: '#9DAA8C', danger: '#E08A7A', field: '#1F221E', fieldBorder: 'rgba(242, 238, 230, 0.4)', primaryBg: '#F2EEE6', primaryText: '#1F221E', secondaryBg: 'transparent' },
 }
 

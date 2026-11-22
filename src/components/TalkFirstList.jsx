@@ -34,12 +34,12 @@ export default function TalkFirstList({ items, allItems = [], nameOf, myUserId, 
     onChanged()
   }
 
-  const small = { fontSize: '0.8125rem', color: '#5C4530', lineHeight: 1.6, margin: 0 }
-  const btn = { padding: '8px 14px', minHeight: '40px', background: '#fff', border: '1px solid #D9CFC0', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', color: '#5C4530' }
+  const small = { fontSize: '0.8125rem', color: '#1F2326', lineHeight: 1.6, margin: 0 }
+  const btn = { padding: '8px 14px', minHeight: '40px', background: '#fff', border: '1px solid #CFC8BA', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', color: '#1F2326' }
 
   return (
     <section aria-labelledby="talk-first" style={{ fontFamily: 'Karla, sans-serif', marginBottom: '24px' }}>
-      <h2 id="talk-first" style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', fontWeight: 400, color: '#3A2F26', margin: '0 0 6px' }}>{L('Snakk sammen først', 'Talk first')}</h2>
+      <h2 id="talk-first" style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', fontWeight: 400, color: '#1F2326', margin: '0 0 6px' }}>{L('Snakk sammen først', 'Talk first')}</h2>
       <p style={{ ...small, marginBottom: '14px' }}>
         {L('Se hvorfor hver enkelt ønsker gjenstandene. Kanskje noen vil la en annen få en av dem. Det som fortsatt ønskes av flere, fordeles etterpå med en metode alle kan godta.',
           'See why each of you wants the items. Perhaps someone will let another have one. What several still want is divided afterwards with a method everyone can accept.')}
@@ -48,13 +48,13 @@ export default function TalkFirstList({ items, allItems = [], nameOf, myUserId, 
         {[...items, ...allItems.filter(i => withdrawn[i.id] !== undefined && !items.some(x => x.id === i.id))].map(item => {
           const mine = item.interests?.find(x => x.user_id === myUserId)
           return (
-            <article key={item.id} style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '14px 16px' }}>
-              <h3 style={{ fontSize: '0.9375rem', color: '#3A2F26', fontWeight: 600, margin: '0 0 10px' }}>{item.title}</h3>
+            <article key={item.id} style={{ background: '#fff', border: '1px solid #CFC8BA', borderRadius: '12px', padding: '14px 16px' }}>
+              <h3 style={{ fontSize: '0.9375rem', color: '#1F2326', fontWeight: 600, margin: '0 0 10px' }}>{item.title}</h3>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px' }}>
                 {(item.interests || []).map(x => (
-                  <li key={x.user_id} style={{ background: '#FBF9F5', border: '1px solid #E8DFD0', borderRadius: '8px', padding: '10px 12px' }}>
-                    <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#3A2F26' }}>{x.user_id === myUserId ? L('Du', 'You') : nameOf(x.user_id)}</div>
-                    <p style={{ ...small, fontStyle: x.reason ? 'italic' : 'normal', color: x.reason ? '#5C4530' : '#75604B' }}>
+                  <li key={x.user_id} style={{ background: '#F5F2EB', border: '1px solid #CFC8BA', borderRadius: '8px', padding: '10px 12px' }}>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#1F2326' }}>{x.user_id === myUserId ? L('Du', 'You') : nameOf(x.user_id)}</div>
+                    <p style={{ ...small, fontStyle: x.reason ? 'italic' : 'normal', color: x.reason ? '#1F2326' : '#575B5E' }}>
                       {x.reason ? `«${x.reason}»` : L('Ingen begrunnelse ennå', 'No reason yet')}
                     </p>
                   </li>

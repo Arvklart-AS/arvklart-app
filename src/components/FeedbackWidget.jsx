@@ -29,7 +29,7 @@ export default function FeedbackWidget({ session, onToast }) {
       <style>{`@media (max-width: 720px) { body:has(.bottom-bar) .fb-launch { display: none; } }`}</style>
       <button className="fb-launch" onClick={() => setOpen(true)} style={{
         position: 'fixed', bottom: '16px', right: '16px', zIndex: 9999,
-        background: '#3A2F26', color: '#FBF9F5', border: 'none',
+        background: '#2F4A43', color: '#F5F2EB', border: 'none',
         borderRadius: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         padding: '7px 12px', cursor: 'pointer',
         fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif',
@@ -50,22 +50,22 @@ export default function FeedbackWidget({ session, onToast }) {
             {sent ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <div style={{ fontSize: '2.25rem', marginBottom: '10px' }}>🙏</div>
-                <div style={{ fontSize: '1rem', color: '#3A2F26' }}>{L('Takk!', 'Thank you!')}</div>
+                <div style={{ fontSize: '1rem', color: '#1F2326' }}>{L('Takk!', 'Thank you!')}</div>
               </div>
             ) : (
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: '1.125rem', fontWeight: '400', color: '#3A2F26' }}>{L('Tilbakemelding', 'Feedback')}</h3>
-                  <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#75604B', cursor: 'pointer' }}>×</button>
+                  <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: '1.125rem', fontWeight: '400', color: '#1F2326' }}>{L('Tilbakemelding', 'Feedback')}</h3>
+                  <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#575B5E', cursor: 'pointer' }}>×</button>
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginBottom: '14px' }}>
                   {[['bug',L('🐛 Feil','🐛 Bug')],['idea',L('💡 Idé','💡 Idea')],['general',L('💬 Generelt','💬 General')]].map(([id,label]) => (
                     <button key={id} onClick={() => setType(id)} style={{
                       flex: 1, padding: '8px 4px',
-                      border: `2px solid ${type===id?'#3A2F26':'#D9CFC0'}`,
+                      border: `2px solid ${type===id?'#2F4A43':'#CFC8BA'}`,
                       borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem',
-                      background: type===id?'#3A2F26':'#fff',
-                      color: type===id?'#FBF9F5':'#5C4530',
+                      background: type===id?'#2F4A43':'#fff',
+                      color: type===id?'#F5F2EB':'#1F2326',
                       fontFamily: 'Karla, sans-serif',
                     }}>{label}</button>
                   ))}
@@ -73,21 +73,21 @@ export default function FeedbackWidget({ session, onToast }) {
                 <textarea value={content} onChange={e => setContent(e.target.value)}
                   placeholder={type==='bug'?L('Hva gikk galt?','What went wrong?'):type==='idea'?L('Hvilken funksjon mangler?','What feature is missing?'):L('Fortell oss hva du synes…','Tell us what you think…')}
                   rows={4} maxLength={2000} style={{
-                    width: '100%', padding: '12px', border: '1px solid #9A8B78',
+                    width: '100%', padding: '12px', border: '1px solid #575B5E',
                     borderRadius: '8px', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif',
-                    background: '#FBF9F5', color: '#3A2F26', resize: 'none',
+                    background: '#F5F2EB', color: '#1F2326', resize: 'none',
                     boxSizing: 'border-box', marginBottom: '14px',
                   }} />
                 <div style={{ marginBottom: '16px' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#75604B', marginBottom: '6px' }}>{L('Anbefaler du Arvklart? (1-10)', 'Would you recommend Arvklart? (1-10)')}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#575B5E', marginBottom: '6px' }}>{L('Anbefaler du Arvklart? (1-10)', 'Would you recommend Arvklart? (1-10)')}</div>
                   <div style={{ display: 'flex', gap: '3px' }}>
                     {[1,2,3,4,5,6,7,8,9,10].map(n => (
                       <button key={n} onClick={() => setNps(nps===n?null:n)} style={{
                         flex: 1, padding: '6px 0',
-                        border: `1px solid ${nps===n?'#3A2F26':'#D9CFC0'}`,
+                        border: `1px solid ${nps===n?'#2F4A43':'#CFC8BA'}`,
                         borderRadius: '5px', cursor: 'pointer', fontSize: '0.6875rem',
-                        background: nps===n?'#3A2F26':'#fff',
-                        color: nps===n?'#fff':'#5C4530',
+                        background: nps===n?'#2F4A43':'#fff',
+                        color: nps===n?'#fff':'#1F2326',
                         fontFamily: 'Karla, sans-serif',
                       }}>{n}</button>
                     ))}
@@ -95,8 +95,8 @@ export default function FeedbackWidget({ session, onToast }) {
                 </div>
                 <button onClick={send} disabled={sending||(!content.trim()&&nps===null)} style={{
                   width: '100%', padding: '14px',
-                  background: (content.trim()||nps!==null)?'#3A2F26':'#D9CFC0',
-                  color: '#FBF9F5', border: 'none', borderRadius: '10px',
+                  background: (content.trim()||nps!==null)?'#2F4A43':'#CFC8BA',
+                  color: '#F5F2EB', border: 'none', borderRadius: '10px',
                   cursor: (content.trim()||nps!==null)?'pointer':'not-allowed',
                   fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif',
                 }}>{sending?L('Sender…','Sending…'):L('Send tilbakemelding','Send feedback')}</button>

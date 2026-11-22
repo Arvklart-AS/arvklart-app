@@ -16,15 +16,15 @@ export default function ItemHistory({ itemId, members, refreshKey }) {
   const nameOf = makeNameOf(members)
   const when = t => new Date(t).toLocaleString(locale(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   return (
-    <details style={{ marginBottom: '24px', background: '#FBF9F5', border: '1px solid #E8DFD0', borderRadius: '10px', padding: '0 14px' }}>
-      <summary style={{ cursor: 'pointer', fontSize: '0.875rem', color: '#5C4530', padding: '12px 0', minHeight: '44px', boxSizing: 'border-box' }}>
+    <details style={{ marginBottom: '24px', background: '#F5F2EB', border: '1px solid #CFC8BA', borderRadius: '10px', padding: '0 14px' }}>
+      <summary style={{ cursor: 'pointer', fontSize: '0.875rem', color: '#1F2326', padding: '12px 0', minHeight: '44px', boxSizing: 'border-box' }}>
         {L('Historikk', 'History')} · {events.length}
       </summary>
       <ol style={{ listStyle: 'none', padding: '0 0 12px', margin: 0, display: 'grid', gap: '8px', fontFamily: 'Karla, sans-serif' }}>
         {events.map(e => (
-          <li key={e.id} style={{ fontSize: '0.8125rem', color: '#3A2F26', lineHeight: 1.5 }}>
+          <li key={e.id} style={{ fontSize: '0.8125rem', color: '#1F2326', lineHeight: 1.5 }}>
             {eventText(e, nameOf)}
-            <span style={{ display: 'block', color: '#75604B', fontSize: '0.75rem' }}>{when(e.created_at)}</span>
+            <span style={{ display: 'block', color: '#575B5E', fontSize: '0.75rem' }}>{when(e.created_at)}</span>
           </li>
         ))}
       </ol>
