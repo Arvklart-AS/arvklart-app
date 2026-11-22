@@ -7,10 +7,12 @@ import { parseNOK, formatNOK as formatAmount } from '../lib/format'
 import { L } from '../lib/lang'
 import { equalValueResolutions, itemsWithoutValue, valueTotal, confirmedWeights, aiEstimate, itemValue } from '../lib/distribution'
 import StoredImage from '../components/StoredImage'
+import ItemThumb, { ItemHead } from '../components/ItemThumb'
 import { assignItems, drawLot } from '../lib/assignments'
 import TalkFirstList from '../components/TalkFirstList'
 import { makeNameOf } from '../lib/eventText'
 import { recipientsOf, recipientIdOf, interestedPeople, personOfUser } from '../lib/recipients'
+import { Overline } from '../components/UI'
 
 const PALETTE = ['#5F6E52','#8B9A7D','#A97C3F','#7A8B6E','#9C8267','#6E8B87']
 
@@ -18,9 +20,9 @@ function Avatar({ name, color, size = 32 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: color || '#8A5A34', flexShrink: 0,
+      background: color || '#C79A6B', flexShrink: 0,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.38, color: '#fff', fontWeight: '600',
+      fontSize: size * 0.38, color: '#1F221E', fontWeight: '600',
     }}>
       {(name || '?')[0].toUpperCase()}
     </div>
@@ -245,16 +247,17 @@ export default function ConflictPage({ session, onToast }) {
     return { ...m, color: PALETTE[i % PALETTE.length], assignedItems: mine, earlier: earlier.sum, total: earlier.sum + now.sum, unknown: earlier.unknown + now.unknown }
   })
 
-  if (loading) return <div style={{ padding:'80px', textAlign:'center', color:'#575B5E', fontFamily:'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
+  if (loading) return <div style={{ padding:'80px', textAlign:'center', color:'#B9B4A8', fontFamily:'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
 
   // Arvingene ser ventesiden som før. Administrator kommer videre med de avklarte gjenstandene.
   if (undecided.length && (myRole !== 'admin' || !items.length)) {
     const meMissing = undecided.some(u => u.member.user_id === session.user.id)
     return (
       <div style={{ maxWidth:'560px', margin:'0 auto', padding:'28px 16px 60px', fontFamily:'Karla, sans-serif' }}>
-        <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#575B5E', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
-        <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.625rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Løsningsmetoder', 'Resolution methods')}</h1>
-        <p style={{ color:'#1F2326', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'24px' }}>
+        <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+        <Overline>{L('Fordeling', 'Distribution')}</Overline>
+        <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight:'400', color:'#F2EEE6', marginBottom:'8px' }}>{L('Løsningsmetoder', 'Resolution methods')}</h1>
+        <p style={{ color:'#F2EEE6', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'24px' }}>
           {L(
             'Løsningsmetodene kan brukes når alle arvingene har tatt stilling til hver gjenstand — enten vist interesse eller sagt at de ikke skal ha den.',
             'The resolution methods can be used once all heirs have decided on every item — either shown interest or said they do not want it.',
@@ -265,17 +268,17 @@ export default function ConflictPage({ session, onToast }) {
             const isMe = member.user_id === session.user.id
             const name = isMe ? L('Du', 'You') : (member.profiles?.display_name || L('En arving', 'An heir'))
             return (
-              <div key={member.user_id} style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'14px 16px' }}>
+              <div key={member.user_id} style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'14px 16px' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'6px' }}>
                   <Avatar name={member.profiles?.display_name} color={memberColor(member.user_id)} size={28} />
-                  <div style={{ fontSize:'0.875rem', color:'#1F2326' }}>
+                  <div style={{ fontSize:'0.875rem', color:'#F2EEE6' }}>
                     <strong style={{ fontWeight:'500' }}>{name}</strong> {L(
                       `mangler å vise interesse eller si nei takk til ${missing.length} ${missing.length === 1 ? 'gjenstand' : 'gjenstander'}`,
                       `${isMe ? 'have' : 'has'} yet to show interest or say no thanks to ${missing.length} ${missing.length === 1 ? 'item' : 'items'}`,
                     )}
                   </div>
                 </div>
-                <div style={{ fontSize:'0.75rem', color:'#575B5E', lineHeight:1.5, paddingLeft:'38px' }}>
+                <div style={{ fontSize:'0.75rem', color:'#B9B4A8', lineHeight:1.5, paddingLeft:'38px' }}>
                   {missing.slice(0, 5).map(i => i.title).join(', ')}{missing.length > 5 ? L(` og ${missing.length - 5} til`, ` and ${missing.length - 5} more`) : ''}
                 </div>
               </div>
@@ -284,11 +287,11 @@ export default function ConflictPage({ session, onToast }) {
         </div>
         <div style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
           {meMissing && (
-            <button onClick={() => navigate(`/estate/${id}/swipe`)} style={{ flex:'1 1 200px', padding:'12px', background:'#2F4A43', color:'#F5F2EB', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+            <button onClick={() => navigate(`/estate/${id}/swipe`)} style={{ flex:'1 1 200px', padding:'12px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
               {L('Ta stilling til dine gjenstander', 'Decide on your items')}
             </button>
           )}
-          <button onClick={() => navigate(`/estate/${id}/status`)} style={{ flex:'1 1 200px', padding:'12px', background:'none', border:'1px solid #CFC8BA', borderRadius:'8px', cursor:'pointer', color:'#1F2326', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+          <button onClick={() => navigate(`/estate/${id}/status`)} style={{ flex:'1 1 200px', padding:'12px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', color:'#F2EEE6', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
             {L('Se hva som gjenstår', 'See what remains')}
           </button>
         </div>
@@ -300,25 +303,26 @@ export default function ConflictPage({ session, onToast }) {
 
   if (!items.length && Object.keys(withdrawn).length) return (
     <div style={{ maxWidth:'560px', margin:'0 auto', padding:'28px 16px 60px', fontFamily:'Karla, sans-serif' }}>
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#575B5E', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
-      <p style={{ color:'#1F2326', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'16px' }}>{L('Ingen gjenstander ønskes av flere lenger.', 'No items are wanted by several people any more.')}</p>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <p style={{ color:'#F2EEE6', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'16px' }}>{L('Ingen gjenstander ønskes av flere lenger.', 'No items are wanted by several people any more.')}</p>
       {talkFirst}
     </div>
   )
 
   if (!items.length) return (
     <div style={{ maxWidth:'560px', margin:'0 auto', padding:'60px 16px', textAlign:'center', fontFamily:'Karla, sans-serif' }}>
-      <h2 style={{ fontFamily:'Fraunces, serif', fontSize:'1.5rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Ingen konflikter', 'No conflicts')}</h2>
-      <p style={{ color:'#575B5E', marginBottom:'24px' }}>{L('Alle gjenstander har høyst én interessert arving — ingen konflikter å løse!', 'Every item has at most one interested heir — no conflicts to resolve!')}</p>
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ padding:'11px 24px', background:'#2F4A43', color:'#F5F2EB', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <h2 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.5rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'8px' }}>{L('Ingen konflikter', 'No conflicts')}</h2>
+      <p style={{ color:'#B9B4A8', marginBottom:'24px' }}>{L('Alle gjenstander har høyst én interessert arving — ingen konflikter å løse!', 'Every item has at most one interested heir — no conflicts to resolve!')}</p>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ padding:'11px 24px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
     </div>
   )
 
   if (myRole !== 'admin') return (
     <div style={{ maxWidth:'560px', margin:'0 auto', padding:'28px 16px 60px', fontFamily:'Karla, sans-serif' }}>
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#575B5E', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
-      <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.625rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Løsningsmetoder', 'Resolution methods')}</h1>
-      <p style={{ color:'#1F2326', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'24px' }}>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <Overline>{L('Fordeling', 'Distribution')}</Overline>
+      <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight:'400', color:'#F2EEE6', marginBottom:'8px' }}>{L('Løsningsmetoder', 'Resolution methods')}</h1>
+      <p style={{ color:'#F2EEE6', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'24px' }}>
         {L('Alle har tatt stilling. Det er administratoren av boet som gjennomfører loddtrekning eller fordeling, gjerne mens dere er samlet.', 'Everyone has decided. The estate administrator carries out the draw or distribution, ideally while you are together.')}
       </p>
       {talkFirst}
@@ -337,39 +341,44 @@ export default function ConflictPage({ session, onToast }) {
         .cf-apply { width: 100%; }
       }`}</style>
 
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#575B5E', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 16px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
       <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:'28px', flexWrap:'wrap', gap:'12px' }}>
         <div>
-          <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.625rem', fontWeight:'400', color:'#1F2326', marginBottom:'4px' }}>{L('Løsningsmetoder', 'Resolution methods')}</h1>
-          <p style={{ color:'#575B5E', fontSize:'0.875rem' }}>{L(`${items.length} gjenstander med overlappende interesser`, `${items.length} ${items.length === 1 ? 'item' : 'items'} with overlapping interests`)}</p>
+          <Overline>{L('Fordeling', 'Distribution')}</Overline>
+          <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight:'400', color:'#F2EEE6', marginBottom:'4px' }}>{L('Løsningsmetoder', 'Resolution methods')}</h1>
+          <p style={{ color:'#B9B4A8', fontSize:'0.875rem' }}>{L(`${items.length} gjenstander med overlappende interesser`, `${items.length} ${items.length === 1 ? 'item' : 'items'} with overlapping interests`)}</p>
         </div>
-        <div style={{ background:resolvedCount===items.length?'#EAE5DA':'#EAE5DA', border:`1px solid ${resolvedCount===items.length?'#CFC8BA':'#CFC8BA'}`, borderRadius:'8px', padding:'8px 16px', fontSize:'0.8125rem', color:resolvedCount===items.length?'#2F4A43':'#1F2326' }}>
+        <div style={{ background:resolvedCount===items.length?'#30342D':'#30342D', border:`1px solid ${resolvedCount===items.length?'rgba(242, 238, 230, 0.14)':'rgba(242, 238, 230, 0.14)'}`, borderRadius:'8px', padding:'8px 16px', fontSize:'0.8125rem', color:resolvedCount===items.length?'#9DAA8C':'#F2EEE6' }}>
           {L(`${resolvedCount} av ${items.length} løst`, `${resolvedCount} of ${items.length} resolved`)}
         </div>
       </div>
 
       {waiting.length > 0 && (
-        <div role="status" style={{ background:'#EAE5DA', border:'1px solid #8A5A34', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px', color:'#1F2326', fontSize:'0.875rem', lineHeight:1.6 }}>
+        <div role="status" style={{ background:'#30342D', border:'1px solid #C79A6B', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px', color:'#F2EEE6', fontSize:'0.875rem', lineHeight:1.6 }}>
           <strong style={{ fontWeight:'600' }}>{L(`${waiting.length} ${waiting.length === 1 ? 'gjenstand venter' : 'gjenstander venter'} på svar og er ikke tatt med her.`, `${waiting.length} ${waiting.length === 1 ? 'item is' : 'items are'} waiting for answers and not included here.`)}</strong>{' '}
           {L('At noen ikke har svart, regnes ikke som nei takk.', 'Not answering is not counted as no thanks.')}
-          <ul style={{ margin:'8px 0 0', paddingLeft:'18px' }}>
+          <ul style={{ margin:'10px 0 0', padding:0, listStyle:'none', display:'grid', gap:'10px' }}>
             {waiting.map(({ item, pending }) => (
-              <li key={item.id}>{item.title}: {L('venter på', 'waiting for')} {pending.map(m => m.user_id === session.user.id ? L('deg', 'you') : (m.profiles?.display_name || L('en arving', 'an heir'))).join(', ')}</li>
+              <li key={item.id} style={{ display:'flex' }}>
+                <ItemHead item={item} size={72}>
+                  <span style={{ fontSize:'0.8125rem' }}>{L('Venter på', 'Waiting for')} {pending.map(m => m.user_id === session.user.id ? L('deg', 'you') : (m.profiles?.display_name || L('en arving', 'an heir'))).join(', ')}</span>
+                </ItemHead>
+              </li>
             ))}
           </ul>
         </div>
       )}
 
       {!people.length && (
-        <div role="status" style={{ background:'#F5F2EB', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px', color:'#1F2326', fontSize:'0.875rem', lineHeight:1.6 }}>
+        <div role="status" style={{ background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px', color:'#F2EEE6', fontSize:'0.875rem', lineHeight:1.6 }}>
           {L('Før gjenstandene kan fordeles, må dere legge inn hvem som kan få gjenstander under «Arvinger».', 'Before the items can be distributed, add who can receive items under «Heirs».')}{' '}
-          <button onClick={() => navigate(`/estate/${id}/heirs`)} style={{ background:'none', border:'none', padding:0, color:'#8A5A34', textDecoration:'underline', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Gå til «Arvinger»', 'Go to «Heirs»')}</button>
+          <button onClick={() => navigate(`/estate/${id}/heirs`)} style={{ background:'none', border:'none', padding:0, color:'#C79A6B', textDecoration:'underline', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Gå til «Arvinger»', 'Go to «Heirs»')}</button>
         </div>
       )}
 
       {/* Mode selector */}
       <details open style={{ marginBottom:'24px' }}>
-        <summary style={{ cursor:'pointer', fontSize:'0.875rem', color:'#1F2326', padding:'10px 0', minHeight:'44px', boxSizing:'border-box' }}>
+        <summary style={{ cursor:'pointer', fontSize:'0.875rem', color:'#F2EEE6', padding:'10px 0', minHeight:'44px', boxSizing:'border-box' }}>
           {L(`Snakk sammen først: begrunnelsene for ${contested.length} ${contested.length === 1 ? 'gjenstand' : 'gjenstander'}`, `Talk first: the reasons for ${contested.length} ${contested.length === 1 ? 'item' : 'items'}`)}
         </summary>
         {talkFirst}
@@ -381,14 +390,14 @@ export default function ConflictPage({ session, onToast }) {
           { id: 'equal', title: L('Jevn verdifordeling', 'Even value split'), desc: L('Algoritme balanserer total NOK-verdi per arving', 'An algorithm balances the total NOK value per heir') },
         ].map(m => (
           <button key={m.id} onClick={() => setMode(m.id)} style={{
-            padding:'16px', border:`2px solid ${mode===m.id?'#2F4A43':'#CFC8BA'}`,
+            padding:'16px', border:`2px solid ${mode===m.id?'#9DAA8C':'rgba(242, 238, 230, 0.14)'}`,
             borderRadius:'12px', cursor:'pointer', textAlign:'left',
-            background:mode===m.id?'#2F4A43':'#fff',
-            color:mode===m.id?'#F5F2EB':'#1F2326',
+            background:mode===m.id?'#F2EEE6':'#272A25',
+            color:mode===m.id?'#1F221E':'#F2EEE6',
             fontFamily:'Karla, sans-serif', transition:'all 0.15s',
           }}>
             <div style={{ fontSize:'0.8125rem', fontWeight:'500', marginBottom:'3px' }}>{m.title}</div>
-            <div style={{ fontSize:'0.6875rem', color:mode===m.id?'#EAE5DA':'#575B5E', lineHeight:1.4 }}>{m.desc}</div>
+            <div style={{ fontSize:'0.6875rem', color:mode===m.id?'#30342D':'#B9B4A8', lineHeight:1.4 }}>{m.desc}</div>
           </button>
         ))}
       </div>
@@ -397,7 +406,7 @@ export default function ConflictPage({ session, onToast }) {
       {mode === 'lottery' && (
         <div>
           {items.filter(i => !resolutions[i.id]).length > 1 && (
-            <button onClick={drawAll} disabled={!!animating} style={{ marginBottom:'16px', padding:'9px 18px', background:animating?'#CFC8BA':'#2F4A43', color:'#fff', border:'none', borderRadius:'8px', cursor:animating?'not-allowed':'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>
+            <button onClick={drawAll} disabled={!!animating} style={{ marginBottom:'16px', padding:'9px 18px', background:animating?'rgba(242, 238, 230, 0.14)':'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:animating?'not-allowed':'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>
               {L('Trekk alle på én gang', 'Draw all at once')}
             </button>
           )}
@@ -407,27 +416,24 @@ export default function ConflictPage({ session, onToast }) {
               const isAnim = animating === item.id
               return (
                 <div key={item.id} style={{
-                  background:'#fff',
-                  border:`1px solid ${winner?'#CFC8BA':isAnim?'#CFC8BA':'#CFC8BA'}`,
+                  background:'#272A25',
+                  border:`1px solid ${winner?'rgba(242, 238, 230, 0.14)':isAnim?'rgba(242, 238, 230, 0.14)':'rgba(242, 238, 230, 0.14)'}`,
                   borderRadius:'12px', padding:'18px 20px',
                   display:'flex', gap:'16px', alignItems:'center', flexWrap:'wrap',
                   transition:'border-color 0.3s',
                 }}>
-                  {item.image_url && (
-                    <StoredImage src={item.image_url} alt={item.title}
-                      style={{ width:'76px', height:'76px', objectFit:'cover', borderRadius:'8px', flexShrink:0, background:'#EAE5DA' }} />
-                  )}
+                  <ItemThumb item={item} size={128} />
                   <div style={{ flex:1, minWidth:'150px' }}>
-                    <div style={{ fontSize:'0.9375rem', color:'#1F2326', fontWeight:'500', marginBottom:'3px' }}>{item.title}</div>
-                    {formatNOK(item.estimated_value) && <div style={{ fontSize:'0.75rem', color:'#2F4A43', marginBottom:'6px' }}>{formatNOK(item.estimated_value)}</div>}
+                    <div style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.2rem', color:'#F2EEE6', marginBottom:'3px' }}>{item.title}</div>
+                    {formatNOK(item.estimated_value) && <div style={{ fontSize:'0.75rem', color:'#9DAA8C', marginBottom:'6px' }}>{formatNOK(item.estimated_value)}</div>}
                     <div style={{ display:'flex', gap:'8px', alignItems:'center', flexWrap:'wrap' }}>
-                      <span style={{ fontSize:'0.6875rem', color:'#575B5E' }}>{L('Vil ha:', 'Wanted by:')}</span>
+                      <span style={{ fontSize:'0.6875rem', color:'#B9B4A8' }}>{L('Vil ha:', 'Wanted by:')}</span>
                       {(item.interests || []).map(x => {
                         const m = getMember(x.user_id)
                         return (
                           <div key={x.id} title={x.reason} style={{ display:'flex', alignItems:'center', gap:'4px' }}>
                             <Avatar name={m?.profiles?.display_name} color={memberColor(x.user_id)} size={22} />
-                            <span style={{ fontSize:'0.75rem', color:'#1F2326' }}>{m?.profiles?.display_name || '?'}</span>
+                            <span style={{ fontSize:'0.75rem', color:'#F2EEE6' }}>{m?.profiles?.display_name || '?'}</span>
                           </div>
                         )
                       })}
@@ -436,23 +442,23 @@ export default function ConflictPage({ session, onToast }) {
                   <div className="cf-action" style={{ flexShrink:0, textAlign:'center', minWidth:'120px' }}>
                     {winner ? (
                       <div>
-                        <div style={{ fontSize:'0.6875rem', color:'#2F4A43', marginBottom:'6px' }}>{L('Vinner', 'Winner')}</div>
+                        <div style={{ fontSize:'0.6875rem', color:'#9DAA8C', marginBottom:'6px' }}>{L('Vinner', 'Winner')}</div>
                         <div className="cf-winner" style={{ display:'flex', alignItems:'center', gap:'8px', justifyContent:'center' }}>
                           <Avatar name={winner.name} color={personColor(winner.id)} size={34} />
-                          <span style={{ fontSize:'0.8125rem', fontWeight:'500', color:'#1F2326' }}>{winner.name}</span>
+                          <span style={{ fontSize:'0.8125rem', fontWeight:'500', color:'#F2EEE6' }}>{winner.name}</span>
                         </div>
                         <button onClick={() => setResolutions(p => { const n = { ...p }; delete n[item.id]; return n })}
-                          style={{ marginTop:'8px', fontSize:'0.6875rem', color:'#575B5E', background:'none', border:'none', cursor:'pointer', fontFamily:'Karla, sans-serif' }}>
+                          style={{ marginTop:'8px', fontSize:'0.6875rem', color:'#B9B4A8', background:'none', border:'none', cursor:'pointer', fontFamily:'Karla, sans-serif' }}>
                           {L('Trekk på nytt', 'Draw again')}
                         </button>
                       </div>
                     ) : isAnim ? (
-                      <div style={{ fontSize:'2.375rem', fontWeight:'700', color:'#2F4A43', fontFamily:'Fraunces, serif', lineHeight:1 }}>
+                      <div style={{ fontSize:'2.375rem', fontWeight:'700', color:'#9DAA8C', fontFamily:"'Bodoni Moda', 'Times New Roman', serif", lineHeight:1 }}>
                         {countdown}
                       </div>
                     ) : (
                       <button onClick={() => drawLottery(item)} disabled={!!animating}
-                        style={{ padding:'10px 18px', background:'#2F4A43', color:'#fff', border:'none', borderRadius:'8px', cursor:animating?'not-allowed':'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', whiteSpace:'nowrap' }}>
+                        style={{ padding:'10px 18px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:animating?'not-allowed':'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', whiteSpace:'nowrap' }}>
                         {L('Trekk vinner', 'Draw winner')}
                       </button>
                     )}
@@ -466,26 +472,26 @@ export default function ConflictPage({ session, onToast }) {
 
       {/* SNAKE DRAFT — setup */}
       {mode === 'snake' && !draftStarted && (
-        <div style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'28px', maxWidth:'500px' }}>
-          <h3 style={{ fontFamily:'Fraunces, serif', fontSize:'1.125rem', fontWeight:'400', color:'#1F2326', marginBottom:'4px' }}>{L('Rekkefølge', 'Picking order')}</h3>
-          <p style={{ fontSize:'0.8125rem', color:'#575B5E', marginBottom:'20px' }}>{L('Den som velger sist i én runde, velger først i neste. Slik blir det rettferdig for alle.', 'Whoever chooses last in one round chooses first in the next. That way it is fair to everyone.')}</p>
+        <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'28px', maxWidth:'500px' }}>
+          <h3 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.125rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'4px' }}>{L('Rekkefølge', 'Picking order')}</h3>
+          <p style={{ fontSize:'0.8125rem', color:'#B9B4A8', marginBottom:'20px' }}>{L('Den som velger sist i én runde, velger først i neste. Slik blir det rettferdig for alle.', 'Whoever chooses last in one round chooses first in the next. That way it is fair to everyone.')}</p>
           <div style={{ display:'flex', flexDirection:'column', gap:'8px', marginBottom:'20px' }}>
             {snakeOrderIds.map((uid, i) => {
               const m = getPerson(uid)
               return (
-                <div key={uid} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'12px 16px', background:'#F5F2EB', borderRadius:'8px', border:'1px solid #CFC8BA' }}>
+                <div key={uid} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'12px 16px', background:'#1F221E', borderRadius:'8px', border:'1px solid rgba(242, 238, 230, 0.14)' }}>
                   <div style={{ width:'24px', height:'24px', borderRadius:'50%', background:PALETTE[i%PALETTE.length], display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.6875rem', color:'#fff', fontWeight:'700' }}>{i+1}</div>
                   <Avatar name={m?.name} color={PALETTE[i%PALETTE.length]} size={32} />
-                  <span style={{ fontSize:'0.875rem', color:'#1F2326', flex:1 }}>{m?.name || '?'}</span>
+                  <span style={{ fontSize:'0.875rem', color:'#F2EEE6', flex:1 }}>{m?.name || '?'}</span>
                 </div>
               )
             })}
           </div>
           <div style={{ display:'flex', gap:'10px' }}>
-            <button onClick={shuffleSnake} style={{ flex:1, padding:'11px', background:'none', border:'1px solid #CFC8BA', borderRadius:'8px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#1F2326' }}>
+            <button onClick={shuffleSnake} style={{ flex:1, padding:'11px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6' }}>
               {L('Tilfeldig rekkefølge', 'Shuffle')}
             </button>
-            <button onClick={() => { setSnakePos(nextPickPos(0, items)); setDraftStarted(true) }} style={{ flex:2, padding:'11px', background:'#2F4A43', color:'#F5F2EB', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+            <button onClick={() => { setSnakePos(nextPickPos(0, items)); setDraftStarted(true) }} style={{ flex:2, padding:'11px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
               {L('Start valgrundene →', 'Start picking →')}
             </button>
           </div>
@@ -495,35 +501,35 @@ export default function ConflictPage({ session, onToast }) {
       {mode === 'snake' && draftStarted && (
         <div>
           {unclaimedItems.length > 0 ? (
-            <div style={{ background:'#2F4A43', color:'#F5F2EB', borderRadius:'12px', padding:'20px 24px', marginBottom:'20px', display:'flex', alignItems:'center', gap:'16px' }}>
+            <div style={{ background:'#30342D', color:'#F2EEE6', border:'1px solid #9DAA8C', borderRadius:'6px', padding:'20px 24px', marginBottom:'20px', display:'flex', alignItems:'center', gap:'16px' }}>
               <Avatar name={getPerson(currentSnakeUser)?.name} color={personColor(currentSnakeUser)} size={52} />
               <div>
-                <div style={{ fontSize:'0.75rem', color:'#575B5E', marginBottom:'3px' }}>
+                <div style={{ fontSize:'0.75rem', color:'#B9B4A8', marginBottom:'3px' }}>
                   {L('Runde', 'Round')} {Math.floor(snakePos/snakeOrderIds.length)+1}, {L('valg', 'pick')} {(snakePos%snakeOrderIds.length)+1} {L('av', 'of')} {snakeOrderIds.length}
                 </div>
-                <div style={{ fontSize:'1.25rem', fontFamily:'Fraunces, serif' }}>
+                <div style={{ fontSize:'1.25rem', fontFamily:"'Bodoni Moda', 'Times New Roman', serif" }}>
                   {getPerson(currentSnakeUser)?.name || '?'} {L('velger nå…', 'is choosing…')}
                 </div>
                 <div style={{ fontSize:'0.75rem', color:'#EAE5DA', marginTop:'3px' }}>{L('Klikk på en av de markerte gjenstandene – du kan bare velge det du har vist interesse for', 'Click one of the highlighted items – you can only pick items you have shown interest in')}</div>
               </div>
             </div>
           ) : (
-            <div style={{ background:'#EAE5DA', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'24px', marginBottom:'20px', textAlign:'center' }}>
-              <div style={{ fontSize:'1.125rem', color:'#1F2326', fontFamily:'Fraunces, serif' }}>{L('Alle valg er gjort!', 'All picks are done!')}</div>
-              <div style={{ fontSize:'0.8125rem', color:'#1F2326', marginTop:'6px' }}>{L('Bekreft fordelingen nedenfor for å tildele gjenstandene offisielt.', 'Confirm the distribution below to officially assign the items.')}</div>
+            <div style={{ background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'24px', marginBottom:'20px', textAlign:'center' }}>
+              <div style={{ fontSize:'1.125rem', color:'#F2EEE6', fontFamily:"'Bodoni Moda', 'Times New Roman', serif" }}>{L('Alle valg er gjort!', 'All picks are done!')}</div>
+              <div style={{ fontSize:'0.8125rem', color:'#F2EEE6', marginTop:'6px' }}>{L('Bekreft fordelingen nedenfor for å tildele gjenstandene offisielt.', 'Confirm the distribution below to officially assign the items.')}</div>
             </div>
           )}
 
           {unclaimedItems.length > 0 && (
             <div style={{ display:'flex', gap:'6px', marginBottom:'20px', flexWrap:'wrap', alignItems:'center' }}>
-              <span style={{ fontSize:'0.75rem', color:'#575B5E' }}>{L('Rekkefølge:', 'Order:')}</span>
+              <span style={{ fontSize:'0.75rem', color:'#B9B4A8' }}>{L('Rekkefølge:', 'Order:')}</span>
               {Array.from({ length: snakeOrderIds.length * 2 }, (_, i) => getSnakeUser(snakePos + i))
                 .filter(uid => wantsAny(uid, unclaimedItems))
                 .slice(0, Math.min(snakeOrderIds.length * 2, unclaimedItems.length + 3))
                 .map((uid, i) => {
                 const m = getPerson(uid)
                 return (
-                  <div key={i} style={{ display:'flex', alignItems:'center', gap:'5px', padding:'3px 10px', borderRadius:'20px', background:i===0?'#2F4A43':'#EAE5DA', color:i===0?'#F5F2EB':'#1F2326', fontSize:'0.75rem' }}>
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:'5px', padding:'3px 10px', borderRadius:'20px', background:i===0?'#F2EEE6':'#30342D', color:i===0?'#1F221E':'#F2EEE6', fontSize:'0.75rem' }}>
                     <Avatar name={m?.name} color={personColor(uid)} size={18} />
                     {m?.name}
                   </div>
@@ -538,25 +544,25 @@ export default function ConflictPage({ session, onToast }) {
                 const isMine = wants(currentSnakeUser, item)
                 return (
                   <div key={item.id} onClick={() => snakePick(item.id)} style={{
-                    background:isMine?'#EAE5DA':'#fff',
-                    border:`2px solid ${isMine?'#2F4A43':'#CFC8BA'}`,
+                    background:isMine?'#30342D':'#272A25',
+                    border:`2px solid ${isMine?'#9DAA8C':'rgba(242, 238, 230, 0.14)'}`,
                     borderRadius:'10px', overflow:'hidden', cursor:isMine?'pointer':'not-allowed', transition:'transform 0.1s',
                     opacity: isMine ? 1 : 0.55,
                   }}
                     onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 6px 20px rgba(0,0,0,0.09)' }}
                     onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='none' }}>
-                    <div style={{ height:'100px', background:'#EAE5DA', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <div style={{ aspectRatio:'4 / 3', background:'#30342D', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
                       {item.image_url
-                        ? <StoredImage src={item.image_url} alt={item.title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                        : <span style={{ fontSize:'2.25rem', color:'#575B5E' }}>·</span>}
+                        ? <StoredImage src={item.image_url} alt={item.title} style={{ width:'100%', height:'100%', objectFit:'contain' }} />
+                        : <span aria-hidden="true" style={{ fontSize:'2.25rem' }}>{item.categories?.emoji || '📦'}</span>}
                     </div>
                     <div style={{ padding:'10px 12px' }}>
-                      <div style={{ fontSize:'0.8125rem', color:'#1F2326', fontWeight:'500', marginBottom:'2px', lineHeight:1.3 }}>{item.title}</div>
-                      {formatNOK(item.estimated_value) && <div style={{ fontSize:'0.6875rem', color:'#2F4A43' }}>{formatNOK(item.estimated_value)}</div>}
+                      <div style={{ fontSize:'0.8125rem', color:'#F2EEE6', fontWeight:'500', marginBottom:'2px', lineHeight:1.3 }}>{item.title}</div>
+                      {formatNOK(item.estimated_value) && <div style={{ fontSize:'0.6875rem', color:'#9DAA8C' }}>{formatNOK(item.estimated_value)}</div>}
                       {isMine ? (
-                        <div style={{ fontSize:'0.6875rem', color:'#2F4A43', marginTop:'4px' }}>{L('Interessert', 'Interested')}</div>
+                        <div style={{ fontSize:'0.6875rem', color:'#9DAA8C', marginTop:'4px' }}>{L('Interessert', 'Interested')}</div>
                       ) : (
-                        <div style={{ fontSize:'0.6875rem', color:'#575B5E', marginTop:'4px' }}>
+                        <div style={{ fontSize:'0.6875rem', color:'#B9B4A8', marginTop:'4px' }}>
                           {(item.interests || []).length} {L(`interessert${(item.interests || []).length !== 1 ? 'e' : ''}`, 'interested')}
                         </div>
                       )}
@@ -568,18 +574,19 @@ export default function ConflictPage({ session, onToast }) {
           )}
 
           {resolvedCount > 0 && (
-            <div style={{ background:'#F5F2EB', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px' }}>
-              <div style={{ fontSize:'0.75rem', color:'#575B5E', fontWeight:'500', marginBottom:'10px', textTransform:'uppercase', letterSpacing:'0.5px' }}>{L('Valgt', 'Chosen')} ({resolvedCount})</div>
+            <div style={{ background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'16px 20px', marginBottom:'20px' }}>
+              <div style={{ fontSize:'0.75rem', color:'#B9B4A8', fontWeight:'500', marginBottom:'10px', textTransform:'uppercase', letterSpacing:'0.5px' }}>{L('Valgt', 'Chosen')} ({resolvedCount})</div>
               <div style={{ display:'flex', flexDirection:'column', gap:'5px' }}>
                 {items.filter(i => resolutions[i.id]).map(item => {
                   const m = getPerson(resolutions[item.id])
                   return (
-                    <div key={item.id} style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'0.8125rem', color:'#1F2326' }}>
+                    <div key={item.id} style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'0.8125rem', color:'#F2EEE6' }}>
                       <Avatar name={m?.name} color={personColor(resolutions[item.id])} size={22} />
                       <span style={{ fontWeight:'500', minWidth:'80px' }}>{m?.name}</span>
-                      <span style={{ color:'#575B5E' }}>→</span>
+                      <span style={{ color:'#B9B4A8' }}>→</span>
+                      <ItemThumb item={item} size={56} />
                       <span style={{ flex:1 }}>{item.title}</span>
-                      {formatNOK(item.estimated_value) && <span style={{ color:'#2F4A43', fontSize:'0.6875rem', whiteSpace:'nowrap' }}>{formatNOK(item.estimated_value)}</span>}
+                      {formatNOK(item.estimated_value) && <span style={{ color:'#9DAA8C', fontSize:'0.6875rem', whiteSpace:'nowrap' }}>{formatNOK(item.estimated_value)}</span>}
                     </div>
                   )
                 })}
@@ -591,7 +598,7 @@ export default function ConflictPage({ session, onToast }) {
 
       {/* JEVN VERDIFORDELING */}
       {mode === 'equal' && missingValues.length > 0 && (
-        <div role="status" style={{ background:'#F5F2EB', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'18px 20px', marginBottom:'20px', color:'#1F2326', lineHeight:1.6 }}>
+        <div role="status" style={{ background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'18px 20px', marginBottom:'20px', color:'#F2EEE6', lineHeight:1.6 }}>
           <div style={{ fontWeight:'600', marginBottom:'6px' }}>
             {L(`${missingValues.length} ${missingValues.length === 1 ? 'gjenstand mangler' : 'gjenstander mangler'} fordelingsverdi og er ikke med i den jevne fordelingen`,
               `${missingValues.length} ${missingValues.length === 1 ? 'item lacks' : 'items lack'} a distribution value and ${missingValues.length === 1 ? 'is' : 'are'} not included in the equal distribution`)}
@@ -600,15 +607,17 @@ export default function ConflictPage({ session, onToast }) {
             {L('De kan fordeles på annen måte, eller få en fordelingsverdi først. En manglende verdi regnes aldri som 0 kr; 0 kr må settes eksplisitt.', 'They can be divided another way, or be given a distribution value first. A missing value is never counted as 0 kr; 0 kr must be set explicitly.')}
           </p>
           {canUseAi.length > 0 && (
-            <button onClick={useAiAsValue} disabled={settingValues} style={{ minHeight:'44px', padding:'8px 14px', marginBottom:'10px', background:'#2F4A43', color:'#fff', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+            <button onClick={useAiAsValue} disabled={settingValues} style={{ minHeight:'44px', padding:'8px 14px', marginBottom:'10px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
               {L(`Bruk AI-anslaget som fordelingsverdi (${canUseAi.length})`, `Use the AI estimate as distribution value (${canUseAi.length})`)}
             </button>
           )}
           <ul style={{ listStyle:'none', padding:0, margin:0, display:'flex', flexDirection:'column', gap:'6px' }}>
             {missingValues.map(it => (
               <li key={it.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'10px', flexWrap:'wrap', fontSize:'0.875rem' }}>
-                <span>{it.title}{it.status === 'assigned' ? L(' (tildelt tidligere)', ' (assigned earlier)') : ''}{aiEstimate(it) !== null ? ` · ${L('AI-anslag', 'AI estimate')} ${formatNOK(aiEstimate(it))}` : ''}</span>
-                <button onClick={() => navigate(`/estate/${id}/item/${it.id}`)} style={{ minHeight:'44px', padding:'8px 14px', background:'#fff', border:'1px solid #575B5E', borderRadius:'8px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#1F2326' }}>
+                <ItemHead item={it} size={72}>
+                  <span style={{ fontSize:'0.8125rem' }}>{it.status === 'assigned' ? L('Tildelt tidligere', 'Assigned earlier') : ''}{aiEstimate(it) !== null ? `${it.status === 'assigned' ? ' · ' : ''}${L('AI-anslag', 'AI estimate')} ${formatNOK(aiEstimate(it))}` : ''}</span>
+                </ItemHead>
+                <button onClick={() => navigate(`/estate/${id}/item/${it.id}`)} style={{ minHeight:'44px', padding:'8px 14px', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6' }}>
                   {L(`Sett fordelingsverdi på ${it.title}`, `Set distribution value for ${it.title}`)}
                 </button>
               </li>
@@ -621,25 +630,26 @@ export default function ConflictPage({ session, onToast }) {
         <div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(240px, 1fr))', gap:'16px', marginBottom:'20px' }}>
             {memberTotals.map(m => (
-              <div key={m.id} style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'12px', padding:'20px' }}>
+              <div key={m.id} style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'20px' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'14px' }}>
                   <Avatar name={m.name} color={m.color} size={44} />
                   <div>
-                    <div style={{ fontSize:'0.875rem', fontWeight:'500', color:'#1F2326' }}>{m.name}</div>
-                    <div style={{ fontSize:'1.375rem', fontFamily:'Fraunces, serif', color:'#2F4A43' }}>
+                    <div style={{ fontSize:'0.875rem', fontWeight:'500', color:'#F2EEE6' }}>{m.name}</div>
+                    <div style={{ fontSize:'1.375rem', fontFamily:"'Bodoni Moda', 'Times New Roman', serif", color:'#9DAA8C' }}>
                       {formatNOK(m.total) || '—'}
                     </div>
-                    {m.earlier > 0 && <div style={{ fontSize:'0.6875rem', color:'#575B5E' }}>{L('inkl.', 'incl.')} {formatNOK(m.earlier)} {L('tildelt tidligere', 'assigned earlier')}</div>}
+                    {m.earlier > 0 && <div style={{ fontSize:'0.6875rem', color:'#B9B4A8' }}>{L('inkl.', 'incl.')} {formatNOK(m.earlier)} {L('tildelt tidligere', 'assigned earlier')}</div>}
                   </div>
                 </div>
                 {m.assignedItems.length === 0 ? (
-                  <div style={{ fontSize:'0.75rem', color:'#575B5E', fontStyle:'italic' }}>{L('Ingen gjenstander tildelt', 'No items assigned')}</div>
+                  <div style={{ fontSize:'0.75rem', color:'#B9B4A8', fontStyle:'italic' }}>{L('Ingen gjenstander tildelt', 'No items assigned')}</div>
                 ) : (
                   <div style={{ display:'flex', flexDirection:'column', gap:'5px' }}>
                     {m.assignedItems.map(item => (
-                      <div key={item.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:'0.75rem', color:'#1F2326', padding:'6px 8px', background:'#F5F2EB', borderRadius:'6px' }}>
-                        <span style={{ lineHeight:1.3 }}>{item.title}</span>
-                        <span style={{ color:'#2F4A43', flexShrink:0, marginLeft:'8px' }}>{formatNOK(itemValue(item)) || '—'}</span>
+                      <div key={item.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:'10px', fontSize:'0.8125rem', color:'#F2EEE6', padding:'6px 8px', background:'#1F221E', borderRadius:'6px' }}>
+                        <ItemThumb item={item} size={64} />
+                        <span style={{ lineHeight:1.3, flex:1 }}>{item.title}</span>
+                        <span style={{ color:'#9DAA8C', flexShrink:0, marginLeft:'8px' }}>{formatNOK(itemValue(item)) || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -647,14 +657,14 @@ export default function ConflictPage({ session, onToast }) {
               </div>
             ))}
           </div>
-          <div style={{ background:'#EAE5DA', border:'1px solid #CFC8BA', borderRadius:'10px', padding:'14px 18px', fontSize:'0.8125rem', color:'#1F2326', marginBottom:'20px', lineHeight:1.6 }}>
+          <div style={{ background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', padding:'14px 18px', fontSize:'0.8125rem', color:'#F2EEE6', marginBottom:'20px', lineHeight:1.6 }}>
             {L('Forslag til jevn fordeling – beslutningsstøtte, ikke en fasit. Gjenstandene med fordelingsverdi sorteres etter synkende verdi, og neste gjenstand går til den av de interesserte som har lavest sum så langt, medregnet det hver arving allerede har fått. Fordelingsverdiene er foreslåtte til dere har godkjent fordelingen.',
               'A proposal for an equal distribution – decision support, not a final answer. Items with a distribution value are sorted by descending value, and the next item goes to the interested heir with the lowest sum so far, including what each heir has already received. The distribution values are proposals until you have approved the distribution.')}
             {' '}{weights
               ? L('Fordelingen er vektet etter arveandelene dere har bekreftet.', 'The distribution is weighted by the inheritance shares you have confirmed.')
               : L('Alle regnes likt; arveandeler brukes bare når administrator har bekreftet at de gjelder innbo og løsøre (under «Arvinger»).', 'Everyone counts equally; inheritance shares are only used when the administrator has confirmed that they apply to household contents (under «Heirs»).')}
           </div>
-          <button onClick={() => setResolutions(computeEqualResolutions())} style={{ padding:'9px 18px', background:'none', border:'1px solid #CFC8BA', borderRadius:'8px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#1F2326', marginBottom:'20px' }}>
+          <button onClick={() => setResolutions(computeEqualResolutions())} style={{ padding:'9px 18px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6', marginBottom:'20px' }}>
             {L('Kjør på nytt', 'Run again')}
           </button>
         </div>
@@ -662,15 +672,15 @@ export default function ConflictPage({ session, onToast }) {
 
       {/* BEKREFT OG TILDEL */}
       {resolvedCount > 0 && (
-        <div className="bottom-bar" style={{ position:'fixed', bottom:0, left:0, right:0, padding:'16px', background:'#fff', borderTop:'1px solid #CFC8BA', boxShadow:'0 -4px 20px rgba(0,0,0,0.08)', zIndex:100 }}>
+        <div className="bottom-bar" style={{ position:'fixed', bottom:0, left:0, right:0, padding:'16px', background:'#272A25', borderTop:'1px solid rgba(242, 238, 230, 0.14)', boxShadow:'0 -4px 20px rgba(0,0,0,0.08)', zIndex:100 }}>
           <div style={{ maxWidth:'920px', margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'16px', flexWrap:'wrap' }}>
             <div>
-              <div style={{ fontSize:'0.875rem', fontWeight:'500', color:'#1F2326' }}>{L(`${resolvedCount} av ${items.length} gjenstander løst`, `${resolvedCount} of ${items.length} items resolved`)}</div>
-              {!allResolved && <div style={{ fontSize:'0.75rem', color:'#575B5E' }}>{L('Gjenværende forblir ukrevde til neste runde', 'The rest stay unclaimed until the next round')}</div>}
+              <div style={{ fontSize:'0.875rem', fontWeight:'500', color:'#F2EEE6' }}>{L(`${resolvedCount} av ${items.length} gjenstander løst`, `${resolvedCount} of ${items.length} items resolved`)}</div>
+              {!allResolved && <div style={{ fontSize:'0.75rem', color:'#B9B4A8' }}>{L('Gjenværende forblir ukrevde til neste runde', 'The rest stay unclaimed until the next round')}</div>}
             </div>
             <button className="cf-apply" onClick={apply} disabled={applying} style={{
-              padding:'13px 32px', background:applying?'#CFC8BA':'#2F4A43', color:'#F5F2EB',
-              border:'none', borderRadius:'10px', cursor:applying?'not-allowed':'pointer',
+              padding:'13px 32px', background:applying?'rgba(242, 238, 230, 0.14)':'#F2EEE6', color:'#1F221E',
+              border:'none', borderRadius: '999px', cursor:applying?'not-allowed':'pointer',
               fontSize:'0.9375rem', fontFamily:'Karla, sans-serif', fontWeight:'500', whiteSpace:'nowrap',
             }}>
               {applying?L('Tildeler…','Assigning…'):L(`Bekreft og tildel (${resolvedCount})`, `Confirm and assign (${resolvedCount})`)}

@@ -3,18 +3,13 @@ import { setInterestReason } from '../lib/decisions'
 import { readReasonDraft, writeReasonDraft, clearReasonDraft } from '../lib/reasonDraft'
 import { L } from '../lib/lang'
 
-// Fargene på lys bakgrunn (gjenstandssiden, sveiping) og på mørk (gjenstandslisten, se estateTheme.js)
-const TONES = {
-  light: { text: '#1F2326', strong: '#1F2326', muted: '#575B5E', link: '#2F4A43', danger: '#9A3B2E', field: '#fff', fieldBorder: '#575B5E', primaryBg: '#2F4A43', primaryText: '#F5F2EB', secondaryBg: '#fff' },
-  dark: { text: '#B9B4A8', strong: '#F2EEE6', muted: '#B9B4A8', link: '#9DAA8C', danger: '#E08A7A', field: '#1F221E', fieldBorder: 'rgba(242, 238, 230, 0.4)', primaryBg: '#F2EEE6', primaryText: '#1F221E', secondaryBg: 'transparent' },
-}
+// Fargene i det mørke uttrykket som alle sidene i boet har (se src/lib/estateTheme.js)
+const t = { text: '#B9B4A8', strong: '#F2EEE6', muted: '#B9B4A8', link: '#9DAA8C', danger: '#E08A7A', field: '#1F221E', fieldBorder: 'rgba(242, 238, 230, 0.4)', primaryBg: '#F2EEE6', primaryText: '#1F221E', secondaryBg: 'transparent' }
 
 // Valgfri begrunnelse på eget ønske: legges til, endres eller fjernes på stedet, uten dialog.
 // Det som skrives speiles som utkast i fanen (reasonDraft), så teksten ikke går tapt hvis feltet lukkes,
 // siden lastes på nytt eller lagringen feiler. Utkastet slettes når begrunnelsen er lagret eller forkastet.
-// dark: mørke farger, til kortene i gjenstandslisten
-export default function ReasonEditor({ itemId, itemTitle, userId, savedReason, onSaved, onToast, compact = false, dark = false }) {
-  const t = dark ? TONES.dark : TONES.light
+export default function ReasonEditor({ itemId, itemTitle, userId, savedReason, onSaved, onToast, compact = false }) {
   const uid = useId()
   const fieldId = `reason-${uid}`, hintId = `reason-hint-${uid}`
   const saved = savedReason || ''

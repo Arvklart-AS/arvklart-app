@@ -24,10 +24,10 @@ export default function ProfileSetupPage({ session, profile, onSaved, onToast })
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F5F2EB', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', fontFamily:'Karla, sans-serif' }}>
-      <div style={{ maxWidth:'400px', width:'100%', background:'#fff', border:'1px solid #CFC8BA', borderRadius:'14px', padding:'40px', boxShadow:'0 4px 32px rgba(0,0,0,0.06)' }}>
-        <h2 style={{ fontFamily:'Fraunces, serif', fontSize:'1.5rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{editing ? L('Min profil', 'My profile') : L('Velkommen', 'Welcome')}</h2>
-        <p style={{ color:'#575B5E', fontSize:'0.875rem', lineHeight:'1.6', marginBottom:'28px' }}>{editing ? L('Navnet og fargen vises for de andre i boene dine.', 'Your name and colour are shown to the others in your estates.') : L('Sett opp profilen din så familiemedlemmer vet hvem du er.', 'Set up your profile so family members know who you are.')}</p>
+    <div style={{ minHeight:'100vh', background:'#1F221E', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', fontFamily:'Karla, sans-serif' }}>
+      <div style={{ maxWidth:'400px', width:'100%', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'14px', padding:'40px', boxShadow:'0 4px 32px rgba(0,0,0,0.06)' }}>
+        <h2 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.5rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'8px' }}>{editing ? L('Min profil', 'My profile') : L('Velkommen', 'Welcome')}</h2>
+        <p style={{ color:'#B9B4A8', fontSize:'0.875rem', lineHeight:'1.6', marginBottom:'28px' }}>{editing ? L('Navnet og fargen vises for de andre i boene dine.', 'Your name and colour are shown to the others in your estates.') : L('Sett opp profilen din så familiemedlemmer vet hvem du er.', 'Set up your profile so family members know who you are.')}</p>
 
         <div style={{ display:'flex', justifyContent:'center', marginBottom:'24px' }}>
           <div style={{ width:'72px', height:'72px', borderRadius:'50%', background:color, border:tc(color)==='#1F2326'?'1px solid #CFC8BA':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.75rem', color:tc(color), fontWeight:'500', transition:'background 0.2s' }}>
@@ -36,23 +36,23 @@ export default function ProfileSetupPage({ session, profile, onSaved, onToast })
         </div>
 
         <div style={{ marginBottom:'20px' }}>
-          <label htmlFor="profilesetup-f1" style={{ display:'block', fontSize:'0.8125rem', color:'#575B5E', marginBottom:'6px' }}>{L('Visningsnavn', 'Display name')}</label>
+          <label htmlFor="profilesetup-f1" style={{ display:'block', fontSize:'0.8125rem', color:'#B9B4A8', marginBottom:'6px' }}>{L('Visningsnavn', 'Display name')}</label>
           <input id="profilesetup-f1" autoComplete="name" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&save()} placeholder={L('f.eks. Kari', 'e.g. Jane')} maxLength={100}
-            style={{ width:'100%', padding:'12px 14px', border:'1px solid #575B5E', borderRadius:'8px', fontSize:'0.9375rem', background:'#F5F2EB', color:'#1F2326', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
+            style={{ width:'100%', padding:'12px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.9375rem', background:'#1F221E', color:'#F2EEE6', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
         </div>
 
         <div style={{ marginBottom:'28px' }}>
-          <div id="profile-colour-label" style={{ display:'block', fontSize:'0.8125rem', color:'#575B5E', marginBottom:'10px' }}>{L('Velg din farge', 'Choose your colour')}</div>
+          <div id="profile-colour-label" style={{ display:'block', fontSize:'0.8125rem', color:'#B9B4A8', marginBottom:'10px' }}>{L('Velg din farge', 'Choose your colour')}</div>
           <div role="group" aria-labelledby="profile-colour-label" style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
             {COLORS.map((c, i) => (
-              <button key={c} onClick={()=>setColor(c)} aria-pressed={color===c} aria-label={L(...COLOR_NAMES[i])} style={{ width:'44px', height:'44px', borderRadius:'50%', background:c, border:color===c?'3px solid #2F4A43':'3px solid transparent', cursor:'pointer', transition:'border 0.15s' }} />
+              <button key={c} onClick={()=>setColor(c)} aria-pressed={color===c} aria-label={L(...COLOR_NAMES[i])} style={{ width:'44px', height:'44px', borderRadius:'50%', background:c, border:color===c?'3px solid #9DAA8C':'3px solid transparent', cursor:'pointer', transition:'border 0.15s' }} />
             ))}
           </div>
         </div>
 
         <button onClick={save} disabled={!name.trim()||loading} style={{
-          width:'100%', padding:'13px', background:name.trim()?'#2F4A43':'#CFC8BA',
-          color:'#F5F2EB', border:'none', borderRadius:'8px',
+          width:'100%', padding:'13px', background:name.trim()?'#F2EEE6':'rgba(242, 238, 230, 0.14)',
+          color:'#1F221E', border:'none', borderRadius: '999px',
           cursor:name.trim()?'pointer':'not-allowed', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif',
         }}>{loading?L('Lagrer…','Saving…'):editing?L('Lagre','Save'):L('Kom i gang →','Get started →')}</button>
       </div>

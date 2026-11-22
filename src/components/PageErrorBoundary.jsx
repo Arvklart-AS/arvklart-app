@@ -11,12 +11,12 @@ export default class PageErrorBoundary extends Component {
   render() {
     if (!this.state.failed) return this.props.children
     return (
-      <div role="alert" style={{ maxWidth: '480px', margin: '64px auto', padding: '0 20px', fontFamily: 'Karla, sans-serif', color: '#1F2326', textAlign: 'center' }}>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 400, fontSize: '1.5rem', marginBottom: '12px' }}>{L('Siden kunne ikke lastes', 'The page could not be loaded')}</h1>
-        <p style={{ color: '#575B5E', fontSize: '0.9375rem', lineHeight: 1.6, marginBottom: '20px' }}>
+      <div role="alert" style={{ maxWidth: '480px', margin: '64px auto', padding: '0 20px', fontFamily: 'Karla, sans-serif', color: '#F2EEE6', textAlign: 'center' }}>
+        <h1 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: 400, fontSize: '1.5rem', marginBottom: '12px' }}>{L('Siden kunne ikke lastes', 'The page could not be loaded')}</h1>
+        <p style={{ color: '#B9B4A8', fontSize: '0.9375rem', lineHeight: 1.6, marginBottom: '20px' }}>
           {L('Sjekk nettforbindelsen og prøv igjen. Ingenting av det du har lagret, er borte.', 'Check your connection and try again. Nothing you have saved is lost.')}
         </p>
-        <button onClick={() => window.location.reload()} style={{ background: '#2F4A43', color: '#F5F2EB', border: 'none', borderRadius: '8px', padding: '12px 22px', fontFamily: 'Karla, sans-serif', fontSize: '0.9375rem', cursor: 'pointer' }}>
+        <button onClick={() => window.location.reload()} style={{ background: '#F2EEE6', color: '#1F221E', border: 'none', borderRadius: '999px', padding: '12px 22px', fontFamily: 'Karla, sans-serif', fontSize: '0.9375rem', cursor: 'pointer' }}>
           {L('Last inn på nytt', 'Reload')}
         </button>
       </div>
@@ -27,7 +27,7 @@ export default class PageErrorBoundary extends Component {
 // Vises mens en app-side lastes (vanligvis et øyeblikk; sidene forhåndslastes etter innlogging)
 export function PageLoading() {
   return (
-    <div role="status" style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fraunces', serif", color: '#575B5E', fontSize: '1.25rem' }}>
+    <div role="status" style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Bodoni Moda', 'Times New Roman', serif", color: '#B9B4A8', fontSize: '1.25rem' }}>
       Arvklart<span className="sr-only">{L(' – laster siden', ' – loading the page')}</span>
     </div>
   )

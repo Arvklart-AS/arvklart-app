@@ -14,6 +14,7 @@ import { L } from '../lib/lang'
 import { Modal } from '../components/UI'
 import ReasonEditor from '../components/ReasonEditor'
 import StoredImage from '../components/StoredImage'
+import { ItemHead } from '../components/ItemThumb'
 
 // Alle gjenstandene i boet, med store bilder. Søk, «Vis»-valg (alle, mine ønsker, ettertraktede, noen vil ha,
 // ingen vil ha, tildelt) og kategori står i adressen (?vis=…&kategori=…&sok=…), og «Analyse» viser fordelingen
@@ -92,6 +93,7 @@ export default function EstateItemsPage({ session, onToast, isDemo }) {
 
         <header className="bo-listehode">
           <div>
+            <p className="bo-overlinje">{L('Gjenstander', 'Items')}</p>
             <h1>{mode === 'analyse' ? L('Analyse', 'Analytics') : filterByKey(vis).label()}</h1>
             <p className="bo-dempet" role="status">
               {mode === 'analyse' || !narrowed
@@ -156,10 +158,9 @@ export default function EstateItemsPage({ session, onToast, isDemo }) {
       </div>
 
       {confirmItem && (
-        <Modal onClose={() => setConfirmItem(null)} labelledBy="slett-tittel" maxWidth={380}
-          panelStyle={{ background: C.flateHoy, color: C.lin, border: `1px solid ${C.kant}` }}>
+        <Modal onClose={() => setConfirmItem(null)} labelledBy="slett-tittel" maxWidth={380}>
           <h2 id="slett-tittel" style={{ fontSize: '1.125rem', marginBottom: '8px' }}>{L('Slett gjenstand', 'Delete item')}</h2>
-          <p style={{ fontSize: '0.875rem', marginBottom: '6px' }}>«{confirmItem.title}»</p>
+          <div style={{ display: 'flex', marginBottom: '10px' }}><ItemHead item={confirmItem} size={120} still /></div>
           <p className="bo-dempet" style={{ fontSize: '0.8125rem', marginBottom: '24px' }}>{L('Kan ikke angres.', 'This cannot be undone.')}</p>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="button" className="bo-knapp stille" style={{ flex: 1 }} onClick={() => setConfirmItem(null)}>{L('Avbryt', 'Cancel')}</button>
@@ -209,7 +210,7 @@ function ItemCard({ item, userId, estateId, back, canDelete, showReason, onOpen,
       {showReason && mine && (
         <div className="begrunnelse">
           <ReasonEditor key={item.id} itemId={item.id} itemTitle={item.title} userId={userId} savedReason={mine.reason || null}
-            compact dark onToast={onToast} onSaved={onReasonSaved} />
+            compact onToast={onToast} onSaved={onReasonSaved} />
         </div>
       )}
     </article>

@@ -60,25 +60,25 @@ export default function ApprovalPanel({ estateId, userId, isAdmin, isDemo, close
   const link = `${window.location.origin}/estate/${estateId}/fordeling`
   const shareText = L(`Fordelingen av innbo og løsøre er lagt frem i Arvklart. Se over og godkjenn eller si fra her: ${link}`, `The division of household contents has been proposed in Arvklart. Review it and approve or object here: ${link}`)
 
-  const box = { background: '#fff', border: '1px solid #CFC8BA', borderRadius: '12px', padding: '16px', marginBottom: '12px' }
-  const small = { fontSize: '0.8125rem', color: '#1F2326', lineHeight: 1.6, margin: 0 }
+  const box = { background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '16px', marginBottom: '12px' }
+  const small = { fontSize: '0.8125rem', color: '#F2EEE6', lineHeight: 1.6, margin: 0 }
   // Alle tildelinger må ha en bekreftet person før et forslag kan legges frem (håndheves i databasen)
   const unconfirmed = unconfirmedAssignments(items)
   const confirmFirst = isAdmin && !closed && unconfirmed.length > 0 && (
     <div style={{ marginTop: '10px' }}>
-      <p style={{ ...small, color: '#1F2326' }}>{L(`Før forslaget kan legges frem, må familien bekrefte hvem som skal ha ${unconfirmed.length === 1 ? 'denne gjenstanden' : `disse ${unconfirmed.length} gjenstandene`}. De er tildelt en konto som ikke er bekreftet som en person på listen:`,
+      <p style={{ ...small, color: '#F2EEE6' }}>{L(`Før forslaget kan legges frem, må familien bekrefte hvem som skal ha ${unconfirmed.length === 1 ? 'denne gjenstanden' : `disse ${unconfirmed.length} gjenstandene`}. De er tildelt en konto som ikke er bekreftet som en person på listen:`,
         `Before the proposal can be made, the family must confirm who should have ${unconfirmed.length === 1 ? 'this item' : `these ${unconfirmed.length} items`}. They are assigned to an account that is not confirmed as a person on the list:`)}</p>
       <ul style={{ ...small, paddingLeft: '18px', margin: '4px 0 0' }}>
-        {unconfirmed.map(i => <li key={i.id}><a href={`/estate/${estateId}/item/${i.id}`} style={{ color: '#1F2326' }}>{i.title}</a></li>)}
+        {unconfirmed.map(i => <li key={i.id}><a href={`/estate/${estateId}/item/${i.id}`} style={{ color: '#F2EEE6' }}>{i.title}</a></li>)}
       </ul>
     </div>
   )
-  const btn = (primary) => ({ minHeight: '44px', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif',
-    background: primary ? '#2F4A43' : '#fff', color: primary ? '#fff' : '#1F2326', border: primary ? 'none' : '1px solid #575B5E' })
+  const btn = (primary) => ({ minHeight: '44px', padding: '8px 14px', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif',
+    background: primary ? '#F2EEE6' : '#272A25', color: primary ? '#1F221E' : '#F2EEE6', border: primary ? 'none' : '1px solid rgba(242, 238, 230, 0.4)' })
 
   return (
     <section aria-labelledby="approval-title" style={{ marginTop: '28px' }}>
-      <h2 id="approval-title" style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', fontWeight: 400, color: '#1F2326', margin: '0 0 10px' }}>{L('Godkjenning', 'Approval')}</h2>
+      <h2 id="approval-title" style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.25rem', fontWeight: 400, color: '#F2EEE6', margin: '0 0 10px' }}>{L('Godkjenning', 'Approval')}</h2>
       <p style={{ ...small, marginBottom: '12px' }}>
         {L('Fordelingen er godkjent når alle beslutningstakerne har godkjent den. Godkjenningen registreres i Arvklart med innloggingen din (e-post og passord). Arvklart verifiserer ikke identitet med BankID.',
           'The distribution is approved when all decision-makers have approved it. The approval is registered in Arvklart with your sign-in (email and password). Arvklart does not verify identity with BankID.')}
@@ -91,37 +91,37 @@ export default function ApprovalPanel({ estateId, userId, isAdmin, isDemo, close
           {isAdmin && !closed && <button onClick={propose} disabled={busy || unconfirmed.length > 0} style={{ ...btn(true), marginTop: '10px' }}>{L('Legg frem forslag', 'Propose the distribution')}</button>}
         </div>
       ) : (
-        <div role="status" style={{ ...box, borderColor: status?.state === 'approved' ? '#CFC8BA' : '#CFC8BA', background: status?.state === 'approved' ? '#EAE5DA' : '#fff' }}>
-          <p style={{ ...small, fontWeight: 600, color: '#1F2326' }}>{stateLabel(status?.state)}</p>
+        <div role="status" style={{ ...box, borderColor: status?.state === 'approved' ? 'rgba(242, 238, 230, 0.14)' : 'rgba(242, 238, 230, 0.14)', background: status?.state === 'approved' ? '#30342D' : '#272A25' }}>
+          <p style={{ ...small, fontWeight: 600, color: '#F2EEE6' }}>{stateLabel(status?.state)}</p>
           <p style={small}>{L(`Versjon ${version.version_no}, lagt frem ${new Date(version.created_at).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric' })}`, `Version ${version.version_no}, proposed ${new Date(version.created_at).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric' })}`)} · {L(`${status?.approved} av ${status?.required} har godkjent`, `${status?.approved} of ${status?.required} have approved`)}</p>
           {unsettled > 0 && <p style={{ ...small, marginTop: '6px', fontWeight: 600 }}>{L(`Delvis fordeling: ${unsettled} ${unsettled === 1 ? 'gjenstand er' : 'gjenstander er'} ikke avklart og omfattes ikke av godkjenningen.`, `Partial distribution: ${unsettled} ${unsettled === 1 ? 'item is' : 'items are'} not settled and not covered by the approval.`)}</p>}
-          {status?.outdated && <p style={{ ...small, marginTop: '6px', color: '#8A5A34' }}>{status.approved_at
+          {status?.outdated && <p style={{ ...small, marginTop: '6px', color: '#C79A6B' }}>{status.approved_at
             ? L('Fordelingen er endret etter at den ble godkjent. Den godkjente versjonen er lagret som dokumentasjon, men endringene krever en ny versjon som alle godkjenner.', 'The distribution has changed since it was approved. The approved version is kept as documentation, but the changes require a new version that everyone approves.')
             : L('Fordelingen er endret etter at forslaget ble lagt frem. Alle må godkjenne en ny versjon.', 'The distribution has changed since the proposal was made. Everyone must approve a new version.')}</p>}
-          {status?.authority_changed && !status?.outdated && <p style={{ ...small, marginTop: '6px', color: '#8A5A34' }}>{L('E-post eller representasjon er endret etter at forslaget ble lagt frem. Administrator må legge frem en ny versjon før noen kan svare.', 'An email address or representation has changed since the proposal was made. The administrator must propose a new version before anyone can respond.')}</p>}
+          {status?.authority_changed && !status?.outdated && <p style={{ ...small, marginTop: '6px', color: '#C79A6B' }}>{L('E-post eller representasjon er endret etter at forslaget ble lagt frem. Administrator må legge frem en ny versjon før noen kan svare.', 'An email address or representation has changed since the proposal was made. The administrator must propose a new version before anyone can respond.')}</p>}
           {status?.state === 'not_digitally_approvable' && <p style={{ ...small, marginTop: '6px' }}>{L('Minst én beslutningstaker har ikke konto og ingen bekreftet representant. Forslaget kan ikke godkjennes digitalt; last ned protokollen for signering på papir, eller inviter arvingen.', 'At least one decision-maker has no account and no confirmed representative. The proposal cannot be approved digitally; download the record for signing on paper, or invite the heir.')}</p>}
 
           {status?.deleted_accounts > 0 && <p style={{ ...small, marginTop: '6px' }}>{L(`${status.deleted_accounts === 1 ? 'Ett svar' : `${status.deleted_accounts} svar`} ble registrert av en konto som senere er slettet. Registreringen er bevart.`, `${status.deleted_accounts === 1 ? 'One response was' : `${status.deleted_accounts} responses were`} registered by an account that has since been deleted. The registration is kept.`)}</p>}
           <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0 0', display: 'grid', gap: '6px' }}>
             {(status?.heirs || []).map(h => (
-              <li key={h.heir_id} style={{ ...small, background: '#F5F2EB', border: '1px solid #CFC8BA', borderRadius: '8px', padding: '8px 10px' }}>
-                <strong style={{ color: '#1F2326' }}>{h.name}</strong>: {heirStatusText(h, nameOf)}
+              <li key={h.heir_id} style={{ ...small, background: '#1F221E', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '8px', padding: '8px 10px' }}>
+                <strong style={{ color: '#F2EEE6' }}>{h.name}</strong>: {heirStatusText(h, nameOf)}
               </li>
             ))}
           </ul>
 
           {canRespond && mine.map(h => (
-            <div key={h.heir_id} style={{ marginTop: '14px', borderTop: '1px solid #CFC8BA', paddingTop: '12px' }}>
-              <p style={{ ...small, fontWeight: 600, color: '#1F2326' }}>
+            <div key={h.heir_id} style={{ marginTop: '14px', borderTop: '1px solid rgba(242, 238, 230, 0.14)', paddingTop: '12px' }}>
+              <p style={{ ...small, fontWeight: 600, color: '#F2EEE6' }}>
                 {h.user_id === userId ? L('Ditt svar', 'Your response') : L(`Svar for ${h.name} (som registrert representant)`, `Respond for ${h.name} (as registered representative)`)}
               </p>
               <p style={small}>{L('Godkjenningen gjelder fordelingen slik den står i denne versjonen. Det som ikke er avklart, omfattes ikke.', 'The approval applies to the distribution as it stands in this version. What is not settled is not covered.')}</p>
               {objecting === h.heir_id ? (
                 <div style={{ display: 'grid', gap: '8px', marginTop: '8px' }}>
                   <label htmlFor={`obj-${h.heir_id}`} style={{ ...small, fontWeight: 600 }}>{L('Hva er du ikke enig i?', 'What do you disagree with?')}</label>
-                  <textarea id={`obj-${h.heir_id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={2000} rows={3} style={{ padding: '10px', border: '1px solid #575B5E', borderRadius: '8px', fontFamily: 'Karla, sans-serif', fontSize: '0.875rem' }} />
+                  <textarea id={`obj-${h.heir_id}`} value={reason} onChange={e => setReason(e.target.value)} maxLength={2000} rows={3} style={{ padding: '10px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontFamily: 'Karla, sans-serif', fontSize: '0.875rem' }} />
                   <label htmlFor={`obj-item-${h.heir_id}`} style={{ ...small, fontWeight: 600 }}>{L('Gjelder det en bestemt gjenstand? (valgfritt)', 'Is it about a specific item? (optional)')}</label>
-                  <select id={`obj-item-${h.heir_id}`} value={itemId} onChange={e => setItemId(e.target.value)} style={{ minHeight: '44px', padding: '8px', border: '1px solid #575B5E', borderRadius: '8px', fontFamily: 'Karla, sans-serif' }}>
+                  <select id={`obj-item-${h.heir_id}`} value={itemId} onChange={e => setItemId(e.target.value)} style={{ minHeight: '44px', padding: '8px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontFamily: 'Karla, sans-serif' }}>
                     <option value="">{L('Ingen bestemt gjenstand', 'No specific item')}</option>
                     {items.map(i => <option key={i.id} value={i.id}>{i.title}</option>)}
                   </select>

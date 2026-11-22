@@ -33,18 +33,18 @@ export default function AgreedValue({ item, estateId, canEdit, onChanged, onToas
     save(Math.round(v), 'manual')
   }
 
-  const btn = { minHeight: '40px', padding: '8px 12px', background: '#fff', border: '1px solid #CFC8BA', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', color: '#1F2326' }
+  const btn = { minHeight: '40px', padding: '8px 12px', background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor: 'pointer', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', color: '#F2EEE6' }
   if (value === null && !canEdit) return null
   return (
-    <section aria-labelledby="agreed-value" style={{ background: '#fff', border: '1px solid #CFC8BA', borderRadius: '10px', padding: '14px', marginBottom: '12px', fontFamily: 'Karla, sans-serif' }}>
-      <h2 id="agreed-value" style={{ fontSize: '0.75rem', color: '#2F4A43', fontWeight: 600, margin: '0 0 4px' }}>{L('Fordelingsverdi (foreslått)', 'Distribution value (proposed)')}</h2>
+    <section aria-labelledby="agreed-value" style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '10px', padding: '14px', marginBottom: '12px', fontFamily: 'Karla, sans-serif' }}>
+      <h2 id="agreed-value" style={{ fontSize: '0.75rem', color: '#9DAA8C', fontWeight: 600, margin: '0 0 4px' }}>{L('Fordelingsverdi (foreslått)', 'Distribution value (proposed)')}</h2>
       {value === null
-        ? <p style={{ fontSize: '0.875rem', color: '#575B5E', margin: 0 }}>{L('Ingen fordelingsverdi ennå. Den er valgfri, og en manglende verdi regnes ikke som 0 kr.', 'No distribution value yet. It is optional, and a missing value is not counted as 0 kr.')}</p>
+        ? <p style={{ fontSize: '0.875rem', color: '#B9B4A8', margin: 0 }}>{L('Ingen fordelingsverdi ennå. Den er valgfri, og en manglende verdi regnes ikke som 0 kr.', 'No distribution value yet. It is optional, and a missing value is not counted as 0 kr.')}</p>
         : <p style={{ margin: 0 }}>
-            <span style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#1F2326' }}>{formatNOK(value)}</span>
-            {item.agreed_value_source && <span style={{ fontSize: '0.75rem', color: '#1F2326' }}> · {SOURCE[item.agreed_value_source]?.()}</span>}
+            <span style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.25rem', color: '#F2EEE6' }}>{formatNOK(value)}</span>
+            {item.agreed_value_source && <span style={{ fontSize: '0.75rem', color: '#F2EEE6' }}> · {SOURCE[item.agreed_value_source]?.()}</span>}
           </p>}
-      <p style={{ fontSize: '0.75rem', color: '#1F2326', lineHeight: 1.5, margin: '6px 0 0' }}>
+      <p style={{ fontSize: '0.75rem', color: '#F2EEE6', lineHeight: 1.5, margin: '6px 0 0' }}>
         {L('Verdien gjenstanden regnes med i fordelingen. Den er adskilt fra AI-anslaget og arvingenes forslag, og blir først endelig når alle har godkjent fordelingen.',
           'The value the item counts with in the distribution. It is separate from the AI estimate and the heirs’ suggestions, and only becomes final when everyone has approved the distribution.')}
       </p>
@@ -52,8 +52,8 @@ export default function AgreedValue({ item, estateId, canEdit, onChanged, onToas
         <form onSubmit={submit} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
           <label htmlFor="agreed-input" className="sr-only">{L('Fordelingsverdi i kroner', 'Distribution value in NOK')}</label>
           <input id="agreed-input" value={text} onChange={e => setText(e.target.value)} inputMode="numeric" placeholder={L('Beløp i kroner', 'Amount in NOK')}
-            style={{ flex: '1 1 140px', minHeight: '40px', padding: '8px 12px', border: '1px solid #575B5E', borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }} />
-          <button type="submit" disabled={busy} style={{ ...btn, background: '#2F4A43', color: '#fff', border: 'none' }}>{L('Lagre', 'Save')}</button>
+            style={{ flex: '1 1 140px', minHeight: '40px', padding: '8px 12px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }} />
+          <button type="submit" disabled={busy} style={{ ...btn, background: '#F2EEE6', color: '#1F221E', border: 'none' }}>{L('Lagre', 'Save')}</button>
           <button type="button" onClick={() => setEditing(false)} style={btn}>{L('Avbryt', 'Cancel')}</button>
         </form>
       ) : (

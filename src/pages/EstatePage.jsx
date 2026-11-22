@@ -10,7 +10,8 @@ import { APP_HOME } from '../lib/routes'
 // Oversikten i et bo. Den svarer bare på «hva vil du gjøre?»:
 //  1. Hvor langt boet har kommet (én linje).
 //  2. «Anbefalt nå»: det viktigste for denne brukeren akkurat nå, med én knapp.
-//  3. Fire nedtrekksgrupper (Gjenstander, Fordeling, Arvinger, Praktisk) med lenker videre til egne sider.
+//  3. Fire nummererte nedtrekksgrupper (Gjenstander, Fordeling, Arvinger, Praktisk) med lenker videre til egne
+//     sider, i samme stil som «Før dere begynner» på arvklart.no.
 // Gjenstandene med bilder, søk, filter og analyse ligger på /estate/:id/gjenstander (EstateItemsPage).
 // Hva som vises for administrator, arving og demo, bestemmes i src/lib/estateOverview.js.
 export default function EstatePage({ session, isDemo }) {
@@ -42,8 +43,9 @@ export default function EstatePage({ session, isDemo }) {
         )}
 
         <header className="bo-hode">
+          <p className="bo-overlinje">{L('Ditt bo', 'Your estate')}</p>
           <h1>{estate.name}</h1>
-          {estate.description && <p className="bo-dempet">{estate.description}</p>}
+          {estate.description && <p className="bo-ingress">{estate.description}</p>}
           <p className="bo-status">
             {counts.total > 0 && <span className="bo-spor" aria-hidden="true"><span style={{ width: `${progress}%` }} /></span>}
             <span>
@@ -66,28 +68,29 @@ export default function EstatePage({ session, isDemo }) {
         {next && (
           <section className="bo-anbefalt" aria-labelledby="anbefalt-tittel">
             <div className="tekst">
-              <span className="bo-etikett">{L('Anbefalt nå', 'Recommended now')}</span>
-              <h2 id="anbefalt-tittel">{next.title}</h2>
+              <p className="bo-overlinje">{L('Anbefalt nå', 'Recommended now')}</p>
+              <h2 id="anbefalt-tittel"><Emphasize text={next.title} /></h2>
               {next.text && <p>{next.text}</p>}
             </div>
-            <Link to={next.path} className="bo-knapp messing">{next.action} →</Link>
+            <Link to={next.path} className="bo-knapp fylt">{next.action} →</Link>
           </section>
         )}
 
-        <section aria-labelledby="valg-tittel">
-          <h2 id="valg-tittel" className="bo-seksjonstittel">{L('Hva vil du gjøre?', 'What do you want to do?')}</h2>
+        <section aria-labelledby="valg-tittel" className="bo-valgseksjon">
+          <p className="bo-overlinje">{L('Alt i boet', 'Everything in the estate')}</p>
+          <h2 id="valg-tittel" className="bo-stor">{L('Hva vil du gjøre?', 'What do you want to do?')}</h2>
           <div className="bo-grupper">
-            {groups.map(group => (
+            {groups.map((group, n) => (
               <details key={group.key} className="bo-gruppe" open={!!openGroups[group.key]}
                 onToggle={e => setOpenGroups(group.key, e.currentTarget.open)}>
                 <summary>
-                  <span className="bo-ikon" aria-hidden="true">{ICONS[group.key]}</span>
+                  <span className="bo-nr" aria-hidden="true">{String(n + 1).padStart(2, '0')}</span>
                   <span>
                     <span className="tittel">{group.title}</span>
                     <span className="beskrivelse">{group.desc}</span>
                   </span>
                   <span className="bo-hint">{group.hint}</span>
-                  <Chevron />
+                  <span className="bo-pluss" aria-hidden="true" />
                 </summary>
                 <ul className="bo-valg">
                   {group.links.map(link => (
@@ -144,14 +147,9 @@ function Message({ children }) {
   )
 }
 
-function Chevron() {
-  return <svg className="bo-pil" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" /></svg>
-}
-
-const icon = path => <svg viewBox="0 0 24 24" fill="none" stroke="#F2EEE6" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round">{path}</svg>
-const ICONS = {
-  gjenstander: icon(<><path d="M3.5 8L12 3.5 20.5 8v8L12 20.5 3.5 16z" /><path d="M3.5 8L12 12.5 20.5 8M12 12.5v8" /></>),
-  fordeling: icon(<><path d="M12 3v18M5 7h14" /><path d="M5 7l-3 7a3 3 0 006 0zM19 7l-3 7a3 3 0 006 0z" /></>),
-  arvinger: icon(<><circle cx="9" cy="8" r="3.2" /><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5" /><circle cx="17" cy="9" r="2.4" /><path d="M16.5 14.6c2.4.2 4 1.7 4.5 4.4" /></>),
-  praktisk: icon(<><rect x="5" y="4.5" width="14" height="16" rx="2" /><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4" /></>),
+// Tallet i en overskrift («Du har 4 gjenstander …») fremheves i ordfargen, som ordene i store overskrifter på nettsiden
+function Emphasize({ text }) {
+  const m = /\d+/.exec(text)
+  if (!m) return text
+  return <>{text.slice(0, m.index)}<span className="bo-ord">{m[0]}</span>{text.slice(m.index + m[0].length)}</>
 }

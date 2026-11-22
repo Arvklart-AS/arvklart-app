@@ -41,32 +41,38 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - `scripts/smoke-browser.mjs` (`.github/workflows/smoke.yml`) er en røyktest i ekte nettleser mot forhåndsvisningen og produksjonen: forsiden, `/home`, `/app` uten innlogging, innlogging med feil passord, nytt passord, invitasjon, veiviseren (i siden, uten iframe; `/veiviser.html` gir 308), personvern og demoen med navigering i demo-boet. Ingen ekte kontoer; den rapporterer bare
 
 ## Fargepalett — bruk alltid disse
-Fargene er fra «Fargepalett.pdf» (designsystemet «Arvklart» → Farger). Appen bruker **produktpaletten (lys)**:
+Fargene er fra «Fargepalett.pdf» (designsystemet «Arvklart» → Farger). **Den innloggede appen er mørk**, i samme uttrykk som arvklart.no (`src/site/site.css`):
 ```
-#1F221E  natt (toppmenyen i appen og headeren på markedssidene)
-#F5F2EB  papir (side-bakgrunn)
-#EAE5DA  kalk (sidefelt, valgt rad, rolige bokser og felt)
-#1F2326  blekk (primærtekst)
-#575B5E  skifer (sekundærtekst, og kanten på input/select/textarea: 6,6:1 mot hvit)
-#2F4A43  granskog (merkefarge: knapper, knappekanter, aktivt steg, suksess, fokusring)
-#8A5A34  messing (lenker, små aksenter og advarsler)
-#CFC8BA  strek (hårstreker og kanter; bare pynt, aldri tekst eller feltkant)
-#9A3B2E  rust (feilmeldinger og sletting)
+#1F221E  natt (bakgrunn og toppmenyen)
+#272A25  flate (kort; Natt løftet litt)
+#30342D  flate høy (bokser, dialoger, menyer, bildebakgrunn)
+#F2EEE6  lin (tekst, og fylte knapper med Natt-tekst)
+#B9B4A8  lin dempet (sekundærtekst; 8,5:1 mot Natt)
+rgba(242,238,230,.14)  hårstreker   rgba(242,238,230,.4)  feltkanter (3:1)
+#9DAA8C  mose (aksent, «ferdig», fokusring)
+#C79A6B  messing lys (overlinjene)    #D7BA9A  ordfarge (fremhevet ord i store overskrifter)
+#E08A7A  rust lys (feil og sletting)  #2F4A43  granskog (mørk grønn flate, f.eks. demobanneret)
 ```
-Hvitt (`#fff`) brukes fortsatt på kort og felt oppå papir. Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) bruker samme lyse palett. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
+Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som også bestemmer hvilke sider som er lyse (`isLightAppPath`) og har den globale CSS-en (`appDarkCss`: Bodoni Moda fra `/fonter`, fokusring, mørke skjemafelt, lyset øverst). Oversikten i boet og gjenstandslisten bruker klassene i `src/lib/estateThemeCss.js` (prefiks `bo-`); de andre sidene har fargene i inline style.
+
+**Lyse sider:** sidene som også vises for utloggede (innlogging, nytt passord, invitasjon, personvern, kontakt, veiviseren, guidene, forsiden) og PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) bruker produktpaletten (lys): papir `#F5F2EB`, kalk `#EAE5DA`, blekk `#1F2326`, skifer `#575B5E`, granskog `#2F4A43`, messing `#8A5A34`, strek `#CFC8BA`, rust `#9A3B2E`.
+
+Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
 
 Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
 `/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
 av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
 og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
 
-Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` i `index.html` (granskog; mørke flater setter lys ring selv). Hvit tekst på granskog, messing og rust holder 4,5:1.
+Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
 
-**Unntak: bo-oversikten er mørk.** Oversikten i boet (`/estate/:id`) og gjenstandslisten (`/estate/:id/gjenstander`) bruker landingssidens mørke palett (Natt `#1F221E` som bakgrunn, Lin `#F2EEE6` tekst, Lin dempet `#B9B4A8`, Mose `#9DAA8C` aksent og fokusring, Granskog `#2F4A43`, Jord `#3A3129`, Messing lys `#C79A6B` høyst én gang per skjerm, Rust lys `#E08A7A` for sletting). Fargene står i `src/lib/estateTheme.js` (liten, brukes av `App.jsx`) og CSS-en i `src/lib/estateThemeCss.js` (klasser med prefiks `bo-`, avgrenset til `.bo-mork`; hover, `<details>` og mobiloppsett krever CSS). Sidene de leder til (sveip, fordeling, gjenstandssiden osv.) bruker produktpaletten over.
+**Uttrykket (som arvklart.no):** overskrifter i Bodoni Moda (`'Bodoni Moda', 'Times New Roman', serif`, med `font-optical-sizing: none`), en overlinje over sideoverskriften (`<Overline>` i `src/components/UI.jsx`), pilleknapper (`borderRadius: '999px'`), hårstreker og nummererte rader med pluss/minus på oversikten.
+
+**Bilde ved hver handling:** der man gjør noe med en gjenstand (løsningsmetoder, fordelingen, ingen vil ha, sveiping, dialoger), vises bildet av gjenstanden med `ItemThumb` eller `ItemHead` (`src/components/ItemThumb.jsx`). Et trykk viser bildet stort, med lenke til gjenstanden; i dialoger brukes `still`, så det ikke åpnes et vindu oppå.
 
 ## Typografi
 - `fontFamily: 'Karla, sans-serif'` — brødtekst og UI
-- `fontFamily: "'Fraunces', serif"` — overskrifter/display
+- `fontFamily: "'Bodoni Moda', 'Times New Roman', serif"` — overskrifter/display i appen (som arvklart.no). Fraunces brukes fortsatt på noen offentlige sider
 
 ## Filer som IKKE skal røres uten diskusjon
 - `src/lib/supabase.js` — Supabase-klient, endringer kan bryte auth

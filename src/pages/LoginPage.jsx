@@ -159,7 +159,7 @@ export default function LoginPage({ onToast }) {
             </p>
           </div>
 
-          <div style={{ marginTop:'20px' }}><TextSizeControl /></div>
+          <div style={{ marginTop:'20px' }}><TextSizeControl light /></div>
         </div>
       </div>
     </div>

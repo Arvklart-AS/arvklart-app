@@ -23,7 +23,7 @@ import { L } from './lib/lang'
 import RouteMeta from './seo/RouteMeta'
 import { APP_HOME, HOME, LANDING_STATE } from './lib/routes'
 import AnalyticsConsent from './components/AnalyticsConsent'
-import { C as DARK, isDarkEstatePath } from './lib/estateTheme'
+import { isLightAppPath, appDarkCss } from './lib/estateTheme'
 // Den innloggede appen lastes ved behov; offentlige sider over er i hovedfilen (forhåndsrendres og hydreres)
 import {
   ProfileSetupPage, EstatesPage, EstatePage, EstateItemsPage, ItemDetailPage, AddItemPage, AddItemsPage, SwipePage, EditItemPage, AdminPage,
@@ -190,15 +190,16 @@ export default function App({ prerendered = false }) {
   return (
     <PlanProvider session={session}>
       {/* app-shell: på /veiviser står veiviseren under appen i siden, og høyden følger da innholdet (veiviserHost.js).
-          Oversikten i boet og gjenstandslisten er mørke (estateTheme.js); da er hele siden mørk under innholdet. */}
-      <div className="app-shell" style={{ minHeight: '100vh', background: isDarkEstatePath(pathname) ? DARK.natt : '#F5F2EB' }}>
+          Appen er mørk (estateTheme.js), unntatt sidene som også vises for utloggede og har et lyst oppsett. */}
+      <style>{appDarkCss}</style>
+      <div className={isLightAppPath(pathname) ? 'app-shell' : 'app-shell app-mork'} style={{ minHeight: '100vh', background: isLightAppPath(pathname) ? '#F5F2EB' : undefined }}>
         <RouteMeta />
         <VeiviserHostGuard />
         {/* Innlogget: aldri statistikk; lastet fra en offentlig side, lastes siden på nytt uten */}
         <AnalyticsConsent loggedIn />
         <TopBar profile={profile} session={session} onToast={showToast} />
         {isDemo && (
-          <div style={{ background: '#EAE5DA', borderBottom: '1px solid #CFC8BA', padding: '8px 20px', textAlign: 'center', fontSize: '0.8125rem', color: '#2F4A43', fontFamily: 'Karla, sans-serif' }}>
+          <div style={{ background: '#2F4A43', padding: '8px 20px', textAlign: 'center', fontSize: '0.8125rem', color: '#F2EEE6', fontFamily: 'Karla, sans-serif' }}>
             {/* Alle besøkende deler demoen (samme konto og bo), og den nullstilles når noen åpner den */}
             {L('Du ser på en', 'You are viewing a')} <strong>demo</strong> {L('av Fam. Hansen sitt bo. Du er Mona, en av tre arvinger og administrator; Kari og Lars har allerede svart. Dette er et offentlig eksempelbo. Ikke skriv personopplysninger. Endringer kan bli nullstilt når andre prøver demoen.', 'of the Hansen family estate. You are Mona, one of three heirs and the administrator; Kari and Lars have already answered. This is a public example estate. Do not enter personal information. Changes may be reset when others try the demo.')}
           </div>
