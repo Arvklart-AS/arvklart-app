@@ -98,9 +98,9 @@ BEGIN
 
   ('face0001-0000-0000-0000-000000000001', 'deed0001-0000-0000-0000-000000000001',
    'Bestemors gyngestol',
-   'Eiketre gyngestol fra 1960-tallet, håndlaget av bestefar Per. Har stått i stua i over 60 år. Original pute med blomstermønster.',
+   'Gyngestol i mørklakkert tre med dreide spiler. Stoppet sete og rygg i lyst, mønstret stoff, og mørk nakkepute. Stoffet er slitt.',
    'cafe0001-0000-0000-0000-000000000001',
-   img_base || 'demo__face0001.jpg',
+   img_base || 'demo__face0001_gyngestol.jpg',
    8500, 'good', 'Demo', 'active'),
 
   ('face0002-0000-0000-0000-000000000002', 'deed0001-0000-0000-0000-000000000001',

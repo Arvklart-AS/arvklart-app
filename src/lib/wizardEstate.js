@@ -64,7 +64,7 @@ export async function createWizardEstate(userId, name) {
   const { data, error } = await createEstate({
     name: str(name, 200).trim() || 'Arveoppgjør',
     description: 'Opprettet fra arveveiviseren',
-    owner_id: userId, invite_code: genCode(), branding_color: '#3A2F26', status: 'active',
+    owner_id: userId, invite_code: genCode(), branding_color: '#1F221E', status: 'active',
   })
   if (error) return { error }
   const { error: memberError } = await supabase.from('estate_members').insert({ estate_id: data.id, user_id: userId, role: 'admin' })

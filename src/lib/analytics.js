@@ -52,9 +52,14 @@ export function clearAnalyticsCookies() {
 export function setConsent(choice) {
   try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: CONSENT_VERSION, choice, at: new Date().toISOString() })) } catch { /* privat modus: spør igjen neste gang */ }
   if (choice === 'denied') {
+    // Rekkefølgen er viktig. Google får beskjed FØR informasjonskapslene slettes: motsatt vei står
+    // GA4 fortsatt i «granted» mellom de to linjene, og en måling som allerede er på vei kan skrive
+    // _ga tilbake før siden lastes på nytt. Komponenten feier én gang til ved innlasting, så
+    // tilbaketrekkingen ikke er avhengig av timing.
+    if (isGtmLoaded()) gtag('consent', 'update', { analytics_storage: 'denied' })
     clearAnalyticsCookies()
-    // Allerede lastet: si fra til Google, og last siden på nytt uten GTM
-    if (isGtmLoaded()) { gtag('consent', 'update', { analytics_storage: 'denied' }); window.location.reload(); return }
+    // Allerede lastet: last siden på nytt uten GTM
+    if (isGtmLoaded()) { window.location.reload(); return }
   }
   window.dispatchEvent(new Event(CONSENT_EVENT))
 }

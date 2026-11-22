@@ -10,6 +10,8 @@ import FounderGate from './components/FounderGate'
 import GuidePage, { VeiviserHostGuard } from './pages/GuidePage'
 import { JoinPage, CategoriesPage, PrivacyPage, AccountPage } from './pages/OtherPages'
 import ContactPage from './pages/ContactPage'
+import HowItWorksPage from './pages/HowItWorksPage'
+import AboutPage from './pages/AboutPage'
 import ArticlePage from './pages/ArticlePage'
 import { getPendingSave, clearPendingSave } from './lib/wizardEstate'
 import { clearAllReasonDrafts } from './lib/reasonDraft'
@@ -134,7 +136,7 @@ export default function App({ prerendered = false }) {
           .select('estate_id').eq('user_id', user.id).limit(1).maybeSingle()
         if (cancelled) return
         setDemoEstateId(membership?.estate_id || null)
-        // Rett fra «Test ut demo» på forsiden og inn i demo-boet
+        // Rett fra «Prøv demo» på forsiden og inn i demo-boet
         if (membership?.estate_id && [HOME, APP_HOME].includes(window.location.pathname)) navigate(`/estate/${membership.estate_id}`)
         return
       }
@@ -169,6 +171,8 @@ export default function App({ prerendered = false }) {
           <Route path="/join/:code" element={<JoinPage onToast={showToast} />} />
           <Route path="/personvern" element={<PrivacyPage />} />
           <Route path="/kontakt" element={<ContactPage />} />
+          <Route path="/slik-fungerer-det" element={<HowItWorksPage />} />
+          <Route path="/om-oss" element={<AboutPage />} />
           <Route path="/veiviser" element={<GuidePage standalone onToast={showToast} />} />
           {/* Guidene (content/guider/*.md): forhåndsrendret; ukjente og utkast gir 404 fra Vercel */}
           <Route path="/guider/:slug" element={<ArticlePage />} />
@@ -209,7 +213,11 @@ export default function App({ prerendered = false }) {
           <Route path={HOME} element={<LoggedInRoot onToast={showToast} />} />
           <Route path={APP_HOME} element={isDemo ? demoHome : <EstatesPage {...p} />} />
           <Route path="/home" element={<Navigate to={HOME} replace state={LANDING_STATE} />} />
-          <Route path="/kontakt" element={<ContactPage />} />
+          {/* Offentlige sider er åpne også for innloggede. Da ligger menyen i TopBar, så sidens
+              egen header er skjult (loggedIn) og demoknappen går til «Mine bo». */}
+          <Route path="/kontakt" element={<ContactPage loggedIn />} />
+          <Route path="/slik-fungerer-det" element={<HowItWorksPage loggedIn />} />
+          <Route path="/om-oss" element={<AboutPage loggedIn />} />
           <Route path="/guider/:slug" element={<ArticlePage />} />
           <Route path="/setup" element={notForDemo(<ProfileSetupPage session={session} profile={profile} onSaved={(saved) => {
             const first = !profile?.display_name
