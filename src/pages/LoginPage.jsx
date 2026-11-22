@@ -65,30 +65,30 @@ export default function LoginPage({ onToast }) {
     : email.trim() && password.trim() && (mode === 'login' || name.trim())
 
   return (
-    <div style={{ minHeight:'100vh', background:'#FBF9F5', display:'flex', fontFamily:'Karla, sans-serif' }}>
+    <div style={{ minHeight:'100vh', background:'#F5F2EB', display:'flex', fontFamily:'Karla, sans-serif' }}>
       <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 20px' }}>
         <div style={{ maxWidth:'400px', width:'100%' }}>
           <div style={{ textAlign:'center', marginBottom:'40px' }}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#5C4530" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom:'16px' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1F2326" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom:'16px' }}>
               <path d="M12 3v18M7 21h10M5 7h4M15 7h4M5 7L2.5 12a2.5 2.5 0 0 0 5 0L5 7zM19 7l-2.5 5a2.5 2.5 0 0 0 5 0L19 7z"/>
             </svg>
-            <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.875rem', fontWeight:'400', color:'#3A2F26', marginBottom:'10px' }}>Arvklart</h1>
-            <p style={{ color:'#75604B', fontSize:'0.9375rem', lineHeight:'1.6' }}>{L('Registrer, ønsk og fordel innbo og løsøre – samlet og dokumentert', 'Register, wish for and divide household contents – in one place, documented')}</p>
+            <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.875rem', fontWeight:'400', color:'#1F2326', marginBottom:'10px' }}>Arvklart</h1>
+            <p style={{ color:'#575B5E', fontSize:'0.9375rem', lineHeight:'1.6' }}>{L('Registrer, ønsk og fordel innbo og løsøre – samlet og dokumentert', 'Register, wish for and divide household contents – in one place, documented')}</p>
           </div>
 
-          <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'14px', padding:'36px', boxShadow:'0 4px 32px rgba(0,0,0,0.06)' }}>
+          <div style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'14px', padding:'36px', boxShadow:'0 4px 32px rgba(0,0,0,0.06)' }}>
             {mode==='forgot' ? (
               <div style={{ marginBottom:'24px' }}>
-                <h2 style={{ fontFamily:'Fraunces, serif', fontSize:'1.375rem', fontWeight:'400', color:'#3A2F26', marginBottom:'8px' }}>{L('Glemt passord', 'Forgot password')}</h2>
-                <p style={{ color:'#75604B', fontSize:'0.875rem', lineHeight:'1.6', margin:0 }}>{L('Skriv inn e-postadressen din, så sender vi deg en lenke for å velge nytt passord.', 'Enter your email address and we will send you a link to choose a new password.')}</p>
+                <h2 style={{ fontFamily:'Fraunces, serif', fontSize:'1.375rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Glemt passord', 'Forgot password')}</h2>
+                <p style={{ color:'#575B5E', fontSize:'0.875rem', lineHeight:'1.6', margin:0 }}>{L('Skriv inn e-postadressen din, så sender vi deg en lenke for å velge nytt passord.', 'Enter your email address and we will send you a link to choose a new password.')}</p>
               </div>
             ) : (
-            <div style={{ display:'flex', background:'#E8DFD0', borderRadius:'8px', padding:'4px', marginBottom:'28px' }}>
+            <div style={{ display:'flex', background:'#EAE5DA', borderRadius:'8px', padding:'4px', marginBottom:'28px' }}>
               {[['login',L('Logg inn','Log in')],['signup',L('Opprett konto','Create account')]].map(([m,l]) => (
                 <button key={m} onClick={()=>switchMode(m)} style={{
                   flex:1, padding:'9px', border:'none', borderRadius:'6px', cursor:'pointer',
                   background:mode===m?'#fff':'transparent',
-                  color:mode===m?'#3A2F26':'#75604B', fontSize:'0.875rem', fontFamily:'Karla, sans-serif',
+                  color:mode===m?'#1F2326':'#575B5E', fontSize:'0.875rem', fontFamily:'Karla, sans-serif',
                   boxShadow:mode===m?'0 1px 4px rgba(0,0,0,0.08)':'none', transition:'all 0.15s',
                 }}>{l}</button>
               ))}
@@ -96,17 +96,17 @@ export default function LoginPage({ onToast }) {
             )}
 
             {invited && mode !== 'forgot' && !confirmSent && (
-              <div style={{ background:'#DCE3D2', borderRadius:'8px', padding:'12px 14px', fontSize:'0.8125rem', color:'#3A5A30', lineHeight:'1.5', marginBottom:'18px' }}>
+              <div style={{ background:'#EAE5DA', borderRadius:'8px', padding:'12px 14px', fontSize:'0.8125rem', color:'#2F4A43', lineHeight:'1.5', marginBottom:'18px' }}>
                 {L('Du er invitert til et bo. Logg inn eller opprett konto med e-posten invitasjonen ble sendt til, så blir du med automatisk.', 'You have been invited to an estate. Log in or create an account with the email the invitation was sent to, and you will join automatically.')}
               </div>
             )}
 
             {confirmSent ? (
-              <div style={{ background:'#DCE3D2', borderRadius:'8px', padding:'16px', fontSize:'0.875rem', color:'#3A2F26', lineHeight:'1.6', marginBottom:'4px' }}>
+              <div style={{ background:'#EAE5DA', borderRadius:'8px', padding:'16px', fontSize:'0.875rem', color:'#1F2326', lineHeight:'1.6', marginBottom:'4px' }}>
                 {L('Vi har sendt en bekreftelseslenke til', 'We have sent a confirmation link to')} <strong>{email.trim()}</strong>. {L('Klikk på lenken i e-posten for å fullføre registreringen. Sjekk søppelpost hvis den ikke dukker opp.', 'Click the link in the email to complete your registration. Check your spam folder if it does not arrive.')}
               </div>
             ) : mode==='forgot' && resetSent ? (
-              <div style={{ background:'#DCE3D2', borderRadius:'8px', padding:'16px', fontSize:'0.875rem', color:'#3A2F26', lineHeight:'1.6', marginBottom:'4px' }}>
+              <div style={{ background:'#EAE5DA', borderRadius:'8px', padding:'16px', fontSize:'0.875rem', color:'#1F2326', lineHeight:'1.6', marginBottom:'4px' }}>
                 {L('Hvis det finnes en konto for', 'If an account exists for')} <strong>{email.trim()}</strong>, {L('får du snart en e-post med en lenke for å tilbakestille passordet. Sjekk søppelpost hvis den ikke dukker opp.', 'you will soon receive an email with a link to reset your password. Check your spam folder if it does not show up.')}
               </div>
             ) : (<>
@@ -114,24 +114,24 @@ export default function LoginPage({ onToast }) {
             <div style={{ display:'flex', flexDirection:'column', gap:'14px', marginBottom:'20px' }}>
               {mode==='signup' && (
                 <div>
-                  <label htmlFor="login-f1" style={{ display:'block', fontSize:'0.8125rem', color:'#75604B', marginBottom:'6px' }}>{L('Ditt navn *', 'Your name *')}</label>
+                  <label htmlFor="login-f1" style={{ display:'block', fontSize:'0.8125rem', color:'#575B5E', marginBottom:'6px' }}>{L('Ditt navn *', 'Your name *')}</label>
                   <input id="login-f1" autoComplete="name" value={name} onChange={e=>setName(e.target.value)} placeholder={L('f.eks. Kari Nordmann', 'e.g. Jane Smith')} maxLength={100}
-                    style={{ width:'100%', padding:'12px 14px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.9375rem', background:'#FBF9F5', color:'#3A2F26', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
+                    style={{ width:'100%', padding:'12px 14px', border:'1px solid #575B5E', borderRadius:'8px', fontSize:'0.9375rem', background:'#F5F2EB', color:'#1F2326', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
                 </div>
               )}
               <div>
-                <label htmlFor="login-f2" style={{ display:'block', fontSize:'0.8125rem', color:'#75604B', marginBottom:'6px' }}>{L('E-post *', 'Email *')}</label>
+                <label htmlFor="login-f2" style={{ display:'block', fontSize:'0.8125rem', color:'#575B5E', marginBottom:'6px' }}>{L('E-post *', 'Email *')}</label>
                 <input id="login-f2" type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleSubmit()} placeholder={L('deg@eksempel.no', 'you@example.com')} maxLength={254}
-                  style={{ width:'100%', padding:'12px 14px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.9375rem', background:'#FBF9F5', color:'#3A2F26', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
+                  style={{ width:'100%', padding:'12px 14px', border:'1px solid #575B5E', borderRadius:'8px', fontSize:'0.9375rem', background:'#F5F2EB', color:'#1F2326', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
               </div>
               {mode!=='forgot' && (
               <div>
-                <label htmlFor="login-f3" style={{ display:'block', fontSize:'0.8125rem', color:'#75604B', marginBottom:'6px' }}>{L('Passord *', 'Password *')}</label>
+                <label htmlFor="login-f3" style={{ display:'block', fontSize:'0.8125rem', color:'#575B5E', marginBottom:'6px' }}>{L('Passord *', 'Password *')}</label>
                 <input id="login-f3" type="password" autoComplete={mode==='signup' ? 'new-password' : 'current-password'} value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleSubmit()} placeholder={mode==='signup'?L('Minst 6 tegn','At least 6 characters'):'••••••••'} maxLength={128}
-                  style={{ width:'100%', padding:'12px 14px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.9375rem', background:'#FBF9F5', color:'#3A2F26', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
+                  style={{ width:'100%', padding:'12px 14px', border:'1px solid #575B5E', borderRadius:'8px', fontSize:'0.9375rem', background:'#F5F2EB', color:'#1F2326', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
                 {mode==='login' && (
                   <div style={{ textAlign:'right', marginTop:'6px' }}>
-                    <button onClick={()=>switchMode('forgot')} style={{ background:'none', border:'none', padding:0, color:'#5F6E52', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Glemt passord?', 'Forgot password?')}</button>
+                    <button onClick={()=>switchMode('forgot')} style={{ background:'none', border:'none', padding:0, color:'#8A5A34', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Glemt passord?', 'Forgot password?')}</button>
                   </div>
                 )}
               </div>
@@ -139,27 +139,27 @@ export default function LoginPage({ onToast }) {
             </div>
 
             <button onClick={handleSubmit} disabled={loading||!canSubmit} style={{
-              width:'100%', padding:'13px', background:canSubmit?'#3A2F26':'#D9CFC0',
-              color:'#FBF9F5', border:'none', borderRadius:'8px',
+              width:'100%', padding:'13px', background:canSubmit?'#2F4A43':'#CFC8BA',
+              color:'#F5F2EB', border:'none', borderRadius:'8px',
               cursor:canSubmit?'pointer':'not-allowed', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif',
             }}>{loading?L('Vent litt…','Please wait…'):mode==='login'?L('Logg inn','Log in'):mode==='forgot'?L('Send lenke','Send link'):L('Opprett konto','Create account')}</button>
             </>)}
 
             {mode==='signup' && (
-              <p style={{ textAlign:'center', marginTop:'12px', fontSize:'0.75rem', color:'#75604B', lineHeight:'1.6' }}>
+              <p style={{ textAlign:'center', marginTop:'12px', fontSize:'0.75rem', color:'#575B5E', lineHeight:'1.6' }}>
                 {L('Ved å opprette konto godtar du våre', 'By creating an account you accept our')}{' '}
-                <a href="/personvern" style={{ color:'#5F6E52' }}>{L('vilkår og personvernerklæring', 'terms and privacy policy')}</a>.
+                <a href="/personvern" style={{ color:'#2F4A43' }}>{L('vilkår og personvernerklæring', 'terms and privacy policy')}</a>.
               </p>
             )}
 
-            <p style={{ textAlign:'center', marginTop:'16px', fontSize:'0.8125rem', color:'#75604B' }}>
-              {mode==='forgot'?<button onClick={()=>switchMode('login')} style={{ background:'none', border:'none', color:'#5F6E52', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Tilbake til innlogging', 'Back to log in')}</button>
-              :mode==='login'?<>{L('Ny her?', 'New here?')}{' '}<button onClick={()=>switchMode('signup')} style={{ background:'none', border:'none', color:'#5F6E52', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Opprett konto', 'Create account')}</button></>
-              :<>{L('Har du konto?', 'Have an account?')}{' '}<button onClick={()=>switchMode('login')} style={{ background:'none', border:'none', color:'#5F6E52', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Logg inn', 'Log in')}</button></>}
+            <p style={{ textAlign:'center', marginTop:'16px', fontSize:'0.8125rem', color:'#575B5E' }}>
+              {mode==='forgot'?<button onClick={()=>switchMode('login')} style={{ background:'none', border:'none', color:'#8A5A34', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Tilbake til innlogging', 'Back to log in')}</button>
+              :mode==='login'?<>{L('Ny her?', 'New here?')}{' '}<button onClick={()=>switchMode('signup')} style={{ background:'none', border:'none', color:'#8A5A34', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Opprett konto', 'Create account')}</button></>
+              :<>{L('Har du konto?', 'Have an account?')}{' '}<button onClick={()=>switchMode('login')} style={{ background:'none', border:'none', color:'#8A5A34', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', textDecoration:'underline' }}>{L('Logg inn', 'Log in')}</button></>}
             </p>
           </div>
 
-          <div style={{ marginTop:'20px' }}><TextSizeControl /></div>
+          <div style={{ marginTop:'20px' }}><TextSizeControl light /></div>
         </div>
       </div>
     </div>
