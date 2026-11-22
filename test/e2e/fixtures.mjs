@@ -38,7 +38,7 @@ export const sessionFor = (email, meta = {}) => {
 // Brukes som setup-valg ({ ...DEMO }) eller med sessionFor(DEMO.email, DEMO.meta).
 export const DEMO = { email: 'mona.demo@arvklart.no', meta: { app_metadata: { provider: 'email', arvklart_demo: 'mona' } } }
 
-export async function setup(browser, { loggedIn = true, viewport = { width: 390, height: 844 }, textSize = null, fixtures = {}, rpc = {}, email = null, meta = null, consent = 'denied' } = {}) {
+export async function setup(browser, { loggedIn = true, viewport = { width: 390, height: 844 }, textSize = null, fixtures = {}, rpc = {}, email = null, meta = null, consent = 'denied', resetLang = true } = {}) {
   const data = { ...FIXTURES, ...fixtures }
   const s0 = email || meta ? sessionFor(email || session.user.email, meta || {}) : session
   const ctx = await browser.newContext({ viewport })
@@ -64,13 +64,15 @@ export async function setup(browser, { loggedIn = true, viewport = { width: 390,
     const body = single ? (rows[0] ?? null) : rows
     return route.fulfill({ status: single && !rows.length ? 406 : 200, contentType: 'application/json', body: JSON.stringify(body) })
   })
-  await page.addInitScript(([s, on, ts, consent]) => {
-    localStorage.removeItem('hs_lang')
+  // resetLang: false beholder språkvalget mellom lastinger. Skriptet kjører på hver navigering, så
+  // med standardverdien blir et språkbytte i testen (som laster siden på nytt) fjernet igjen.
+  await page.addInitScript(([s, on, ts, consent, nullstillSprak]) => {
+    if (nullstillSprak) localStorage.removeItem('hs_lang')
     if (ts) localStorage.setItem('hs_text_size', ts)
     // loggedIn: null rører ikke økten (en innlogging i testen overlever da ny lasting av siden)
     if (on) localStorage.setItem('sb-test-auth-token', JSON.stringify(s)); else if (on === false) localStorage.removeItem('sb-test-auth-token')
     if (consent && !localStorage.getItem('hs_analytics_consent')) localStorage.setItem('hs_analytics_consent', JSON.stringify({ v: 1, choice: consent, at: '2026-01-01T00:00:00Z' }))
-  }, [s0, loggedIn, textSize, consent])
+  }, [s0, loggedIn, textSize, consent, resetLang])
   return { ctx, page, calls }
 }
 

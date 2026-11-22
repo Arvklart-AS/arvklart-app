@@ -12,11 +12,12 @@ import TextSizeControl from '../components/TextSizeControl'
 import { PRIVACY_UPDATED } from '../lib/privacy'
 import { APP_HOME, HOME } from '../lib/routes'
 import { ConsentSettings } from '../components/AnalyticsConsent'
+import { Overline } from '../components/UI'
 
 const updatedText = () => new Date(`${PRIVACY_UPDATED}T12:00:00`).toLocaleDateString(getLang() === 'en' ? 'en-GB' : 'nb-NO', { day: 'numeric', month: 'long', year: 'numeric' })
 
-const btn = { minHeight:'44px', padding:'10px 20px', background:'#3A2F26', color:'#FBF9F5', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }
-const h2 = { fontFamily:"'Fraunces', serif", fontSize:'1.375rem', fontWeight:'400', color:'#3A2F26' }
+const btn = { minHeight:'44px', padding:'10px 20px', background:'#2F4A43', color:'#F5F2EB', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }
+const h2 = { fontFamily:"'Fraunces', serif", fontSize:'1.375rem', fontWeight:'400', color:'#1F2326' }
 
 export function JoinPage({ session, onToast }) {
   const { code } = useParams()
@@ -53,7 +54,7 @@ export function JoinPage({ session, onToast }) {
   const texts = { invalid: L('Lenken kan ha blitt fornyet. Be den som administrerer boet om en ny.', 'The link may have been renewed. Ask the estate administrator for a new one.') }
 
   return (
-    <div style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#FBF9F5', fontFamily:'Karla, sans-serif' }}>
+    <div style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F5F2EB', fontFamily:'Karla, sans-serif' }}>
       <div style={{ textAlign:'center', padding:'40px 20px', maxWidth:'460px' }}>
         {status === 'joining' ? (
           <h2 style={h2}>{L('Blir med i boet…', 'Joining the estate…')}</h2>
@@ -61,19 +62,19 @@ export function JoinPage({ session, onToast }) {
           <>
             <h2 style={h2}>{titles[status]}</h2>
             {status === 'denied' ? (
-              <div style={{ textAlign:'left', marginTop:'12px', color:'#3A2F26', lineHeight:1.6 }}>
+              <div style={{ textAlign:'left', marginTop:'12px', color:'#1F2326', lineHeight:1.6 }}>
                 <p>{L('Du er logget inn som', 'You are logged in as')} <strong style={{ overflowWrap:'anywhere' }}>{email}</strong>.</p>
                 <p style={{ marginTop:'8px' }}>{L('Den som administrerer boet, må legge til akkurat denne e-postadressen under «Arvinger». Send den gjerne til dem, og trykk «Prøv igjen» etterpå.', 'The estate administrator must add exactly this email address under «Heirs». You can send it to them, then tap «Try again».')}</p>
                 <div style={{ display:'flex', flexDirection:'column', gap:'8px', marginTop:'16px' }}>
-                  <button onClick={copyEmail} style={{ ...btn, background:'#fff', color:'#3A2F26', border:'1px solid #9A8B78' }}>{copied ? L('E-postadressen er kopiert ✓', 'Email address copied ✓') : L('Kopier e-postadressen min', 'Copy my email address')}</button>
+                  <button onClick={copyEmail} style={{ ...btn, background:'#fff', color:'#1F2326', border:'1px solid #575B5E' }}>{copied ? L('E-postadressen er kopiert ✓', 'Email address copied ✓') : L('Kopier e-postadressen min', 'Copy my email address')}</button>
                   <button onClick={() => { setStatus('joining'); setAttempt(a => a + 1) }} style={btn}>{L('Prøv igjen', 'Try again')}</button>
-                  <button onClick={switchAccount} style={{ ...btn, background:'none', color:'#5F6E52', textDecoration:'underline' }}>{L('Logg inn med en annen e-post', 'Log in with another email')}</button>
+                  <button onClick={switchAccount} style={{ ...btn, background:'none', color:'#8A5A34', textDecoration:'underline' }}>{L('Logg inn med en annen e-post', 'Log in with another email')}</button>
                 </div>
               </div>
             ) : (
-              <p style={{ color:'#75604B', marginTop:'8px', lineHeight:'1.5' }}>{texts[status] || errorMsg}</p>
+              <p style={{ color:'#575B5E', marginTop:'8px', lineHeight:'1.5' }}>{texts[status] || errorMsg}</p>
             )}
-            <button onClick={() => navigate(APP_HOME)} style={{ ...btn, marginTop:'20px', background:'none', color:'#5C4530', border:'1px solid #9A8B78' }}>{L('Til mine bo', 'To my estates')}</button>
+            <button onClick={() => navigate(APP_HOME)} style={{ ...btn, marginTop:'20px', background:'none', color:'#1F2326', border:'1px solid #575B5E' }}>{L('Til mine bo', 'To my estates')}</button>
           </>
         )}
       </div>
@@ -109,36 +110,37 @@ export function CategoriesPage({ onToast }) {
     onToast(L('Kategori fjernet', 'Category removed')); load()
   }
 
-  const input = { padding:'10px 14px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.9375rem', background:'#FBF9F5', color:'#3A2F26', fontFamily:'Karla, sans-serif' }
+  const input = { padding:'10px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.9375rem', background:'#1F221E', color:'#F2EEE6', fontFamily:'Karla, sans-serif' }
 
   return (
     <div style={{ maxWidth:'520px', margin:'0 auto', padding:'28px 16px', fontFamily:'Karla, sans-serif' }}>
-      <button onClick={()=>navigate(`/estate/${id}/admin`)} style={{ background:'none', border:'none', color:'#75604B', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til administrasjon', '← Back to administration')}</button>
-      <h1 style={{ fontFamily:"'Fraunces', serif", fontSize:'1.5rem', fontWeight:'400', color:'#3A2F26', marginBottom:'28px' }}>{L('Kategorier', 'Categories')}</h1>
+      <button onClick={()=>navigate(`/estate/${id}/admin`)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til administrasjon', '← Back to administration')}</button>
+      <Overline>{L('Boet', 'The estate')}</Overline>
+      <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight:'400', color:'#F2EEE6', marginBottom:'28px' }}>{L('Kategorier', 'Categories')}</h1>
 
-      <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'12px', padding:'24px', marginBottom:'16px' }}>
-        <p style={{ fontSize:'0.8125rem', color:'#75604B', marginBottom:'14px' }}>{L('Legg til ny kategori:', 'Add a new category:')}</p>
+      <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'24px', marginBottom:'16px' }}>
+        <p style={{ fontSize:'0.8125rem', color:'#B9B4A8', marginBottom:'14px' }}>{L('Legg til ny kategori:', 'Add a new category:')}</p>
         <div style={{ display:'flex', gap:'8px', marginBottom: showPicker?'12px':'0' }}>
           <button onClick={()=>setShowPicker(!showPicker)} style={{ ...input, padding:'10px 14px', cursor:'pointer', fontSize:'1.25rem' }}>{newEmoji}</button>
           <input value={newLabel} onChange={e=>setNewLabel(e.target.value)} onKeyDown={e=>e.key==='Enter'&&add()} placeholder={L('Kategorinavn…', 'Category name…')} maxLength={100} style={{ ...input, flex:1, minWidth:0 }} />
-          <button onClick={add} disabled={!newLabel.trim()} style={{ padding:'10px 18px', background:newLabel.trim()?'#3A2F26':'#D9CFC0', color:'#FBF9F5', border:'none', borderRadius:'8px', cursor:newLabel.trim()?'pointer':'not-allowed', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>+</button>
+          <button onClick={add} disabled={!newLabel.trim()} style={{ padding:'10px 18px', background:newLabel.trim()?'#F2EEE6':'rgba(242, 238, 230, 0.14)', color:'#1F221E', border:'none', borderRadius: '999px', cursor:newLabel.trim()?'pointer':'not-allowed', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>+</button>
         </div>
         {showPicker && (
-          <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', padding:'12px', background:'#E8DFD0', borderRadius:'8px' }}>
-            {EMOJIS.map(e=>(<button key={e} onClick={()=>{setNewEmoji(e);setShowPicker(false)}} style={{ fontSize:'1.25rem', background:newEmoji===e?'#D9CFC0':'none', border:'none', cursor:'pointer', padding:'5px', borderRadius:'6px' }}>{e}</button>))}
+          <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', padding:'12px', background:'#30342D', borderRadius:'8px' }}>
+            {EMOJIS.map(e=>(<button key={e} onClick={()=>{setNewEmoji(e);setShowPicker(false)}} style={{ fontSize:'1.25rem', background:newEmoji===e?'rgba(242, 238, 230, 0.14)':'none', border:'none', cursor:'pointer', padding:'5px', borderRadius:'6px' }}>{e}</button>))}
           </div>
         )}
       </div>
 
-      <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'12px', overflow:'hidden' }}>
+      <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', overflow:'hidden' }}>
         {categories.length === 0 && (
-          <div style={{ padding:'24px', textAlign:'center', color:'#75604B', fontSize:'0.875rem' }}>{L('Ingen kategorier ennå. Legg til den første.', 'No categories yet. Add the first one.')}</div>
+          <div style={{ padding:'24px', textAlign:'center', color:'#B9B4A8', fontSize:'0.875rem' }}>{L('Ingen kategorier ennå. Legg til den første.', 'No categories yet. Add the first one.')}</div>
         )}
         {categories.map((c,i)=>(
-          <div key={c.id} style={{ display:'flex', alignItems:'center', padding:'14px 20px', borderBottom:i<categories.length-1?'1px solid #E8DFD0':'none' }}>
+          <div key={c.id} style={{ display:'flex', alignItems:'center', padding:'14px 20px', borderBottom:i<categories.length-1?'1px solid rgba(242, 238, 230, 0.14)':'none' }}>
             <span style={{ fontSize:'1.25rem', marginRight:'14px' }}>{c.emoji}</span>
-            <span style={{ flex:1, fontSize:'0.9375rem', color:'#3A2F26' }}>{categoryLabel(c.label)}</span>
-            <button onClick={()=>remove(c.id)} title={L('Fjern kategori', 'Remove category')} style={{ background:'none', border:'none', color:'#75604B', cursor:'pointer', fontSize:'1.25rem' }}>×</button>
+            <span style={{ flex:1, fontSize:'0.9375rem', color:'#F2EEE6' }}>{categoryLabel(c.label)}</span>
+            <button onClick={()=>remove(c.id)} title={L('Fjern kategori', 'Remove category')} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'1.25rem' }}>×</button>
           </div>
         ))}
       </div>
@@ -148,7 +150,11 @@ export function CategoriesPage({ onToast }) {
 
 // ── PrivacyPage ───────────────────────────────────────────────────────────────
 // Fyll inn når selskapet er registrert; da vises navn og org.nr. som behandlingsansvarlig.
-const COMPANY = { name: '', orgnr: '' }
+// Verifisert 19.11.2026 mot Enhetsregisteret (data.brreg.no/enhetsregisteret/api/enheter/938816085):
+// ARVKLART AS, aksjeselskap, registrert i Enhets- og Foretaksregisteret 05.11.2026, stiftet 02.11.2026,
+// Tertnesgrenden 13, 5113 Tertnes (Bergen). Ikke konkurs, ikke under avvikling.
+// Samme opplysninger står i bunnteksten på de offentlige sidene (src/site/SiteLayout.jsx).
+const COMPANY = { name: 'Arvklart AS', orgnr: '938 816 085' }
 
 export function PrivacyPage() {
   const [tab, setTab] = useState(() => window.location.hash === '#vilkar' ? 'terms' : 'privacy')
@@ -161,28 +167,28 @@ export function PrivacyPage() {
   useEffect(() => {
     if (window.location.hash === '#informasjonskapsler') document.getElementById('informasjonskapsler')?.scrollIntoView()
   }, [])
-  const s = { fontFamily: 'Karla, sans-serif', maxWidth: '720px', margin: '0 auto', padding: '40px 20px 80px', color: '#3A2F26', lineHeight: '1.8' }
-  const h2s = { fontFamily: 'Fraunces, serif', fontSize: '1.25rem', fontWeight: '400', marginTop: '32px', marginBottom: '8px', color: '#3A2F26' }
-  const ps = { fontSize: '0.9375rem', color: '#5C4530', marginBottom: '12px' }
-  const lis = { fontSize: '0.9375rem', color: '#5C4530', marginBottom: '6px' }
+  const s = { fontFamily: 'Karla, sans-serif', maxWidth: '720px', margin: '0 auto', padding: '40px 20px 80px', color: '#1F2326', lineHeight: '1.8' }
+  const h2s = { fontFamily: 'Fraunces, serif', fontSize: '1.25rem', fontWeight: '400', marginTop: '32px', marginBottom: '8px', color: '#1F2326' }
+  const ps = { fontSize: '0.9375rem', color: '#1F2326', marginBottom: '12px' }
+  const lis = { fontSize: '0.9375rem', color: '#1F2326', marginBottom: '6px' }
   return (
     <div style={s}>
-      <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: '400', color: '#3A2F26', marginBottom: '6px' }}>{L('Juridisk', 'Legal')}</h1>
-      <p style={{ color: '#75604B', fontSize: '0.875rem', marginBottom: '28px' }}>{L(`Sist oppdatert: ${updatedText()}`, `Last updated: ${updatedText()}`)}</p>
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '32px', borderBottom: '1px solid #E8DFD0', paddingBottom: '16px' }}>
+      <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: '400', color: '#1F2326', marginBottom: '6px' }}>{L('Juridisk', 'Legal')}</h1>
+      <p style={{ color: '#575B5E', fontSize: '0.875rem', marginBottom: '28px' }}>{L(`Sist oppdatert: ${updatedText()}`, `Last updated: ${updatedText()}`)}</p>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '32px', borderBottom: '1px solid #CFC8BA', paddingBottom: '16px' }}>
         {[['privacy', L('Personvernerklæring', 'Privacy policy')], ['terms', L('Vilkår for bruk', 'Terms of use')]].map(([key, label]) => (
-          <button key={key} onClick={() => switchTab(key)} style={{ padding: '8px 18px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'Karla, sans-serif', fontSize: '0.875rem', background: tab === key ? '#3A2F26' : '#E8DFD0', color: tab === key ? '#FBF9F5' : '#5C4530' }}>{label}</button>
+          <button key={key} onClick={() => switchTab(key)} style={{ padding: '8px 18px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontFamily: 'Karla, sans-serif', fontSize: '0.875rem', background: tab === key ? '#2F4A43' : '#EAE5DA', color: tab === key ? '#F5F2EB' : '#1F2326' }}>{label}</button>
         ))}
       </div>
 
       {isEn() && (
-        <p style={{ ...ps, fontSize: '0.8125rem', color: '#75604B' }}>This is an English translation. If the Norwegian and English versions differ, the Norwegian version applies.</p>
+        <p style={{ ...ps, fontSize: '0.8125rem', color: '#575B5E' }}>This is an English translation. If the Norwegian and English versions differ, the Norwegian version applies.</p>
       )}
 
       {tab === 'privacy' && (
         <div>
           <p style={ps}>{L('Denne personvernerklæringen beskriver hvordan ArvKlart («vi», «oss», «tjenesten») behandler personopplysninger om deg som bruker.', 'This privacy policy describes how ArvKlart (“we”, “us”, “the service”) processes personal data about you as a user.')}</p>
-          <p style={{ ...ps, background: '#DCE3D2', border: '1px solid #B8C8A8', borderRadius: '8px', padding: '12px 16px' }}>
+          <p style={{ ...ps, background: '#EAE5DA', border: '1px solid #CFC8BA', borderRadius: '8px', padding: '12px 16px' }}>
             <strong>{L('Behandlingsansvarlig:', 'Data controller:')}</strong> {COMPANY.name ? `${COMPANY.name}${COMPANY.orgnr ? `, ${L('org.nr.', 'org. no.')} ${COMPANY.orgnr}` : ''}` : 'ArvKlart'} · {L('kontakt', 'contact')}: admin@arvklart.no
           </p>
           <h2 style={h2s}>{L('Hva vi samler inn', 'What we collect')}</h2>
@@ -206,22 +212,22 @@ export function PrivacyPage() {
             <li style={lis}><strong>Supabase Inc. (USA)</strong> — {L('database, fillagring og innlogging. Behandler data på våre vegne etter Supabases databehandleravtale, som er en del av Supabases tjenestevilkår. Databasen og filene lagres i EU (Frankfurt, AWS eu-central-1).', 'database, file storage and login. Processes data on our behalf under Supabase\'s data processing agreement, which is part of Supabase\'s terms of service. The database and files are stored in the EU (Frankfurt, AWS eu-central-1).')}</li>
             <li style={lis}><strong>Vercel Inc. (USA)</strong> — {L('levering av nettsiden (hosting). Vercel mottar tekniske opplysninger som IP-adresse når du åpner appen.', 'delivery of the website (hosting). Vercel receives technical information such as your IP address when you open the app.')}</li>
             <li style={lis}><strong>Google Ireland Limited</strong> — {L('statistikk med Google Analytics på de offentlige sidene, bare når du har godtatt det. Se «Informasjonskapsler og statistikk».', 'statistics with Google Analytics on the public pages, only when you have accepted it. See «Cookies and statistics».')}</li>
-            <li style={lis}><strong>Anthropic PBC (USA)</strong> — {L('AI-analyse av bilder og verdiestimat, bare når du har samtykket. Bildene og beskrivelsen sendes, men ikke navnet eller e-posten din. Anthropic bruker som standard ikke data fra API-et til å trene modeller. Dataene slettes som hovedregel innen 30 dager, men kan oppbevares lenger ved mistanke om brudd på bruksvilkårene eller når loven krever det. Se', 'AI analysis of photos and value estimates, only when you have consented. The photos and description are sent, but not your name or email. By default, Anthropic does not use data from the API to train models. As a rule the data is deleted within 30 days, but it may be kept longer if a breach of the usage policy is suspected or the law requires it. See')} <a href="https://www.anthropic.com/privacy" target="_blank" rel="noreferrer" style={{ color: '#5F6E52' }}>{L('Anthropics personvernerklæring', "Anthropic's privacy policy")}</a>.</li>
+            <li style={lis}><strong>Anthropic PBC (USA)</strong> — {L('AI-analyse av bilder og verdiestimat, bare når du har samtykket. Bildene og beskrivelsen sendes, men ikke navnet eller e-posten din. Anthropic bruker som standard ikke data fra API-et til å trene modeller. Dataene slettes som hovedregel innen 30 dager, men kan oppbevares lenger ved mistanke om brudd på bruksvilkårene eller når loven krever det. Se', 'AI analysis of photos and value estimates, only when you have consented. The photos and description are sent, but not your name or email. By default, Anthropic does not use data from the API to train models. As a rule the data is deleted within 30 days, but it may be kept longer if a breach of the usage policy is suspected or the law requires it. See')} <a href="https://www.anthropic.com/privacy" target="_blank" rel="noreferrer" style={{ color: '#2F4A43' }}>{L('Anthropics personvernerklæring', "Anthropic's privacy policy")}</a>.</li>
           </ul>
           <h2 style={h2s} id="informasjonskapsler">{L('Informasjonskapsler og statistikk', 'Cookies and statistics')}</h2>
           <p style={ps}>{L('Arvklart lagrer bare det som trengs for at tjenesten skal virke slik du ber om, i nettleseren din: innloggingen, språk, tekststørrelse, samtykke til AI og påbegynte tekster. Dette krever ikke samtykke.', 'Arvklart only stores what is needed for the service to work as you request, in your browser: your login, language, text size, consent to AI and unfinished texts. This does not require consent.')}</p>
-          <p style={ps}>{L('Bare hvis du godtar, bruker vi Google Analytics 4 (via Google Tag Manager) til statistikk på de offentlige sidene: forsiden, kontakt, personvern og veiviseren. Appen, boene, innloggingen og demoen måles aldri, og vi sender ikke navn, e-post eller innhold fra boene. Google lagrer informasjonskapslene _ga og _ga_<id> i opptil to år og mottar opplysninger om besøket (sidene du ser, omtrentlig sted, nettleser og enhet). Google Analytics 4 lagrer ikke IP-adressen. Opplysningene kan overføres til USA etter EU–US Data Privacy Framework. Du kan når som helst endre valget her; trekker du samtykket tilbake, slettes informasjonskapslene.', 'Only if you accept, we use Google Analytics 4 (via Google Tag Manager) for statistics on the public pages: the home page, contact, privacy and the guide. The app, the estates, login and the demo are never measured, and we do not send names, email or estate content. Google stores the cookies _ga and _ga_<id> for up to two years and receives information about the visit (the pages you view, approximate location, browser and device). Google Analytics 4 does not store the IP address. The information may be transferred to the USA under the EU–US Data Privacy Framework. You can change your choice here at any time; if you withdraw your consent, the cookies are deleted.')}</p>
+          <p style={ps}>{L('Bare hvis du godtar, bruker vi Google Analytics 4 (via Google Tag Manager) til statistikk på de offentlige sidene: forsiden, «Slik fungerer det», «Om oss», kontakt, personvern, veiviseren og guidene. Appen, boene, innloggingen og demoen måles aldri, og vi sender ikke navn, e-post eller innhold fra boene. Google lagrer informasjonskapslene _ga og _ga_<id> i opptil to år og mottar opplysninger om besøket (sidene du ser, omtrentlig sted, nettleser og enhet). Google Analytics 4 lagrer ikke IP-adressen. Opplysningene kan overføres til USA etter EU–US Data Privacy Framework. Du kan når som helst endre valget her; trekker du samtykket tilbake, slettes informasjonskapslene.', 'Only if you accept, we use Google Analytics 4 (via Google Tag Manager) for statistics on the public pages: the home page, «How it works», «About us», contact, privacy, the guide and the articles. The app, the estates, login and the demo are never measured, and we do not send names, email or estate content. Google stores the cookies _ga and _ga_<id> for up to two years and receives information about the visit (the pages you view, approximate location, browser and device). Google Analytics 4 does not store the IP address. The information may be transferred to the USA under the EU–US Data Privacy Framework. You can change your choice here at any time; if you withdraw your consent, the cookies are deleted.')}</p>
           <ConsentSettings />
           <h2 style={h2s}>{L('Lagringstid', 'Retention period')}</h2>
           <p style={ps}>{L('Opplysninger lagres så lenge kontoen er aktiv. Ved kontosletting slettes personopplysningene dine fra tjenesten med en gang, og fra sikkerhetskopiene når disse utløper, med unntak av det vi er rettslig forpliktet til å oppbevare. Profilen din, ønskene dine med begrunnelse, «nei takk», kommentarene og tilbakemeldingene dine og medlemskapene dine slettes. Bo der du er eneste medlem, slettes helt med bilder og dokumenter, også om andre personer uten konto står på listen der. Bo du deler med andre, beholdes for dem: gjenstander, bilder og dokumenter du har lagt inn, blir værende som boets innhold. Navnet ditt fjernes fra det du har lagt inn, og verdiforslagene, stemmene og rettelsene dine blir stående uten navnet ditt. Står du på listen over personer i boet, blir det administratoren har registrert om deg der (navn, e-post, relasjon og andel) stående, sammen med det som er registrert om fordelingen (tildelinger, godkjenninger og eventuelle begrunnelser), til boet slettes. Var du eneste administrator, overtar det medlemmet som har vært lengst med. Bruken av AI registreres bare som antall og kostnad (uten bilder eller tekst) og slettes sammen med kontoen. Et avsluttet bo med bilder og dokumenter oppbevares til det slettes. Det finnes ingen automatisk sletting. Administratoren kan be oss slette boet (admin@arvklart.no); vi kontrollerer at forespørselen kommer fra en administrator av boet før noe slettes. Slettingen gjelder hele boet for alle medlemmer og kan ikke angres.', 'Data is stored for as long as the account is active. When you delete your account, your personal data is deleted from the service immediately, and from the backups when they expire, except what we are legally obliged to keep. Your profile, your wishes with reasons, «no thanks», your comments and feedback and your memberships are deleted. Estates where you are the only member are deleted completely with photos and documents, even if other people without an account are on the list there. Estates you share with others are kept for them: items, photos and documents you added remain as the estate\'s content. Your name is removed from what you added, and your value suggestions, votes and corrections remain without your name. If you are on the list of people in the estate, what the administrator registered about you there (name, email, relationship and share) remains, together with what has been registered about the distribution (assignments, approvals and any reasons given), until the estate is deleted. If you were the only administrator, the member who has been in the estate the longest takes over. AI usage is recorded only as counts and cost (without photos or text) and is deleted with the account. A closed estate with its photos and documents is kept until it is deleted. There is no automatic deletion. The administrator can ask us to delete the estate (admin@arvklart.no); we check that the request comes from an administrator of the estate before anything is deleted. The deletion applies to the whole estate for all members and cannot be undone.')}</p>
           <h2 style={h2s}>{L('Dine rettigheter', 'Your rights')}</h2>
-          <p style={ps}>{L('Du har rett til innsyn, retting, sletting, dataportabilitet og å protestere mot behandlingen. I «Min konto» kan du laste ned opplysningene dine som PDF og slette kontoen. For annet, også en maskinlesbar kopi, kontakt oss på admin@arvklart.no. Du kan klage til', 'You have the right to access, rectification, erasure, data portability and to object to the processing. In «My account» you can download your data as a PDF and delete your account. For anything else, including a machine-readable copy, contact us at admin@arvklart.no. You can complain to')} <a href="https://www.datatilsynet.no" target="_blank" rel="noreferrer" style={{ color: '#5F6E52' }}>{L('Datatilsynet', 'Datatilsynet (the Norwegian Data Protection Authority)')}</a>.</p>
+          <p style={ps}>{L('Du har rett til innsyn, retting, sletting, dataportabilitet og å protestere mot behandlingen. I «Min konto» kan du laste ned opplysningene dine som PDF og slette kontoen. For annet, også en maskinlesbar kopi, kontakt oss på admin@arvklart.no. Du kan klage til', 'You have the right to access, rectification, erasure, data portability and to object to the processing. In «My account» you can download your data as a PDF and delete your account. For anything else, including a machine-readable copy, contact us at admin@arvklart.no. You can complain to')} <a href="https://www.datatilsynet.no" target="_blank" rel="noreferrer" style={{ color: '#2F4A43' }}>{L('Datatilsynet', 'Datatilsynet (the Norwegian Data Protection Authority)')}</a>.</p>
           <h2 style={h2s}>{L('Sikkerhet', 'Security')}</h2>
           <p style={ps}>{L('All kommunikasjon er TLS-kryptert. Data er kryptert i ro. Tilgang til produksjonsdata er begrenset til autorisert personell.', 'All communication is TLS encrypted. Data is encrypted at rest. Access to production data is limited to authorised personnel.')}</p>
           <h2 style={h2s}>{L('Endringer', 'Changes')}</h2>
           <p style={ps}>{L('Vi informerer om vesentlige endringer før de trer i kraft.', 'We inform you of material changes before they take effect.')}</p>
           <h2 style={h2s}>{L('Kontakt', 'Contact')}</h2>
-          <p style={ps}><a href="mailto:admin@arvklart.no" style={{ color: '#5F6E52' }}>admin@arvklart.no</a></p>
+          <p style={ps}><a href="mailto:admin@arvklart.no" style={{ color: '#2F4A43' }}>admin@arvklart.no</a></p>
         </div>
       )}
 
@@ -245,7 +251,7 @@ export function PrivacyPage() {
           <h2 style={h2s}>{L('Gjeldende lov', 'Governing law')}</h2>
           <p style={ps}>{L('Norsk lov gjelder. Tvister søkes løst i minnelighet; ellers ved Oslo tingrett.', 'Norwegian law applies. Disputes shall be resolved amicably if possible; otherwise by Oslo District Court.')}</p>
           <h2 style={h2s}>{L('Kontakt', 'Contact')}</h2>
-          <p style={ps}><a href="mailto:admin@arvklart.no" style={{ color: '#5F6E52' }}>admin@arvklart.no</a></p>
+          <p style={ps}><a href="mailto:admin@arvklart.no" style={{ color: '#2F4A43' }}>admin@arvklart.no</a></p>
         </div>
       )}
     </div>
@@ -315,68 +321,69 @@ export function AccountPage({ session, onToast }) {
 
   return (
     <div style={{ maxWidth: '560px', margin: '0 auto', padding: '40px 20px', fontFamily: 'Karla, sans-serif' }}>
-      <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.625rem', fontWeight: '400', color: '#3A2F26', marginBottom: '6px' }}>{L('Min konto', 'My account')}</h1>
-      <p style={{ color: '#75604B', fontSize: '0.875rem', marginBottom: '32px' }}>{session.user.email}</p>
+      <Overline>{L('Konto', 'Account')}</Overline>
+      <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight: '400', color: '#F2EEE6', marginBottom: '6px' }}>{L('Min konto', 'My account')}</h1>
+      <p style={{ color: '#B9B4A8', fontSize: '0.875rem', marginBottom: '32px' }}>{session.user.email}</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-        <div style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.0625rem', fontWeight: '400', color: '#3A2F26', marginBottom: '12px' }}>{L('Visning', 'Display')}</h2>
+        <div style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '24px' }}>
+          <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#F2EEE6', marginBottom: '12px' }}>{L('Visning', 'Display')}</h2>
           <TextSizeControl />
-          <p style={{ fontSize: '0.8125rem', color: '#75604B', marginTop: '10px', lineHeight: 1.5 }}>{L('Gjelder på denne enheten. Teksten følger også tekststørrelsen du har valgt på telefonen.', 'Applies on this device. The text also follows the text size you have chosen on your phone.')}</p>
+          <p style={{ fontSize: '0.8125rem', color: '#B9B4A8', marginTop: '10px', lineHeight: 1.5 }}>{L('Gjelder på denne enheten. Teksten følger også tekststørrelsen du har valgt på telefonen.', 'Applies on this device. The text also follows the text size you have chosen on your phone.')}</p>
         </div>
 
         {/* Språk per konto: følger brukeren til andre enheter. Endrer ikke det som er lagret i boet. */}
-        <fieldset style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '24px', margin: 0 }}>
-          <legend style={{ fontFamily: 'Fraunces, serif', fontSize: '1.0625rem', fontWeight: '400', color: '#3A2F26', padding: '0 4px' }}>{L('Språk', 'Language')}</legend>
+        <fieldset style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '24px', margin: 0 }}>
+          <legend style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#F2EEE6', padding: '0 4px' }}>{L('Språk', 'Language')}</legend>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
             {[['no', 'Norsk'], ['en', 'English']].map(([code, label]) => (
-              <label key={code} style={{ display: 'flex', alignItems: 'center', gap: '8px', minHeight: '44px', padding: '8px 14px', border: `2px solid ${getLang() === code ? '#3A2F26' : '#D9CFC0'}`, borderRadius: '8px', cursor: 'pointer', fontSize: '0.9375rem', color: '#3A2F26' }}>
+              <label key={code} style={{ display: 'flex', alignItems: 'center', gap: '8px', minHeight: '44px', padding: '8px 14px', border: `2px solid ${getLang() === code ? '#9DAA8C' : 'rgba(242, 238, 230, 0.14)'}`, borderRadius: '8px', cursor: 'pointer', fontSize: '0.9375rem', color: '#F2EEE6' }}>
                 <input type="radio" name="account-lang" value={code} checked={getLang() === code} lang={code === 'en' ? 'en' : 'no'}
                   onChange={() => changeLanguage(code, { userId: session.user.id, isDemo: isDemoSession(session) })} />
                 <span lang={code === 'en' ? 'en' : 'no'}>{label}</span>
               </label>
             ))}
           </div>
-          <p style={{ fontSize: '0.8125rem', color: '#75604B', marginTop: '10px', lineHeight: 1.5 }}>{L('Lagres på kontoen din og gjelder på alle enheter. Det dere har skrevet i boet, oversettes ikke.', 'Saved to your account and used on all devices. What has been written in the estate is not translated.')}</p>
+          <p style={{ fontSize: '0.8125rem', color: '#B9B4A8', marginTop: '10px', lineHeight: 1.5 }}>{L('Lagres på kontoen din og gjelder på alle enheter. Det dere har skrevet i boet, oversettes ikke.', 'Saved to your account and used on all devices. What has been written in the estate is not translated.')}</p>
         </fieldset>
 
-        <div style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.0625rem', fontWeight: '400', color: '#3A2F26', marginBottom: '6px' }}>{L('Last ned dine data', 'Download your data')}</h2>
-          <p style={{ fontSize: '0.875rem', color: '#5C4530', marginBottom: '16px', lineHeight: '1.6' }}>{L('Last ned personopplysningene vi har om deg som PDF: profil, bo du er med i, interesser, kommentarer, gjenstander og dokumenter du har lagt inn, og tilbakemeldinger.', 'Download the personal data we hold about you as a PDF: profile, estates you belong to, interests, comments, items and documents you have added, and feedback.')}</p>
-          <button onClick={exportData} disabled={exporting} style={{ padding: '10px 20px', background: '#5F6E52', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+        <div style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '24px' }}>
+          <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#F2EEE6', marginBottom: '6px' }}>{L('Last ned dine data', 'Download your data')}</h2>
+          <p style={{ fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '16px', lineHeight: '1.6' }}>{L('Last ned personopplysningene vi har om deg som PDF: profil, bo du er med i, interesser, kommentarer, gjenstander og dokumenter du har lagt inn, og tilbakemeldinger.', 'Download the personal data we hold about you as a PDF: profile, estates you belong to, interests, comments, items and documents you have added, and feedback.')}</p>
+          <button onClick={exportData} disabled={exporting} style={{ padding: '10px 20px', background: '#F2EEE6', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
             {exporting ? L('Eksporterer…', 'Exporting…') : L('Last ned mine data', 'Download my data')}
           </button>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.0625rem', fontWeight: '400', color: '#3A2F26', marginBottom: '6px' }}>{L('Samtykke til AI-analyse', 'Consent to AI analysis')}</h2>
-          <p style={{ fontSize: '0.875rem', color: '#5C4530', marginBottom: '12px', lineHeight: '1.6' }}>
+        <div style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '24px' }}>
+          <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#F2EEE6', marginBottom: '6px' }}>{L('Samtykke til AI-analyse', 'Consent to AI analysis')}</h2>
+          <p style={{ fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '12px', lineHeight: '1.6' }}>
             {aiConsent
               ? L('Du har samtykket til at bilder og beskrivelser sendes til Anthropic når du bruker AI-analyse eller verdiestimat i denne nettleseren.', 'You have consented to photos and descriptions being sent to Anthropic when you use AI analysis or value estimates in this browser.')
               : L('Du har ikke gitt samtykke til AI-analyse i denne nettleseren. Du blir spurt første gang du bruker funksjonen.', 'You have not consented to AI analysis in this browser. You will be asked the first time you use the feature.')}
           </p>
           {aiConsent && (
-            <button onClick={() => { withdrawAiConsent(); setAiConsent(false); onToast(L('Samtykket er trukket tilbake', 'Your consent has been withdrawn')) }} style={{ padding: '9px 18px', background: 'none', border: '1px solid #D9CFC0', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', color: '#5C4530' }}>{L('Trekk tilbake samtykket', 'Withdraw consent')}</button>
+            <button onClick={() => { withdrawAiConsent(); setAiConsent(false); onToast(L('Samtykket er trukket tilbake', 'Your consent has been withdrawn')) }} style={{ padding: '9px 18px', background: 'none', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', color: '#F2EEE6' }}>{L('Trekk tilbake samtykket', 'Withdraw consent')}</button>
           )}
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #D9CFC0', borderRadius: '12px', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.0625rem', fontWeight: '400', color: '#3A2F26', marginBottom: '6px' }}>{L('Personvern og vilkår', 'Privacy and terms')}</h2>
-          <p style={{ fontSize: '0.875rem', color: '#5C4530', marginBottom: '12px', lineHeight: '1.6' }}>{L('Les vår personvernerklæring og vilkår for bruk av tjenesten.', 'Read our privacy policy and terms of use for the service.')}</p>
-          <a href="/personvern" style={{ fontSize: '0.875rem', color: '#5F6E52' }}>{L('Åpne personvernerklæring →', 'Open privacy policy →')}</a>
+        <div style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '24px' }}>
+          <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#F2EEE6', marginBottom: '6px' }}>{L('Personvern og vilkår', 'Privacy and terms')}</h2>
+          <p style={{ fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '12px', lineHeight: '1.6' }}>{L('Les vår personvernerklæring og vilkår for bruk av tjenesten.', 'Read our privacy policy and terms of use for the service.')}</p>
+          <a href="/personvern" style={{ fontSize: '0.875rem', color: '#9DAA8C' }}>{L('Åpne personvernerklæring →', 'Open privacy policy →')}</a>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #F0D4D4', borderRadius: '12px', padding: '24px' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.0625rem', fontWeight: '400', color: '#8B3A3A', marginBottom: '6px' }}>{L('Slett konto', 'Delete account')}</h2>
-          <p style={{ fontSize: '0.875rem', color: '#5C4530', marginBottom: '16px', lineHeight: '1.6' }}>{L('Sletter kontoen og personopplysningene dine permanent. Bo der du er eneste medlem, slettes med bilder og dokumenter. Bo du deler med andre, beholdes for dem: ønskene, kommentarene og profilen din slettes, mens gjenstander, bilder og dokumenter du har lagt inn, blir værende uten navnet ditt, og verdiforslagene og stemmene dine blir stående uten navnet ditt. Står du på listen over personer i boet, blir det som er registrert om deg der (navn, e-post, relasjon og andel) og om fordelingen (tildelinger og godkjenninger) stående til boet slettes. Er du eneste administrator, overtar den som har vært lengst med.', 'Permanently deletes your account and your personal data. Estates where you are the only member are deleted with photos and documents. Estates you share with others are kept for them: your wishes, comments and profile are deleted, while items, photos and documents you added remain without your name, and your value suggestions and votes remain without your name. If you are on the list of people in the estate, what is registered about you there (name, email, relationship and share) and about the distribution (assignments and approvals) remains until the estate is deleted. If you are the only administrator, the member who has been there longest takes over.')}</p>
+        <div style={{ background: '#272A25', border: '1px solid #E08A7A', borderRadius: '12px', padding: '24px' }}>
+          <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#E08A7A', marginBottom: '6px' }}>{L('Slett konto', 'Delete account')}</h2>
+          <p style={{ fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '16px', lineHeight: '1.6' }}>{L('Sletter kontoen og personopplysningene dine permanent. Bo der du er eneste medlem, slettes med bilder og dokumenter. Bo du deler med andre, beholdes for dem: ønskene, kommentarene og profilen din slettes, mens gjenstander, bilder og dokumenter du har lagt inn, blir værende uten navnet ditt, og verdiforslagene og stemmene dine blir stående uten navnet ditt. Står du på listen over personer i boet, blir det som er registrert om deg der (navn, e-post, relasjon og andel) og om fordelingen (tildelinger og godkjenninger) stående til boet slettes. Er du eneste administrator, overtar den som har vært lengst med.', 'Permanently deletes your account and your personal data. Estates where you are the only member are deleted with photos and documents. Estates you share with others are kept for them: your wishes, comments and profile are deleted, while items, photos and documents you added remain without your name, and your value suggestions and votes remain without your name. If you are on the list of people in the estate, what is registered about you there (name, email, relationship and share) and about the distribution (assignments and approvals) remains until the estate is deleted. If you are the only administrator, the member who has been there longest takes over.')}</p>
           {!confirmDelete ? (
-            <button onClick={() => setConfirmDelete(true)} style={{ padding: '10px 20px', background: 'none', border: '1px solid #8B3A3A', color: '#8B3A3A', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>{L('Slett min konto', 'Delete my account')}</button>
+            <button onClick={() => setConfirmDelete(true)} style={{ padding: '10px 20px', background: 'none', border: '1px solid #E08A7A', color: '#E08A7A', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>{L('Slett min konto', 'Delete my account')}</button>
           ) : (
             <div>
-              <p style={{ fontSize: '0.875rem', color: '#8B3A3A', marginBottom: '12px', fontWeight: '500' }}>{L('Er du helt sikker? Dette kan ikke angres.', 'Are you absolutely sure? This cannot be undone.')}</p>
+              <p style={{ fontSize: '0.875rem', color: '#E08A7A', marginBottom: '12px', fontWeight: '500' }}>{L('Er du helt sikker? Dette kan ikke angres.', 'Are you absolutely sure? This cannot be undone.')}</p>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: '10px', background: 'none', border: '1px solid #D9CFC0', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', color: '#5C4530' }}>{L('Avbryt', 'Cancel')}</button>
-                <button onClick={deleteAccount} disabled={deleting} style={{ flex: 1, padding: '10px', background: '#8B3A3A', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+                <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: '10px', background: 'none', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', color: '#F2EEE6' }}>{L('Avbryt', 'Cancel')}</button>
+                <button onClick={deleteAccount} disabled={deleting} style={{ flex: 1, padding: '10px', background: '#E08A7A', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
                   {deleting ? L('Sletter…', 'Deleting…') : L('Ja, slett permanent', 'Yes, delete permanently')}
                 </button>
               </div>

@@ -10,6 +10,8 @@ import FounderGate from './components/FounderGate'
 import GuidePage, { VeiviserHostGuard } from './pages/GuidePage'
 import { JoinPage, CategoriesPage, PrivacyPage, AccountPage } from './pages/OtherPages'
 import ContactPage from './pages/ContactPage'
+import HowItWorksPage from './pages/HowItWorksPage'
+import AboutPage from './pages/AboutPage'
 import ArticlePage from './pages/ArticlePage'
 import { getPendingSave, clearPendingSave } from './lib/wizardEstate'
 import { clearAllReasonDrafts } from './lib/reasonDraft'
@@ -21,9 +23,10 @@ import { L } from './lib/lang'
 import RouteMeta from './seo/RouteMeta'
 import { APP_HOME, HOME, LANDING_STATE } from './lib/routes'
 import AnalyticsConsent from './components/AnalyticsConsent'
+import { isLightAppPath, appDarkCss } from './lib/estateTheme'
 // Den innloggede appen lastes ved behov; offentlige sider over er i hovedfilen (forhåndsrendres og hydreres)
 import {
-  ProfileSetupPage, EstatesPage, EstatePage, ItemDetailPage, AddItemPage, AddItemsPage, SwipePage, EditItemPage, AdminPage,
+  ProfileSetupPage, EstatesPage, EstatePage, EstateItemsPage, ItemDetailPage, AddItemPage, AddItemsPage, SwipePage, EditItemPage, AdminPage,
   FounderPage, TasksPage, DocumentVaultPage, HeirsPage, GoodwillPage, ConflictPage, UnwantedPage, DistributionPage, StatusPage,
   preloadAppPages,
 } from './appPages'
@@ -133,7 +136,7 @@ export default function App({ prerendered = false }) {
           .select('estate_id').eq('user_id', user.id).limit(1).maybeSingle()
         if (cancelled) return
         setDemoEstateId(membership?.estate_id || null)
-        // Rett fra «Test ut demo» på forsiden og inn i demo-boet
+        // Rett fra «Prøv demo» på forsiden og inn i demo-boet
         if (membership?.estate_id && [HOME, APP_HOME].includes(window.location.pathname)) navigate(`/estate/${membership.estate_id}`)
         return
       }
@@ -168,6 +171,8 @@ export default function App({ prerendered = false }) {
           <Route path="/join/:code" element={<JoinPage onToast={showToast} />} />
           <Route path="/personvern" element={<PrivacyPage />} />
           <Route path="/kontakt" element={<ContactPage />} />
+          <Route path="/slik-fungerer-det" element={<HowItWorksPage />} />
+          <Route path="/om-oss" element={<AboutPage />} />
           <Route path="/veiviser" element={<GuidePage standalone onToast={showToast} />} />
           {/* Guidene (content/guider/*.md): forhåndsrendret; ukjente og utkast gir 404 fra Vercel */}
           <Route path="/guider/:slug" element={<ArticlePage />} />
@@ -184,15 +189,17 @@ export default function App({ prerendered = false }) {
 
   return (
     <PlanProvider session={session}>
-      {/* app-shell: på /veiviser står veiviseren under appen i siden, og høyden følger da innholdet (veiviserHost.js) */}
-      <div className="app-shell" style={{ minHeight: '100vh', background: '#FBF9F5' }}>
+      {/* app-shell: på /veiviser står veiviseren under appen i siden, og høyden følger da innholdet (veiviserHost.js).
+          Appen er mørk (estateTheme.js), unntatt sidene som også vises for utloggede og har et lyst oppsett. */}
+      <style>{appDarkCss}</style>
+      <div className={isLightAppPath(pathname) ? 'app-shell' : 'app-shell app-mork'} style={{ minHeight: '100vh', background: isLightAppPath(pathname) ? '#F5F2EB' : undefined }}>
         <RouteMeta />
         <VeiviserHostGuard />
         {/* Innlogget: aldri statistikk; lastet fra en offentlig side, lastes siden på nytt uten */}
         <AnalyticsConsent loggedIn />
         <TopBar profile={profile} session={session} onToast={showToast} />
         {isDemo && (
-          <div style={{ background: '#DCE3D2', borderBottom: '1px solid #B8C8A8', padding: '8px 20px', textAlign: 'center', fontSize: '0.8125rem', color: '#3A5A30', fontFamily: 'Karla, sans-serif' }}>
+          <div style={{ background: '#2F4A43', padding: '8px 20px', textAlign: 'center', fontSize: '0.8125rem', color: '#F2EEE6', fontFamily: 'Karla, sans-serif' }}>
             {/* Alle besøkende deler demoen (samme konto og bo), og den nullstilles når noen åpner den */}
             {L('Du ser på en', 'You are viewing a')} <strong>demo</strong> {L('av Fam. Hansen sitt bo. Du er Mona, en av tre arvinger og administrator; Kari og Lars har allerede svart. Dette er et offentlig eksempelbo. Ikke skriv personopplysninger. Endringer kan bli nullstilt når andre prøver demoen.', 'of the Hansen family estate. You are Mona, one of three heirs and the administrator; Kari and Lars have already answered. This is a public example estate. Do not enter personal information. Changes may be reset when others try the demo.')}
           </div>
@@ -207,7 +214,11 @@ export default function App({ prerendered = false }) {
           <Route path={HOME} element={<LoggedInRoot onToast={showToast} />} />
           <Route path={APP_HOME} element={isDemo ? demoHome : <EstatesPage {...p} />} />
           <Route path="/home" element={<Navigate to={HOME} replace state={LANDING_STATE} />} />
-          <Route path="/kontakt" element={<ContactPage />} />
+          {/* Offentlige sider er åpne også for innloggede. Da ligger menyen i TopBar, så sidens
+              egen header er skjult (loggedIn) og demoknappen går til «Mine bo». */}
+          <Route path="/kontakt" element={<ContactPage loggedIn />} />
+          <Route path="/slik-fungerer-det" element={<HowItWorksPage loggedIn />} />
+          <Route path="/om-oss" element={<AboutPage loggedIn />} />
           <Route path="/guider/:slug" element={<ArticlePage />} />
           <Route path="/setup" element={notForDemo(<ProfileSetupPage session={session} profile={profile} onSaved={(saved) => {
             const first = !profile?.display_name
@@ -216,6 +227,7 @@ export default function App({ prerendered = false }) {
             else navigate(APP_HOME)
           }} onToast={showToast} />)} />
           <Route path="/estate/:id" element={<EstatePage {...p} />} />
+          <Route path="/estate/:id/gjenstander" element={<EstateItemsPage {...p} />} />
           <Route path="/estate/:id/item/:itemId" element={<ItemDetailPage {...p} />} />
           <Route path="/estate/:id/swipe" element={<SwipePage {...p} />} />
           <Route path="/estate/:id/item/:itemId/edit" element={notForDemo(<EditItemPage {...p} />)} />
@@ -256,7 +268,7 @@ function LoggedInRoot({ onToast }) {
 
 function Splash() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FBF9F5', fontFamily: "'Fraunces', serif", color: '#75604B', fontSize: '1.25rem', gap: '12px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F2EB', fontFamily: "'Fraunces', serif", color: '#575B5E', fontSize: '1.25rem', gap: '12px' }}>
       Arvklart
     </div>
   )

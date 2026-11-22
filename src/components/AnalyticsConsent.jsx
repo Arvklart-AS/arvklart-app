@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { L } from '../lib/lang'
-import { CONSENT_EVENT, canLoadAnalytics, getConsent, hasAuthInUrl, isGtmLoaded, loadGtm, setConsent } from '../lib/analytics'
+import { CONSENT_EVENT, canLoadAnalytics, clearAnalyticsCookies, getConsent, hasAuthInUrl, isGtmLoaded, loadGtm, setConsent } from '../lib/analytics'
 // Registeret over offentlige sider: markedssidene og alle publiserte guider (aldri utkast eller app-sider)
 import { pageFor } from '../seo/registry'
 
@@ -25,22 +25,28 @@ export default function AnalyticsConsent({ loggedIn }) {
   useEffect(() => {
     if (consent === undefined) return
     const allowed = canLoadAnalytics({ consent, page: pageFor(pathname), loggedIn, authInUrl: hasAuthInUrl() })
-    if (allowed) loadGtm()
-    else if (isGtmLoaded()) window.location.reload()
+    if (allowed) { loadGtm(); return }
+    // Avslått: fei bort informasjonskapsler som kan ha rukket å bli skrevet rett før GTM fikk
+    // beskjed, eller av en måling som allerede var på vei. Da er tilbaketrekkingen uavhengig av
+    // timing, i stedet for å virke «som regel».
+    if (consent === 'denied') clearAnalyticsCookies()
+    if (isGtmLoaded()) window.location.reload()
   }, [consent, pathname, loggedIn])
 
   if (consent !== null || loggedIn || !pageFor(pathname)) return null
   return (
-    <section aria-label={L('Informasjonskapsler', 'Cookies')} style={{
-      position: 'fixed', left: '16px', right: '16px', bottom: '16px', zIndex: 10000, maxWidth: '440px',
+    // Plasseringen (fixed, side og bunn) ligger i index.html under «.consent-ask», så den kan
+    // tilpasses skjermbredden og de faste knappene på de offentlige sidene. Logikken og de to like
+    // tydelige valgene er uendret.
+    <section className="consent-ask" aria-label={L('Informasjonskapsler', 'Cookies')} style={{
       background: '#FBF9F5', color: '#3A2F26', border: '1px solid #D9CFC0', borderRadius: '12px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '18px 20px', fontFamily: 'Karla, sans-serif',
     }}>
       <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 400, fontSize: '1.125rem', marginBottom: '8px' }}>{L('Tillater du statistikk?', 'Do you allow statistics?')}</h2>
       <p style={{ fontSize: '0.875rem', lineHeight: 1.55, color: '#5C4530', marginBottom: '14px' }}>
         {L(
-          'Med samtykket ditt bruker vi Google Analytics til å se hvordan forsiden og veiviseren brukes. Det lagrer informasjonskapsler og sender opplysninger om besøket til Google. Appen og boene måles aldri.',
-          'With your consent, we use Google Analytics to see how the home page and the guide are used. This stores cookies and sends information about the visit to Google. The app and the estates are never measured.',
+          'Med samtykket ditt bruker vi Google Analytics til å se hvordan de offentlige sidene brukes. Det lagrer informasjonskapsler og sender opplysninger om besøket til Google. Appen og boene måles aldri.',
+          'With your consent, we use Google Analytics to see how the public pages are used. This stores cookies and sends information about the visit to Google. The app and the estates are never measured.',
         )}{' '}
         <a href="/personvern#informasjonskapsler" style={{ color: '#5F6E52' }}>{L('Les mer', 'Read more')}</a>
       </p>

@@ -9,6 +9,10 @@ import {
 import { L, isEn } from '../lib/lang'
 import { HOME, LANDING_STATE } from '../lib/routes'
 import { usePageData } from '../seo/pageData'
+// Samme header som de andre offentlige sidene — komponenten deles, den kopieres ikke
+import { SiteHeader } from '../site/SiteLayout'
+import { useHydrated } from '../site/useHydrated'
+import useDemo from '../site/useDemo'
 
 // Hindrer at en ventende lagring kjøres to ganger hvis siden monteres på nytt underveis
 let processingPending = false
@@ -50,6 +54,9 @@ export default function GuidePage({ standalone = false, session = null, onToast 
   const { id } = useParams()
   const { pathname } = useLocation()
   const pageData = usePageData()
+  const hydrated = useHydrated()
+  // Demoinngangen i headeren er den samme som på de andre offentlige sidene (src/site/useDemo.js)
+  const demo = useDemo({ loggedIn: Boolean(session) })
   // Veiviseren ligger i siden (se over): bare /veiviser lastet fra serveren, og ikke engelsk veiviser (den er i rammen)
   const inline = !id && pageData?.kind === 'veiviser' && pageData.path === pathname && !(isEn() && GUIDE_EN)
     && (typeof document === 'undefined' || Boolean(hostEl()))
@@ -231,15 +238,21 @@ export default function GuidePage({ standalone = false, session = null, onToast 
     await saveInto(estate.id, estate.name)
   }
 
-  const bar = (
-      <div style={{ padding: '12px 20px', background: '#FBF9F5', borderBottom: '1px solid #D9CFC0', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button onClick={goBack} style={{ background: 'none', border: 'none', color: '#75604B', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
-          {id ? L('← Tilbake til boet', '← Back to the estate') : L('← Tilbake til hjemmesiden', '← Back to the home page')}
-        </button>
-        {busy && <span style={{ fontSize: '0.8125rem', color: '#5F6E52', fontFamily: 'Karla, sans-serif' }}>{L('Lagrer i boet …', 'Saving to the estate …')}</span>}
-        {isEn() && !GUIDE_EN && <span style={{ fontSize: '0.8125rem', color: '#75604B', fontFamily: 'Karla, sans-serif', marginLeft: 'auto' }}>The inheritance guide follows Norwegian law and is only available in Norwegian.</span>}
+  // «Tilbake» utelått der den offentlige headeren står over: den har både logoen og menyen,
+  // og to navigasjoner over hverandre tok en tredel av første skjermbilde på mobil.
+  const visTilbake = !(inline && !session)
+  const enMerknad = isEn() && !GUIDE_EN
+  const bar = (visTilbake || busy || enMerknad) ? (
+      <div style={{ padding: '12px 20px', background: '#F5F2EB', borderBottom: '1px solid #CFC8BA', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {visTilbake && (
+          <button onClick={goBack} style={{ background: 'none', border: 'none', color: '#575B5E', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+            {id ? L('← Tilbake til boet', '← Back to the estate') : L('← Tilbake til hjemmesiden', '← Back to the home page')}
+          </button>
+        )}
+        {busy && <span style={{ fontSize: '0.8125rem', color: '#2F4A43', fontFamily: 'Karla, sans-serif' }}>{L('Lagrer i boet …', 'Saving to the estate …')}</span>}
+        {enMerknad && <span style={{ fontSize: '0.8125rem', color: '#575B5E', fontFamily: 'Karla, sans-serif', marginLeft: visTilbake ? 'auto' : 0 }}>The inheritance guide follows Norwegian law and is only available in Norwegian.</span>}
       </div>
-  )
+  ) : null
   const modals = (
     <>
       {modal?.kind === 'auth' && (
@@ -251,8 +264,28 @@ export default function GuidePage({ standalone = false, session = null, onToast 
     </>
   )
 
-  // Veiviseren står i siden under appen: bare linjen og dialogene her (linjen blir stående øverst, se veiviserHost.js)
-  if (inline) return <>{bar}{modals}</>
+  // Veiviseren står i siden under appen: headeren, linjen og dialogene her (de blir stående øverst,
+  // se veiviserHost.js, som gjør #root klebrig). Veiviserens eget innhold og adressene er urørt.
+  //
+  // Headeren er den delte komponenten fra src/site/SiteLayout.jsx. CSS-en i site.css er avgrenset til
+  // rotklassen «ak», så headeren må ligge inne i en «ak»-rot. Den dekker bare headeren, ikke veiviseren.
+  //
+  // Språkvalget er ærlig: menyen følger brukerens språk, men veiviserens innhold er norsk, og
+  // linjen under sier det på engelsk (se «bar» over). Ingen oversettelse er lovet.
+  //
+  // Innlogget ligger menyen i TopBar, som på de andre offentlige sidene, og headeren er skjult.
+  if (inline) return (
+    <>
+      {!session && (
+        <div className={`ak${hydrated ? ' ak-js' : ''}`} lang={isEn() ? 'en' : 'nb'}>
+          <a className="skip" href="#veiviser">{L('Hopp til veiviseren', 'Skip to the guide')}</a>
+          <SiteHeader demo={demo} current="/veiviser" />
+        </div>
+      )}
+      {bar}
+      {modals}
+    </>
+  )
 
   return (
     <div className={standalone ? 'guide-shell standalone' : 'guide-shell'} style={{ height: standalone ? '100vh' : 'calc(100vh - 56px)', display: 'flex', flexDirection: 'column' }}>
@@ -272,8 +305,8 @@ export default function GuidePage({ standalone = false, session = null, onToast 
 
 // ── Dialoger ─────────────────────────────────────────────────
 const font = 'Karla, sans-serif'
-const inputStyle = { width: '100%', padding: '11px 14px', border: '1px solid #9A8B78', borderRadius: '8px', fontSize: '0.9375rem', background: '#FBF9F5', color: '#3A2F26', fontFamily: font, boxSizing: 'border-box' }
-const labelStyle = { display: 'block', fontSize: '0.8125rem', color: '#5C4530', marginBottom: '6px' }
+const inputStyle = { width: '100%', padding: '11px 14px', border: '1px solid #575B5E', borderRadius: '8px', fontSize: '0.9375rem', background: '#F5F2EB', color: '#1F2326', fontFamily: font, boxSizing: 'border-box' }
+const labelStyle = { display: 'block', fontSize: '0.8125rem', color: '#1F2326', marginBottom: '6px' }
 
 function Overlay({ title, intro, onClose, children }) {
   const boxRef = useRef(null)
@@ -292,10 +325,10 @@ function Overlay({ title, intro, onClose, children }) {
       style={{ position: 'fixed', inset: 0, background: 'rgba(58,47,38,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 1000, fontFamily: font }}>
       <div ref={boxRef} tabIndex={-1} style={{ background: '#fff', borderRadius: '14px', padding: '28px', width: '100%', maxWidth: '440px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 12px 48px rgba(0,0,0,0.18)', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: '1.375rem', fontWeight: '400', color: '#3A2F26', margin: 0 }}>{title}</h2>
-          <button onClick={onClose} data-close aria-label={L('Lukk', 'Close')} style={{ background: 'none', border: 'none', fontSize: '1.375rem', lineHeight: 1, color: '#75604B', cursor: 'pointer' }}>×</button>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: '1.375rem', fontWeight: '400', color: '#1F2326', margin: 0 }}>{title}</h2>
+          <button onClick={onClose} data-close aria-label={L('Lukk', 'Close')} style={{ background: 'none', border: 'none', fontSize: '1.375rem', lineHeight: 1, color: '#575B5E', cursor: 'pointer' }}>×</button>
         </div>
-        {intro && <p style={{ fontSize: '0.875rem', color: '#75604B', lineHeight: 1.6, margin: '0 0 20px' }}>{intro}</p>}
+        {intro && <p style={{ fontSize: '0.875rem', color: '#575B5E', lineHeight: 1.6, margin: '0 0 20px' }}>{intro}</p>}
         {children}
       </div>
     </div>
@@ -304,7 +337,7 @@ function Overlay({ title, intro, onClose, children }) {
 
 function PrimaryButton({ children, disabled, onClick }) {
   return (
-    <button onClick={onClick} disabled={disabled} style={{ width: '100%', padding: '13px', background: disabled ? '#D9CFC0' : '#3A2F26', color: '#FBF9F5', border: 'none', borderRadius: '8px', cursor: disabled ? 'not-allowed' : 'pointer', fontSize: '0.9375rem', fontFamily: font }}>
+    <button onClick={onClick} disabled={disabled} style={{ width: '100%', padding: '13px', background: disabled ? '#CFC8BA' : '#2F4A43', color: '#F5F2EB', border: 'none', borderRadius: '8px', cursor: disabled ? 'not-allowed' : 'pointer', fontSize: '0.9375rem', fontFamily: font }}>
       {children}
     </button>
   )
@@ -377,14 +410,14 @@ function AuthModal({ startInLogin, request, onClose }) {
       )}
       onClose={close}>
       {info ? (
-        <p style={{ background: '#DCE3D2', color: '#3A5A30', padding: '14px', borderRadius: '8px', fontSize: '0.875rem', lineHeight: 1.6 }}>{info}</p>
+        <p style={{ background: '#EAE5DA', color: '#2F4A43', padding: '14px', borderRadius: '8px', fontSize: '0.875rem', lineHeight: 1.6 }}>{info}</p>
       ) : (
         <>
-          <div style={{ display: 'flex', background: '#E8DFD0', borderRadius: '8px', padding: '4px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', background: '#EAE5DA', borderRadius: '8px', padding: '4px', marginBottom: '20px' }}>
             {[['signup', L('Ny bruker', 'New user')], ['login', L('Har bruker', 'Have an account')]].map(([m, l]) => (
               <button key={m} onClick={() => { setMode(m); setError(null) }} style={{
                 flex: 1, padding: '9px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: font,
-                background: mode === m ? '#fff' : 'transparent', color: mode === m ? '#3A2F26' : '#75604B',
+                background: mode === m ? '#fff' : 'transparent', color: mode === m ? '#1F2326' : '#575B5E',
                 boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
               }}>{l}</button>
             ))}
@@ -401,15 +434,15 @@ function AuthModal({ startInLogin, request, onClose }) {
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} placeholder={mode === 'signup' ? L('Minst 6 tegn', 'At least 6 characters') : ''} style={inputStyle} /></div>
             <div><label style={labelStyle} htmlFor="wz-estate">{L('Navn på boet', 'Estate name')}</label>
               <input id="wz-estate" value={estateName} onChange={e => setEstateName(e.target.value)} onKeyDown={onKey} maxLength={200} placeholder={L('f.eks. Boet etter Kari Hansen', 'e.g. The estate of Jane Smith')} style={inputStyle} />
-              <p style={{ fontSize: '0.75rem', color: '#75604B', margin: '6px 0 0' }}>{L('Du kan endre navnet senere.', 'You can change the name later.')}</p></div>
+              <p style={{ fontSize: '0.75rem', color: '#575B5E', margin: '6px 0 0' }}>{L('Du kan endre navnet senere.', 'You can change the name later.')}</p></div>
           </div>
-          {error && <p role="alert" style={{ color: '#9B3B2E', fontSize: '0.875rem', margin: '0 0 14px' }}>{error}</p>}
+          {error && <p role="alert" style={{ color: '#9A3B2E', fontSize: '0.875rem', margin: '0 0 14px' }}>{error}</p>}
           <PrimaryButton onClick={submit} disabled={!canSubmit || loading}>
             {loading ? L('Vent litt …', 'Please wait …') : mode === 'signup' ? L('Opprett bruker og lagre', 'Create account and save') : L('Logg inn og lagre', 'Log in and save')}
           </PrimaryButton>
           {mode === 'signup' && (
-            <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.75rem', color: '#75604B', lineHeight: 1.6 }}>
-              {L('Ved å opprette bruker godtar du våre', 'By creating an account you accept our')} <a href="/personvern" target="_blank" rel="noopener noreferrer" style={{ color: '#5F6E52' }}>{L('vilkår og personvernerklæring', 'terms and privacy policy')}</a>.
+            <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.75rem', color: '#575B5E', lineHeight: 1.6 }}>
+              {L('Ved å opprette bruker godtar du våre', 'By creating an account you accept our')} <a href="/personvern" target="_blank" rel="noopener noreferrer" style={{ color: '#2F4A43' }}>{L('vilkår og personvernerklæring', 'terms and privacy policy')}</a>.
             </p>
           )}
         </>
@@ -431,12 +464,12 @@ function ChooseEstateModal({ userId, busy, onClose, onChoose, onCreate }) {
         'Choose which estate to save the result in, or create a new one. Heirs and steps from the guide are added – what you entered yourself is not changed.',
       )}
       onClose={onClose}>
-      {estates === null ? <p style={{ color: '#75604B', fontSize: '0.875rem' }}>{L('Laster …', 'Loading …')}</p> : (
+      {estates === null ? <p style={{ color: '#575B5E', fontSize: '0.875rem' }}>{L('Laster …', 'Loading …')}</p> : (
         <>
           {estates.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
               {estates.map(e => (
-                <button key={e.id} disabled={busy} onClick={() => onChoose(e.id, e.name)} style={{ textAlign: 'left', padding: '13px 14px', background: '#FBF9F5', border: '1px solid #D9CFC0', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9375rem', color: '#3A2F26', fontFamily: font }}>
+                <button key={e.id} disabled={busy} onClick={() => onChoose(e.id, e.name)} style={{ textAlign: 'left', padding: '13px 14px', background: '#F5F2EB', border: '1px solid #CFC8BA', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9375rem', color: '#1F2326', fontFamily: font }}>
                   {e.name}
                 </button>
               ))}

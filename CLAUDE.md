@@ -9,11 +9,12 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - Lag PR til `main` når du er ferdig — be den andre om review
 
 ## Teknisk stack
-- **Frontend**: React 18 + Vite, inline JSX-styles (ingen CSS-filer)
-- **Design**: Alle komponenter bruker inline `style`-props med palette-tokens (se nedenfor)
+- **Frontend**: React 18 + Vite, inline JSX-styles (ingen CSS-filer i appen)
+- **Design**: Appens komponenter bruker inline `style`-props med palette-tokens (se nedenfor). **Unntak: de offentlige markedssidene** (`/`, `/slik-fungerer-det`, `/om-oss`, `/kontakt`) har sitt eget designsystem i `src/site/` med all CSS i `src/site/site.css`, avgrenset til rotklassen `.ak`. Egen fil fordi ~1 000 linjer CSS i en JavaScript-streng ville sprengt budsjettet for offentlige sider; som stilark teller den ikke med. **Avgrensningen går én vei:** ingen regel i `site.css` treffer utenfor `.ak`, men appens globale reset i `index.html` (`* { margin:0; padding:0 }`, `:focus-visible`, skriftstørrelse) gjelder også inne i `.ak`. Derfor settes marger på `dl`, `dd`, `figure` m.fl. uttrykkelig i `site.css` i stedet for å bygge på nettleserens standardverdier. Se `docs/ny-offentlig-nettside.md`
+- **Fonter**: Karla og Fraunces fra Google Fonts (`index.html`) for appen **og for markedssidene** — de offentlige sidene gjør altså fortsatt to eksterne kall (`fonts.googleapis.com`, `fonts.gstatic.com`), uavhengig av samtykke; **Bodoni Moda** selvhostes fra `public/fonter/` og brukes bare på markedssidene, til overskrifter. Ikke lag en lokal `@font-face` med familienavnet `Karla` — den ville overstyrt appens vekter 300/500/600 med den ene 400-fila
 - **Database**: Supabase (PostgreSQL) — se `supabase/README.md` for struktur, rekkefølge og deploy
 - **Auth**: Supabase Auth (e-post/passord, glemt passord). Navnet ved registrering lagres i `user_metadata.display_name`, og profilen opprettes fra det ved første innlogging (`App.jsx`)
-- **Språk**: norsk og engelsk. All tekst skrives som `L('norsk', 'english')` fra `src/lib/lang.js`; datoer og beløp formateres med `locale()` (eller `formatNOK` i `src/lib/format.js`). Verdier som lagres i databasen (kategorier, relasjoner, oppgavekategorier) er alltid norske og oversettes bare ved visning. Språket følger kontoen: `profiles.preferred_lang` (`no`/`en`/`null`). `null` betyr ikke valgt, og da gjelder norsk.
+- **Språk**: norsk og engelsk. All tekst skrives som `L('norsk', 'english')` fra `src/lib/lang.js`. De fire markedssidene (`src/site/`, `src/pages/LandingPage.jsx`, `HowItWorksPage.jsx`, `AboutPage.jsx`, `ContactPage.jsx`) er oversatt med den samme `L()`-løsningen. **Begge språk ligger på samme adresse** — språket følger kontoen og `hs_lang`, ikke URL-en — så det finnes ingen språkadresser: canonical er den ene adressen, og det settes **ingen `hreflang`**. Den forhåndsrendrede HTML-en, altså versjonen søkemotorene leser, er norsk; engelsk rendres i nettleseren. Rotelementet `.ak` merkes med gjeldende språk. Skal engelsk kunne indekseres, må sidene få egne adresser — se `docs/ny-offentlig-nettside.md`. Veiviseren er fortsatt norsk, og det sies i den engelske teksten der det lenkes dit; datoer og beløp formateres med `locale()` (eller `formatNOK` i `src/lib/format.js`). Verdier som lagres i databasen (kategorier, relasjoner, oppgavekategorier) er alltid norske og oversettes bare ved visning. Språket følger kontoen: `profiles.preferred_lang` (`no`/`en`/`null`). `null` betyr ikke valgt, og da gjelder norsk.
   - Ved innlogging tas kontoens språk i bruk med `adoptProfileLang` i `lang.js`.
   - Byttet lagres med `changeLanguage` i `languagePref.js` fra menyen og fra «Min konto». Det lagres også i `user_metadata.lang` for e-postmalene.
   - `localStorage` (`hs_lang`) er bare en hurtigbuffer.
@@ -23,7 +24,7 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - **Deployment**: Vercel, automatisk fra `main`. Sikkerhetshodene (CSP, `X-Frame-Options`, `Permissions-Policy` m.m.) står i `vercel.json`. Skript og tilkoblinger tillates bare fra egen side, Supabase-prosjektet (også `wss://` for sanntid) og cdnjs (jsPDF i veiviseren). Ingen skript direkte i HTML-en, heller ikke i veiviserens ramme `public/arveveiviser/ramme.html` (skriptene ligger i `public/arveveiviser/`). Ny ekstern kilde må inn i CSP-en, og `test/e2e/csp.mjs` sjekker at ingenting blokkeres
 
 ## Teknisk SEO
-- Registeret over offentlige, indekserbare sider er markedssidene i `src/seo/pages.js` (`/`, `/kontakt`, `/personvern`, `/veiviser`) og de publiserte guidene i `content/guider/<slug>.md` (`/guider/<slug>`, lest av `src/seo/content.js`). Metadata, forhåndsrendering, `sitemap.xml` og RouteMeta bygger på det (`publicRegistry()` ved bygging, `src/seo/registry.js` i nettleseren via `virtual:arvklart-guides`, bare metadata). Canonical-domenet er `https://www.arvklart.no`. Appen (`/app`, `/estate/…`), innlogging, `/nytt-passord`, `/join/…`, `/konto`, `/founder` og `/setup` får `X-Robots-Tag: noindex` fra `vercel.json`; ukjente adresser og utkast gir **HTTP 404** (`public/404.html`). Aldri global noindex, og aldri `Disallow` i `robots.txt` for å skjule sider (det er ikke tilgangskontroll, og Google ser da ikke noindex)
+- Registeret over offentlige, indekserbare sider er markedssidene i `src/seo/pages.js` (`/`, `/slik-fungerer-det`, `/om-oss`, `/kontakt`, `/personvern`, `/veiviser`) og de publiserte guidene i `content/guider/<slug>.md` (`/guider/<slug>`, lest av `src/seo/content.js`). Metadata, forhåndsrendering, `sitemap.xml` og RouteMeta bygger på det (`publicRegistry()` ved bygging, `src/seo/registry.js` i nettleseren via `virtual:arvklart-guides`, bare metadata). Canonical-domenet er `https://www.arvklart.no`. Appen (`/app`, `/estate/…`), innlogging, `/nytt-passord`, `/join/…`, `/konto`, `/founder` og `/setup` får `X-Robots-Tag: noindex` fra `vercel.json`; ukjente adresser og utkast gir **HTTP 404** (`public/404.html`). Aldri global noindex, og aldri `Disallow` i `robots.txt` for å skjule sider (det er ikke tilgangskontroll, og Google ser da ikke noindex)
 - **Ny guide**: én fil `content/guider/<slug>.md` med metadata øverst (se `content/guider/README.md`; malen `mal-for-guide.md` er et utkast). `status: published` gir side, sitemap (`lastmod` = `updated`/`published`) og strukturerte data (`Article`, `BreadcrumbList`) ved bygging, uten endring i `vercel.json` eller andre lister. Feil i metadata eller interne lenker stopper bygget. Teksten skrives av `src/seo/markdown.js` (trygg, uten rå HTML) og kommer til nettleseren som datablokk (`src/seo/pageData.js`), ikke i JavaScript-filene. Malen er `src/pages/ArticlePage.jsx`
 - `vercel.json` har bare generelle regler: app-rutene og sidene som rendres i nettleseren (`/personvern`) omskrives til `shell.html`, `/guider/<slug>` til `guider/<slug>.html` og `/<side>` til `<side>.html`; ingen omskriving av alt, så en adresse uten fil gir 404. Ny app-rute må inn i app-regelen og noindex-regelen (`test/seo/seo.test.js` simulerer rutingen for alle rutene i `App.jsx` og feiler ellers). Vercel leser bare `vercel.json` fra repoet, aldri en fil laget under byggingen
 - Forsiden ligger på `/` og appen på `/app` (fra PR 2, se `docs/seo-migrering-forside-til-rot.md`). Rutene står i `src/lib/routes.js` (`HOME`, `APP_HOME`, `LANDING_STATE`); bruk dem, aldri `'/'` eller `'/app'` direkte. En innlogget som åpner `/` direkte (bokmerke, e-postlenke) sendes til `/app`; appens «Tilbake til hjemmesiden» navigerer til `/` med `LANDING_STATE` og viser forsiden. `/home` sendes permanent (308) til `/` (`redirects` i `vercel.json`). `/estate/…`, `/join/…`, `/nytt-passord` og `/logg-inn` er uendret. E-postlenker fra Supabase lander på `/` med økten i adressen (`#access_token=…`); de hydreres ikke som forsiden (`hasAuthInUrl` i `src/seo/clientState.js`, samme mønster i `public/seo-early.js`), og brukeren går videre til appen
@@ -31,7 +32,7 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - Code splitting: sidene i den innloggede appen lastes ved behov (`src/appPages.js`, `lazyPage` i `src/lib/lazyPage.js`) og forhåndslastes i bakgrunnen etter innlogging. Offentlige og forhåndsrendrede sider (og innlogging) importeres direkte i `App.jsx`; de må ikke gjøres lazy, ellers stemmer ikke hydreringen. En fil som mangler etter ny utrulling gir én ny lasting av siden, deretter en melding (`PageErrorBoundary`). `test/e2e/chunks.mjs` håndhever budsjettet for JavaScript på offentlige sider (175 kB gzip; var 371 kB før splitting)
 - **Veiviseren på `/veiviser`** (forhåndsrendret, fra PR 4): hele veiviseren står i HTML-en, ikke i en iframe, så søkemotorer leser de fem fasene, ordlisten, ressursene og startkortet uten JavaScript.
   - Byggesteget (`src/seo/veiviserHost.js`) legger rammens markering og CSS (`public/arveveiviser/ramme.html`, CSS-en gjelder bare i `#veiviser`, med samme innbyrdes rangering) i `<main id="veiviser" data-veiviser-host>` etter appen, og fyller inn HTML-en fra `sections.js` (fasene, ordlisten, ressursene) og `intro.js` (startkortet). Teksten finnes bare der; `page.js` og `ui.js` kobler på knappene.
-  - I nettleseren viser GuidePage bare «Tilbake»-linjen og dialogene, og snakker med veiviseren i samme vindu (samme meldinger som før: `veiviser-ready`, `-context`, `-save`, `-saved`, `-back`, `-navigate`). `#root` blir stående øverst; `VeiviserHostGuard` skjuler veiviseren på andre ruter.
+  - I nettleseren viser GuidePage den felles offentlige headeren (`SiteHeader` fra `src/site/SiteLayout.jsx` — samme komponent som de andre offentlige sidene, ikke en kopi) og dialogene, og snakker med veiviseren i samme vindu (samme meldinger som før: `veiviser-ready`, `-context`, `-save`, `-saved`, `-back`, `-navigate`). `#root` blir stående øverst; `VeiviserHostGuard` skjuler veiviseren på andre ruter. «Tilbake»-linjen vises bare der headeren ikke står over (inne i et bo, og for innloggede, som har menyen i TopBar); den engelske merknaden om at veiviseren er norsk, står uendret.
   - Iframen (`/arveveiviser/ramme.html`, noindex) brukes fortsatt fra et bo (`/estate/:id/guide`), ved navigering til `/veiviser` inne i appen og for engelsk veiviser (`VITE_GUIDE_EN`). `/veiviser.html` sendes permanent (308) til `/veiviser`.
   - Ny tekst i veiviseren skrives i `sections.js`/`intro.js` (eller `questions.js` osv. for spørsmålene), aldri i HTML-en. `test/fixtures/veiviser-tekst.json` er fasiten fra før ombyggingen; `test/seo/veiviser.test.js` og `test/e2e/veiviser.mjs` feiler hvis tekst, lenker eller forklaringer endres. Endres teksten med vilje, lages fasiten på nytt. Avsenderlinjen («Sist oppdatert», `UPDATED` i `sections.js`) settes til datoen innholdet endres, og siden påstår ingen faglig gjennomgang.
 - `src/seo/RouteMeta.jsx` setter tittel, beskrivelse og canonical ved navigering: bare offentlige sider har canonical. Strukturerte data: `WebSite` og `Organization` bare på forsiden `/` (opplysninger fra nettstedet). JSON-LD (`type="application/ld+json"`) er en datablokk, ikke et skript, og er unntatt regelen om skript i HTML-en
@@ -40,25 +41,38 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - `scripts/smoke-browser.mjs` (`.github/workflows/smoke.yml`) er en røyktest i ekte nettleser mot forhåndsvisningen og produksjonen: forsiden, `/home`, `/app` uten innlogging, innlogging med feil passord, nytt passord, invitasjon, veiviseren (i siden, uten iframe; `/veiviser.html` gir 308), personvern og demoen med navigering i demo-boet. Ingen ekte kontoer; den rapporterer bare
 
 ## Fargepalett — bruk alltid disse
+Fargene er fra «Fargepalett.pdf» (designsystemet «Arvklart» → Farger). **Den innloggede appen er mørk**, i samme uttrykk som arvklart.no (`src/site/site.css`):
 ```
-#3A2F26  espresso (primær bakgrunn, topbar)
-#FBF9F5  snow (side-bakgrunn)
-#E8DFD0  sand (kort, input-bakgrunn)
-#D9CFC0  grense/border
-#75604B  mørk latte (sekundær tekst; 5,7:1 på snow, 4,5:1 på sand)
-#9C8267  latte (bare ikoner, diagramflater og dekor; for lys som tekst)
-#9A8B78  feltkant (input/select/textarea; 3,3:1 mot hvit)
-#5C4530  valnøtt (primær tekst i lys kontekst)
-#5F6E52  mørk sage (suksess, aksent)
-#8B9A7D  sage
-#DCE3D2  tåkesage (subtil bakgrunn)
+#1F221E  natt (bakgrunn og toppmenyen)
+#272A25  flate (kort; Natt løftet litt)
+#30342D  flate høy (bokser, dialoger, menyer, bildebakgrunn)
+#F2EEE6  lin (tekst, og fylte knapper med Natt-tekst)
+#B9B4A8  lin dempet (sekundærtekst; 8,5:1 mot Natt)
+rgba(242,238,230,.14)  hårstreker   rgba(242,238,230,.4)  feltkanter (3:1)
+#9DAA8C  mose (aksent, «ferdig», fokusring)
+#C79A6B  messing lys (overlinjene)    #D7BA9A  ordfarge (fremhevet ord i store overskrifter)
+#E08A7A  rust lys (feil og sletting)  #2F4A43  granskog (mørk grønn flate, f.eks. demobanneret)
 ```
+Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som også bestemmer hvilke sider som er lyse (`isLightAppPath`) og har den globale CSS-en (`appDarkCss`: Bodoni Moda fra `/fonter`, fokusring, mørke skjemafelt, lyset øverst). Oversikten i boet og gjenstandslisten bruker klassene i `src/lib/estateThemeCss.js` (prefiks `bo-`); de andre sidene har fargene i inline style.
 
-Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` i `index.html` (mørke flater setter lys ring selv). Hvit tekst bare på `#5F6E52` eller mørkere, ikke på `#8B9A7D`.
+**Lyse sider:** sidene som også vises for utloggede (innlogging, nytt passord, invitasjon, personvern, kontakt, veiviseren, guidene, forsiden) og PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) bruker produktpaletten (lys): papir `#F5F2EB`, kalk `#EAE5DA`, blekk `#1F2326`, skifer `#575B5E`, granskog `#2F4A43`, messing `#8A5A34`, strek `#CFC8BA`, rust `#9A3B2E`.
+
+Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
+
+Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
+`/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
+av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
+og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
+
+Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
+
+**Uttrykket (som arvklart.no):** overskrifter i Bodoni Moda (`'Bodoni Moda', 'Times New Roman', serif`, med `font-optical-sizing: none`), en overlinje over sideoverskriften (`<Overline>` i `src/components/UI.jsx`), pilleknapper (`borderRadius: '999px'`), hårstreker og nummererte rader med pluss/minus på oversikten.
+
+**Bilde ved hver handling:** der man gjør noe med en gjenstand (løsningsmetoder, fordelingen, ingen vil ha, sveiping, dialoger), vises bildet av gjenstanden med `ItemThumb` eller `ItemHead` (`src/components/ItemThumb.jsx`). Et trykk viser bildet stort, med lenke til gjenstanden; i dialoger brukes `still`, så det ikke åpnes et vindu oppå.
 
 ## Typografi
 - `fontFamily: 'Karla, sans-serif'` — brødtekst og UI
-- `fontFamily: "'Fraunces', serif"` — overskrifter/display
+- `fontFamily: "'Bodoni Moda', 'Times New Roman', serif"` — overskrifter/display i appen (som arvklart.no). Fraunces brukes fortsatt på noen offentlige sider
 
 ## Filer som IKKE skal røres uten diskusjon
 - `src/lib/supabase.js` — Supabase-klient, endringer kan bryte auth
@@ -109,7 +123,7 @@ Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:foc
 ## Demokonto
 Demokontoene Mona, Kari og Lars (i dag `*.demo@heirsplit.no`, byttes til `*.demo@arvklart.no` med `--apply-email`) er syntetiske demobrukere — ikke slett eller endre dataene deres i databasen.
 - Demokontoene kjennes igjen bare på merket `app_metadata.arvklart_demo` (`mona`/`kari`/`lars`), som bare service role kan sette (`scripts/demo-identity.mjs`: tørrkjøring som standard, `--apply-mark` krever bekreftede id-er og nekter kontoer som er i andre bo, `--remove-mark` ruller tilbake), og som følger kontoen selv om e-posten endres. Samme regel i `is_demo_user()`, `reset_demo_estate()` (fra `20261109190000_demo_identity.sql`), edge-funksjonene (`_shared/demoIdentity.ts`) og appen (`src/lib/demoIdentity.js`). E-postdomenet brukes aldri (Arvklart eier ikke heirsplit.no). Nullstillingen og migreringen stopper hvis en merket konto er medlem eller eier i et annet bo, så en ekte konto som er merket ved en feil, aldri røres. Kari og Lars logger aldri inn (stengt med `--apply-lock`)
-- «Test ut demo» kaller edge-funksjonen `demo-login` (`_shared/demoLoginHandler.ts`), som nullstiller demo-boet (`reset_demo_estate()`) og returnerer en økt. Passordet ligger bare i hemmeligheten `DEMO_PASSWORD`, aldri i frontend. Kontoen må være merket Mona (`DEMO_USER_ID` anbefales); feiler nullstillingen, slipper ingen inn (503); ved feil settes bare passordet tilbake, aldri e-posten
+- «Prøv demo» kaller edge-funksjonen `demo-login` (`_shared/demoLoginHandler.ts`), som nullstiller demo-boet (`reset_demo_estate()`) og returnerer en økt. Passordet ligger bare i hemmeligheten `DEMO_PASSWORD`, aldri i frontend. Kontoen må være merket Mona (`DEMO_USER_ID` anbefales); feiler nullstillingen, slipper ingen inn (503); ved feil settes bare passordet tilbake, aldri e-posten
 - Alle besøkende deler demokontoen: utlogging fra demoen er lokal (`signOutDemo()` i `src/lib/demo.js`, `scope: 'local'`), ellers ville én besøkende logget ut alle andre. Banneret sier at demoen er et offentlig eksempelbo uten personopplysninger
 - Demoboet har bare syntetiske kontoer (Kari, Lars og Mona, som eier det). `reset_demo_estate()` fjerner ekte kontoer og alt de har lagt inn i demoboet ved hver demoinnlogging (fra `20261024`); legg aldri en ekte konto inn i demoboet
 - Demoinnholdet (fra `20261109210000_demo_content_fixes.sql`): titler, beskrivelser og bilder står i gjenstandsradene og endres bare med en migrering; `reset_demo_estate()` rører dem aldri. Eksempelsvarene (ønsker med begrunnelse fra Kari og Lars; Mona er den besøkende og svarer selv, banneret sier det) står i `reset_demo_estate()` og legges inn på nytt ved hver demoinnlogging; `seed/demo_estate.sql` har de samme. Tekstene beskriver bare det bildene viser (ingen oppdiktede merker, antall eller priser) og viser at flere kan ønske det samme og snakke sammen; Arvklart bestemmer aldri fordelingen. `test/lib/demoContent.test.js`, `test/db/run.sh` mobilreisen i `test/e2e/demo.mjs` og røyktesten mot prod (`scripts/smoke-browser.mjs`, mobilvindu) sjekker det
@@ -138,9 +152,13 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
 ## Viktige sider og ruter
 | Rute | Komponent | Beskrivelse |
 |------|-----------|-------------|
-| `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app` |
+| `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app`. Designet ligger i `src/site/` |
+| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret) |
+| `/om-oss` | AboutPage | Teamet bak Arvklart (forhåndsrendret) |
+| `/kontakt` | ContactPage | Kontakt, e-post med ferdig emne (forhåndsrendret; ingen skjema) |
 | `/app` | EstatesPage | Liste over brukerens bo (inngangen til appen) |
-| `/estate/:id` | EstatePage | Bo-oversikt |
+| `/estate/:id` | EstatePage | Bo-oversikten: hvor langt boet har kommet, «Anbefalt nå» (én handling) og fire nedtrekksgrupper (Gjenstander, Fordeling, Arvinger, Praktisk) med lenker til egne sider. Hva administrator, arving og demo ser, og hva som anbefales, står i `src/lib/estateOverview.js` (testet i `test/estate/overview.test.js`). Demoen viser ikke sidene som er sperret for den (`notForDemo`), og kan prøve AI, men ikke lagre |
+| `/estate/:id/gjenstander` | EstateItemsPage | Alle gjenstandene med store bilder. Søk, «Vis» (alle, mine ønsker, ettertraktede, noen vil ha, ingen vil ha, tildelt) og kategori står i adressen (`?vis=…&kategori=…&sok=…`, `src/lib/itemFilters.js`), og «Analyse» (`?visning=analyse`) viser fordelingen per kategori og status. Gjenstandssiden går tilbake hit med samme utvalg (`state.back`) |
 | `/estate/:id/add` | AddItemPage | Legg til gjenstand (inkl. AI-analyse) |
 | `/estate/:id/add-many` | AddItemsPage | Legg til opptil 20 gjenstander: kamera i appen (ett bilde = én gjenstand, «Flere bilder av denne» for flere), kamerarull/filer/dra-og-slipp, AI analyserer alle (ett kall per gjenstand, høyst fire samtidig). Analysen låser bare kortene den gjelder, og etter første «Analyser med AI» analyseres nye bilder av seg selv. AI lagrer aldri selv: brukeren ser over kortene og trykker «Godkjenn og lagre alle» |
 | `/estate/:id/swipe` | SwipePage | Ta stilling til gjenstander (vil ha / nei takk) |
@@ -170,4 +188,4 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
   - I delte bo gis administratorrollen videre. Navn, verdiforslag, stemmer og AI-rettelser fjernes fra gjenstandene, mens gjenstandene og bildene blir værende som boets innhold.
   - Appen får faste feilkoder, aldri råtekst.
 - Sletting av avsluttede bo (`estates.closed_at`): edge-funksjonen `cleanup-closed-estates` (data, filer og tilbakemeldinger knyttet til boet; sletter bo avsluttet for over 12 mnd) er **ikke i drift** (ingen cron, `cleanup_runs` ikke kjørt i prod). Appen og personvernerklæringen lover derfor ingen automatisk sletting: et avsluttet bo oppbevares til administratoren ber Arvklart slette det, eller til eneste medlem sletter kontoen. Ikke lov en frist i tekstene før en rutine med ansvarlig, kontrollintervall og logg i `cleanup_runs` er satt i drift og testet; kjøringer skal logges i `cleanup_runs`. Foreldreløse bilder ryddes bare manuelt med `cleanup-orphan-images` (dry_run + bekreftelse). Se `supabase/README.md`
-- Behandlingsansvarlig (selskapsnavn og org.nr.) fylles inn i `COMPANY` i `OtherPages.jsx`
+- Behandlingsansvarlig: `COMPANY` i `OtherPages.jsx` er **Arvklart AS, org.nr. 938 816 085**, verifisert 19.11.2026 mot Enhetsregisteret (`data.brreg.no/enhetsregisteret/api/enheter/938816085`: aksjeselskap, registrert 05.11.2026, Tertnesgrenden 13, 5113 Tertnes). De samme opplysningene står i bunnteksten på de offentlige sidene (`src/site/SiteLayout.jsx`); `test/seo/nettsted.test.js` sjekker at de to stemmer overens
