@@ -84,8 +84,8 @@ export default function Journey() {
           </div>
           <div className="st__shots st__shots--duo">
             <Sh src="i-skjema.webp" w={640} h={837}
-              alt={L('Skjermbilde fra demoen: skjemaet «Legg til gjenstand» med felt for bilder, navn og kategori.',
-                'Screenshot from the demo: the «Legg til gjenstand» (Add item) form with fields for photos, name and category.')}
+              alt={L('Skjermbilde fra demoen: skjemaet «Legg til gjenstand» med knappene «Ta bilder» og «Velg bilder» og feltet for navn.',
+                'Screenshot from the demo: the «Legg til gjenstand» (Add item) form with the «Ta bilder» (Take photos) and «Velg bilder» (Choose photos) buttons and the name field.')}
               caption={L('«Legg til gjenstand»: bilde, navn, kategori og tilstand.', '«Legg til gjenstand»: photo, name, category and condition.')} />
             <Sh src="j-maleri.webp" w={680} h={216}
               alt={L('Skjermbilde fra demoen: oljemaleriet av blomster slik det ligger i boet etter at det er registrert.',
