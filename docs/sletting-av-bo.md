@@ -7,8 +7,10 @@ Dette dokumentet beskriver hvordan Arvklart sletter et bo eller en kundekonto, h
 | Hva | Hvem | Hvor |
 |---|---|---|
 | Egen konto | Kunden selv | «Min konto» (`/konto`, edge-funksjonen `delete-account`) |
-| Et helt bo | Bare founders (nettstedets administratorer) med tofaktor | Founder-dashboardet `/founder` → «Boer» → «Slett …» (`founder-delete`) |
-| En kundekonto | Bare founders med tofaktor | `/founder` → «Brukere» → «Slett …» (`founder-delete`) |
+| Et helt bo | Bare founders (nettstedets administratorer) med tofaktor | Founder-dashboardet `/founder` → fanen «Sletting (GDPR)» (søk) eller «Boer» → «Slett …» (`founder-delete`) |
+| En kundekonto | Bare founders med tofaktor | `/founder` → «Sletting (GDPR)» (søk) eller «Brukere» → «Slett …» (`founder-delete`) |
+
+Fanen **«Sletting (GDPR)»** i `/founder` samler alt: om slettefunksjonen er rullet ut (ellers vises kommandoen), at automatisk sletting ikke er i drift, søk etter bo og kontoer, rutinen under, sletteloggen (med «Prøv igjen» på slettinger som ikke ble fullført), avsluttede bo og forslaget til lagringstider. Dataene kommer fra `founder-delete` (`{ action: 'overview' }`), fordi `founder_audit_log` bare kan leses med service role.
 
 Administratoren av et bo kan ikke slette boet selv. Hen ber om det på admin@arvklart.no, slik personvernerklæringen sier.
 
@@ -20,7 +22,7 @@ Administratoren av et bo kan ikke slette boet selv. Hen ber om det på admin@arv
 2. **Varsle de andre medlemmene ved behov.** Når et delt bo skal slettes, bør administratoren gi beskjed og la de andre laste ned protokollen først. Slettingen gjelder alle, og den kan ikke angres.
 3. **Slett i `/founder` (krever tofaktor i økten).** Dialogen viser først hva som slettes. Slettingen skjer bare når du skriver boets navn eller kontoens e-post. Demoboet, demokontoene, din egen konto og andre founders kan ikke slettes her.
 4. **Svar kunden innen én måned** (art. 12 nr. 3). Si at dataene er slettet fra tjenesten, og at de forsvinner fra sikkerhetskopiene når de roterer ut.
-5. **Kontroller loggen.**
+5. **Kontroller loggen** i fanen «Sletting (GDPR)», eller i SQL Editor:
 
    ```sql
    select created_at, action, details->>'status' as status, details
@@ -32,7 +34,7 @@ Administratoren av et bo kan ikke slette boet selv. Hen ber om det på admin@arv
    - `status = 'ok'`: slettingen er fullført.
    - `failed` eller `started`: noe sto igjen. Prøv igjen fra dashboardet. Slettingen er idempotent: det som allerede er slettet, hoppes over, og det som står igjen, er urørt.
 
-Loggen inneholder bare id-er og antall, ingen navn, e-post, titler eller filstier. Den viser at slettingen er gjort (ansvar etter art. 5 nr. 2) og kan bare leses i SQL Editor.
+Loggen inneholder bare id-er og antall, ingen navn, e-post, titler eller filstier. Den viser at slettingen er gjort (ansvar etter art. 5 nr. 2) og kan bare leses i fanen «Sletting (GDPR)» (via edge-funksjonen) og i SQL Editor.
 
 ## Hva som slettes med et bo
 

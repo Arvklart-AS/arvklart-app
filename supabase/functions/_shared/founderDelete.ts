@@ -5,6 +5,7 @@
 // Flyten er alltid to kall:
 //   1. { kind, id, dry_run: true }  → hva som ville blitt slettet (antall), og hva som må skrives for å bekrefte
 //   2. { kind, id, confirm }        → slettingen; confirm må være boets navn eller kontoens e-post
+// I tillegg { action: 'overview' } → sletteloggen og avsluttede bo til fanen «Sletting (GDPR)» (bare lesing).
 //
 // • Bo: deleteEstate (filer som også brukes av et annet bo, slettes ikke; tilbakemeldinger knyttet til boet; boet med
 //   alt innhold via on delete cascade). Kontoene til medlemmene består.
@@ -32,6 +33,35 @@ export type FounderDeleteDeps = {
   safeError?: (e: unknown) => unknown
   deleteEstate?: (admin: SupabaseClient, estateId: string) => Promise<unknown>
   deleteAccount?: (admin: SupabaseClient, userId: string) => Promise<Record<string, unknown>>
+  // CLOSED_ESTATE_RETENTION_MONTHS (tolket), bare til visning i oversikten
+  retentionMonths?: number | null
+}
+
+const DELETE_ACTIONS = ['delete_estate', 'delete_user']
+const LOG_LIMIT = 200
+
+// Oversikten i fanen «Sletting (GDPR)»: sletteloggen (bare id-er, antall og status, aldri feiltekst) og avsluttede bo.
+// founder_audit_log har RLS uten policies, så den kan bare leses her (service role) og i SQL Editor.
+async function overview(admin: SupabaseClient, retentionMonths: number | null) {
+  const log = must(await admin.from('founder_audit_log').select('id, created_at, action, founder_id, details')
+    .in('action', DELETE_ACTIONS).order('created_at', { ascending: false }).limit(LOG_LIMIT)) as
+    { id: string; created_at: string; action: string; founder_id: string | null; details: Record<string, unknown> | null }[] || []
+  const closed = must(await admin.from('estates').select('id, name, closed_at')
+    .not('closed_at', 'is', null).neq('id', DEMO_ESTATE_ID).order('closed_at', { ascending: true })) as
+    { id: string; name: string; closed_at: string }[] || []
+  return {
+    log: log.map(r => ({
+      id: r.id,
+      created_at: r.created_at,
+      kind: r.action === 'delete_estate' ? 'estate' : 'user',
+      founder_id: r.founder_id,
+      target_id: (r.details?.estate_id ?? r.details?.user_id ?? null) as string | null,
+      status: (r.details?.status ?? 'started') as string,
+      counts: r.details?.counts ?? null,
+    })),
+    closed_estates: closed.map(e => ({ id: e.id, name: e.name, closed_at: e.closed_at })),
+    retention_months: retentionMonths,
+  }
 }
 
 // Tofaktornivået i JWT-en. Leses bare etter at getUser() har godtatt den samme JWT-en hos Supabase Auth.
@@ -114,6 +144,7 @@ export async function handleFounderDelete(req: Request, d: FounderDeleteDeps): P
 
     let body: Record<string, unknown> = {}
     try { body = await req.json() } catch { /* tom body */ }
+    if (body.action === 'overview') return d.json({ success: true, ...await overview(admin, d.retentionMonths ?? null) })
     const kind = body.kind
     const id = typeof body.id === 'string' ? body.id : ''
     const dryRun = body.dry_run === true

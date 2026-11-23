@@ -5,9 +5,11 @@
 import { adminClient, getUser, json, preflight } from '../_shared/http.ts'
 import { handleFounderDelete } from '../_shared/founderDelete.ts'
 import { safeError } from '../_shared/cleanup.ts'
+import { parseRetentionMonths } from '../_shared/closedEstates.ts'
 
 Deno.serve(req => handleFounderDelete(req, {
   preflight, getUser, json, safeError,
   admin: adminClient,
+  retentionMonths: parseRetentionMonths(Deno.env.get('CLOSED_ESTATE_RETENTION_MONTHS')),
   log: line => console.log(line),
 }))
