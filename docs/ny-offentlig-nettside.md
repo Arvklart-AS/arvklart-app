@@ -323,8 +323,14 @@ i markupen er uendret. Bildene er beskåret og skalert, ikke redigert, og har in
   ventesiden). Hun svarte «Ikke interessert» i demoen; det nullstilles ved neste demoinnlogging.
 * Alt-tekstene er oppdatert der innholdet er endret: PC- og mobiloversikten, skjemaet og veiviserens
   nye overskrift.
-* Bildene på «Slik fungerer det» (`f-filtre`, `f-flere`, `i-legg-til`, `j-verdi`, `m-fordeling`,
-  `m-godkjenning`, plakatbildet) er ikke tatt på nytt i denne runden.
+* Bildene på «Slik fungerer det» er tatt på nytt på samme måte: `i-legg-til`, `j-verdi`,
+  `m-fordeling` og `m-godkjenning` med samme mål. Tre har fått nytt format, fordi appen har endret seg:
+  `f-filtre` (1320×84) viser nå verktøylinjen over galleriet (søk, «Alle gjenstander», kategori,
+  Bilder/Analyse), som erstatter den gamle filterraden; `--zoom` er satt ned til 1,7, så valget
+  «Alle gjenstander» synes på mobil. `f-flere` (640×360) viser de to kortene merket «2 vil ha» uten
+  biter av nabokortet. `i-legg-til` (640×344) tar med hele navnefeltet.
+* **Plakatbildet til filmen** (`produktvideo-plakat.webp`) er et bilde fra selve filmen og viser det
+  lyse uttrykket, som resten av filmen. Det byttes når filmen tas opp på nytt, ikke alene.
 
 ---
 
