@@ -8,10 +8,14 @@ import { L } from '../lib/lang'
 // Skjermbildene viser det norske grensesnittet. Det står i den engelske etiketten, så en engelsk
 // leser ikke tror appen er oversatt i bildet. Bildene manipuleres ikke.
 
+// `kilde="pdf"` er dokumentet løsningen selv lager, ikke et bilde av en skjerm. Det skal stå, så
+// leseren vet hva hen ser på.
 export function Cap({ kilde = 'demoen', children, center = false, as: Tag = 'figcaption' }) {
   const label = kilde === 'arvklart'
     ? L('Skjermbilde fra Arvklart', 'Screenshot from Arvklart (Norwegian interface)')
-    : L('Skjermbilde fra demoen', 'Screenshot from the demo (Norwegian interface)')
+    : kilde === 'pdf'
+      ? L('PDF fra demoen', 'PDF from the demo (Norwegian)')
+      : L('Skjermbilde fra demoen', 'Screenshot from the demo (Norwegian interface)')
   return (
     <Tag className={center ? 'cap cap--c' : 'cap'}>
       <span className="label">{label}</span>

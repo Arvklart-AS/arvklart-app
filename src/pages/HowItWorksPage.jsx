@@ -374,6 +374,19 @@ export default function HowItWorksPage({ loggedIn = false }) {
           <Cap>{L('Siden «Fordelingen», med utkastet som PDF.', 'The «Fordelingen» page, with the draft as a PDF.')}</Cap>
         </figure>
 
+        {/* Dokumentet selv. Laget av den samme koden som lager PDF-en i løsningen
+            (src/lib/distributionPdf.js, kind: 'demo'), med gjenstandene og verdiene fra
+            eksempelboet — ikke en tegning. DEMO-vannmerket står i PDF-en, ikke lagt på her. */}
+        <figure className="shotfig del__shot">
+          <div className="deskframe">
+            <Img lazy src="p-rapport.webp" w={1100} h={1145}
+              alt={L('Side 1 av PDF-en fra eksempelboet, med DEMO-vannmerke: overskriften «Fordeling av innbo og løsøre», gjenstandene per arving med beløp og avvik fra en lik andel, og til slutt tre gjenstander under «Ikke avklart – omfattes ikke av godkjenningen».',
+                'Page 1 of the PDF from the example estate, watermarked DEMO: the heading «Fordeling av innbo og løsøre» (Division of household contents), the items per heir with amounts and the deviation from an equal share, and finally three items under «Ikke avklart» (Not settled).')} />
+          </div>
+          <Cap kilde="pdf">{L('Hvem som får hva, og det som ikke er avklart. Gjenstander uten fordelingsverdi står uten beløp, aldri som 0 kr.',
+                  'Who gets what, and what is not settled. Items without a distribution value are shown without an amount, never as 0 kr.')}</Cap>
+        </figure>
+
         <Utdyp tittel={L('Hva «godkjent» betyr i Arvklart', 'What «approved» means in Arvklart')}>
           <div className="def">
             <div>
