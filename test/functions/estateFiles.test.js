@@ -96,3 +96,41 @@ describe('deleteEstate', { skip: !TS && 'Node uten TypeScript-støtte' }, () => 
     assert.equal(fake.db.feedback.length, 1)
   })
 })
+
+describe('filer som deles med et annet bo', { skip: !TS && 'Node uten TypeScript-støtte' }, () => {
+  test('eldre bilder, logo og dokumenter som et annet bo bruker, slettes ikke; boets egne slettes', async () => {
+    const fake = fakeSupabase({
+      tables: estateTables({
+        items: [
+          { id: 1, estate_id: EST, image_url: URL + 'items/delt.jpg', extra_images: [URL + 'items/bare-min.jpg'] },
+          { id: 2, estate_id: OTHER, image_url: null, extra_images: JSON.stringify([URL + 'items/delt.jpg?t=1']) },
+        ],
+        documents: [
+          { id: 'd1', estate_id: EST, file_path: 'documents/eldre/delt.pdf' },
+          { id: 'd2', estate_id: EST, file_path: 'documents/eldre/bare-min.pdf' },
+          { id: 'd3', estate_id: OTHER, file_path: 'documents/eldre/delt.pdf' },
+        ],
+      }),
+      storage: {
+        'item-images': { 'items/delt.jpg': {}, 'items/bare-min.jpg': {}, 'logos/delt.png': {}, ...manyFiles(EST, 2) },
+        'estate-docs': { 'documents/eldre/delt.pdf': {}, 'documents/eldre/bare-min.pdf': {} },
+      },
+    })
+    fake.db.estates[0].branding_logo = URL + 'logos/delt.png'
+    fake.db.estates[1].branding_logo = URL + 'logos/delt.png'
+    assert.deepEqual(await mod.countEstateFiles(fake.client, EST), { documents: 1, images: 3 })
+    await mod.removeEstateFiles(fake.client, EST)
+    assert.deepEqual([...fake.buckets['item-images'].keys()].sort(), ['items/delt.jpg', 'logos/delt.png'])
+    assert.deepEqual([...fake.buckets['estate-docs'].keys()], ['documents/eldre/delt.pdf'])
+  })
+
+  test('gjenstandene i andre bo leses side for side (mer enn 1000)', async () => {
+    const others = Array.from({ length: 1500 }, (_, i) => ({ id: `o${String(i).padStart(5, '0')}`, estate_id: OTHER, image_url: i === 1400 ? URL + 'items/delt.jpg' : null, extra_images: [] }))
+    const fake = fakeSupabase({
+      tables: estateTables({ items: [{ id: 'x', estate_id: EST, image_url: URL + 'items/delt.jpg', extra_images: [] }, ...others] }),
+      storage: { 'item-images': { 'items/delt.jpg': {} }, 'estate-docs': {} },
+    })
+    await mod.removeEstateFiles(fake.client, EST)
+    assert.ok(fake.buckets['item-images'].has('items/delt.jpg'))
+  })
+})
