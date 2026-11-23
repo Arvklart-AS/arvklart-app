@@ -54,7 +54,7 @@ const TRINN = () => [
       'Gjenstanden merkes «2 vil ha» i galleriet, med navnene på dem som har svart. Filteret «Ettertraktede» samler alle slike gjenstander.',
       'The item is marked «2 vil ha» (2 want it) in the gallery, with the names of those who answered. The «Ettertraktede» (contested) filter gathers every item like it.',
     ),
-    bilde: { src: 'f-flere.webp', w: 673, h: 308, zoom: 1.4 },
+    bilde: { src: 'f-flere.webp', w: 640, h: 360, zoom: 1.4 },
     alt: L(
       'Skjermbilde fra demoen: to gjenstandskort merket «2 vil ha» — oljemaleriet og familiealbumet — med navnene Lars Hansen og Kari Hansen under.',
       'Screenshot from the demo (Norwegian interface): two item cards marked «2 vil ha» (2 want it) — the oil painting and the family album — with the names Lars Hansen and Kari Hansen below.',
@@ -205,7 +205,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
         )}>
         <figure className="shotfig del__shot">
           <div className="deskframe" style={{ '--zoom': 1.5 }}>
-            <Img lazy src="i-legg-til.webp" w={640} h={332}
+            <Img lazy src="i-legg-til.webp" w={640} h={344}
               alt={L('Skjermbilde fra demoen: skjemaet «Legg til gjenstand» med «Bilder (valgfri, maks 5)», knappene «Ta bilder» og «Velg bilder», og feltet «Navn på gjenstand».',
                 'Screenshot from the demo (Norwegian interface): the «Legg til gjenstand» (Add item) form with «Bilder (valgfri, maks 5)» (photos, optional, max 5), the «Ta bilder» (Take photos) and «Velg bilder» (Choose photos) buttons, and the «Navn på gjenstand» (Item name) field.')} />
           </div>
@@ -260,10 +260,10 @@ export default function HowItWorksPage({ loggedIn = false }) {
           'You register names and email addresses. Arvklart writes an invitation message with a link, which you send on yourself. The person invited logs in with that same email address and answers one item at a time.',
         )}>
         <figure className="shotfig del__shot del__shot--bred">
-          <div className="deskframe" style={{ '--zoom': 2.6 }}>
-            <Img lazy src="f-filtre.webp" w={1320} h={186}
-              alt={L('Skjermbilde fra demoen: filterraden over galleriet med Alle 10, Mine 0, Ettertraktede 3, Noen vil ha 8, Ingen vil ha 2 og Tildelt 0, og søkefeltet under.',
-                'Screenshot from the demo (Norwegian interface): the filter row above the gallery with Alle 10 (all), Mine 0 (mine), Ettertraktede 3 (contested), Noen vil ha 8 (someone wants), Ingen vil ha 2 (nobody wants) and Tildelt 0 (allocated), with the search field below.')} />
+          <div className="deskframe" style={{ '--zoom': 1.7 }}>
+            <Img lazy src="f-filtre.webp" w={1320} h={84}
+              alt={L('Skjermbilde fra demoen: verktøylinjen over galleriet med søkefeltet, valget «Alle gjenstander (10)», «Alle kategorier» og byttet mellom Bilder og Analyse.',
+                'Screenshot from the demo (Norwegian interface): the toolbar above the gallery with the search field, the «Alle gjenstander (10)» (all items) choice, «Alle kategorier» (all categories) and the switch between Bilder (pictures) and Analyse (analysis).')} />
           </div>
           <Cap>{L(
             'Galleriet kan filtreres på dine egne svar, på hva flere har sagt ja til, hva noen vil ha, hva ingen har sagt ja til, og hva som allerede er tildelt.',
