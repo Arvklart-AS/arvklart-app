@@ -153,27 +153,13 @@ export default function HowItWorksPage({ loggedIn = false }) {
         lead={L(
           'Fire deler, fra de første bildene til en fordeling dere kan dokumentere. Vi følger ett oljemaleri fra eksempelboet hele veien.',
           'Four parts, from the first photos to a division you can document. We follow one oil painting from the example estate all the way.',
-        )}>
-        <p className="phero__cta">
-          <DemoCta demo={demo} />
-          <a className="ul ul--sub" href={demo.href} onClick={demo.onClick}>{L('Ingen registrering', 'No sign-up')}</a>
-        </p>
-        <DemoError demo={demo} />
-        <p className="micro">{L(
-          'Eksempelboet har 3 arvinger og 10 gjenstander. Du trenger ingen konto for å se det.',
-          'The example estate has 3 heirs and 10 items. You need no account to look at it.',
-        )}</p>
-      </PageHero>
-
-      {/* ============ VIDEOEN ============ */}
-      {/* Uten lyd, uten autostart og uten løkke: den starter bare når noen trykker, så den
-          respekterer både «reduser bevegelse» og databruk. Plakatbildet har samme mål som
-          videoen, så siden ikke hopper mens den lastes. De fire delene under sier det samme
-          i tekst, og det er tekstalternativet til videoen (WCAG 1.2.1). */}
-      <section className="ground g-natt sec sec--tight" aria-labelledby="h2-video">
-        <div className="rules" aria-hidden="true"><i /></div>
-        <div className="wrap">
-          <h2 id="h2-video" className="visuelt-skjult">{L('Film: Arvklart på ett minutt', 'Film: Arvklart in one minute')}</h2>
+        )}
+        /* FILMEN
+           Uten lyd, uten autostart og uten løkke: den starter bare når noen trykker, så den
+           respekterer både «reduser bevegelse» og databruk. Plakatbildet har samme mål som
+           videoen, så siden ikke hopper mens den lastes. Tekstalternativet (WCAG 1.2.1) er de
+           fire delene under, slik reserveteksten i <video> sier. */
+        aside={
           <figure className="vid">
             <video className="vid__v" controls playsInline preload="metadata"
               poster="/nettsted/produktvideo-plakat.webp" width={1920} height={1080}
@@ -185,16 +171,18 @@ export default function HowItWorksPage({ loggedIn = false }) {
               {L('Nettleseren din kan ikke spille av denne filmen. De fire delene under forklarer det samme i tekst.',
                  'Your browser cannot play this film. The four parts below explain the same thing in text.')}
             </video>
-            <figcaption className="cap">
-              <span className="label">{L('Film uten lyd', 'Film without sound')}</span>
-              <i>{L(
-                '1 min 15 sek. Alt filmen viser, står også i tekst i de fire delene under.',
-                '1 min 15 sec. Everything the film shows is also written out in the four parts below.',
-              )}</i>
-            </figcaption>
           </figure>
-        </div>
-      </section>
+        }>
+        <p className="phero__cta">
+          <DemoCta demo={demo} />
+          <a className="ul ul--sub" href={demo.href} onClick={demo.onClick}>{L('Ingen registrering', 'No sign-up')}</a>
+        </p>
+        <DemoError demo={demo} />
+        <p className="micro">{L(
+          'Eksempelboet har 3 arvinger og 10 gjenstander. Du trenger ingen konto for å se det.',
+          'The example estate has 3 heirs and 10 items. You need no account to look at it.',
+        )}</p>
+      </PageHero>
 
       {/* ============ DEL 1 ============ */}
       <Del n={1} id="h2-1" overline={L('Del 1 av 4', 'Part 1 of 4')}
@@ -384,6 +372,19 @@ export default function HowItWorksPage({ loggedIn = false }) {
                 'Screenshot from the demo (Norwegian interface): the «Fordelingen» (The distribution) page with the text saying everything is provisional until everyone has approved, and the «Last ned utkast (PDF)» button.')} />
           </div>
           <Cap>{L('Siden «Fordelingen», med utkastet som PDF.', 'The «Fordelingen» page, with the draft as a PDF.')}</Cap>
+        </figure>
+
+        {/* Dokumentet selv. Laget av den samme koden som lager PDF-en i løsningen
+            (src/lib/distributionPdf.js, kind: 'demo'), med gjenstandene og verdiene fra
+            eksempelboet — ikke en tegning. DEMO-vannmerket står i PDF-en, ikke lagt på her. */}
+        <figure className="shotfig del__shot">
+          <div className="deskframe">
+            <Img lazy src="p-rapport.webp" w={1100} h={1145}
+              alt={L('Side 1 av PDF-en fra eksempelboet, med DEMO-vannmerke: overskriften «Fordeling av innbo og løsøre», gjenstandene per arving med beløp og avvik fra en lik andel, og til slutt tre gjenstander under «Ikke avklart – omfattes ikke av godkjenningen».',
+                'Page 1 of the PDF from the example estate, watermarked DEMO: the heading «Fordeling av innbo og løsøre» (Division of household contents), the items per heir with amounts and the deviation from an equal share, and finally three items under «Ikke avklart» (Not settled).')} />
+          </div>
+          <Cap kilde="pdf">{L('Hvem som får hva, og det som ikke er avklart. Gjenstander uten fordelingsverdi står uten beløp, aldri som 0 kr.',
+                  'Who gets what, and what is not settled. Items without a distribution value are shown without an amount, never as 0 kr.')}</Cap>
         </figure>
 
         <Utdyp tittel={L('Hva «godkjent» betyr i Arvklart', 'What «approved» means in Arvklart')}>

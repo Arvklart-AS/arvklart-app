@@ -59,10 +59,19 @@ Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som 
 
 Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
 
-Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
-`/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
-av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
-og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
+**Toppmenyen er alltid `#1F221E`, uansett bo.** `TopBar.jsx` har riktignok
+`estate?.branding_color || '#1F221E'`, men `App.jsx` sender aldri `estate` til komponenten
+(`<TopBar profile session onToast />`, det eneste stedet den brukes), så uttrykket faller alltid
+tilbake på standarden. Det har aldri vært sendt — ikke før den mørke appen heller. Teksten er
+hardkodet lys (`#F5F2EB`); `tc()` i samme fil velger lys eller mørk tekst etter lysheten i fargen,
+men brukes bare på avatarfargen.
+
+Derfor: **`estates.branding_color` påvirker ikke toppmenyen.** Den leses bare ett sted som synes —
+den lille ruten på bo-kortet på `/app` (`EstatesPage.jsx`). «Merkevare» på `/estate/:id/admin`
+skriver verdien, men den slår altså ikke ut i toppen av appen slik siden kan gi inntrykk av.
+Migreringen `20261120170000_header_farge` (ikke kjørt) ville bare endret den lille ruten.
+Skal «Merkevare» virke på toppmenyen, må `estate` sendes til `TopBar` **og** tekstfargen velges
+med `tc()`, ellers blir lys tekst på lys flate.
 
 Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
 
@@ -158,7 +167,7 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
 | Rute | Komponent | Beskrivelse |
 |------|-----------|-------------|
 | `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app`. Designet ligger i `src/site/` |
-| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret) |
+| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret). Produktfilmen står i sidetoppen, i høyre kolonne ved siden av overskriften (`aside` på `PageHero`): uten lyd, uten autostart og uten løkke, og tekstalternativet (WCAG 1.2.1) er de fire delene under |
 | `/om-oss` | AboutPage | Teamet bak Arvklart (forhåndsrendret) |
 | `/kontakt` | ContactPage | Kontakt, e-post med ferdig emne (forhåndsrendret; ingen skjema) |
 | `/app` | EstatesPage | Liste over brukerens bo (inngangen til appen) |

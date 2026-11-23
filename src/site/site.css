@@ -1055,34 +1055,23 @@ halvparten. Lyset kommer fra øvre venstre.
   opacity:clamp(0,calc(var(--lift) * 2.6 - 1.6),1);
   transition:opacity var(--t-m) var(--ease)
 }
-.ak .cross .phone{
-  display:none
-}
 .ak .cap--c{
   justify-items:center;text-align:center;margin-inline:auto
 }
+/* På smale skjermer sto skjermbildene før forstørret (`--zoom`) og klippet, med en maske som
+   tonet ut mot høyre. Det ga uleselige utsnitt: på 390 px ble bildene 498–1060 px brede, så
+   opptil 63 % av innholdet lå utenfor skjermen, og man så bare en bit av en knapp. Nå vises
+   hele bildet i full bredde. Skriften inni blir liten, men bildene er illustrasjoner — det er
+   «Du gjør»/«Da skjer» og brødteksten som bærer meningen. `--zoom` gjelder fortsatt ingenting
+   over 760 px, der bildene uansett vises i sin helhet. */
 @media (max-width:760px){
-  .ak .deskframe{
-    overflow:hidden
-  }
   .ak .deskframe img{
-    width:calc(100% * var(--zoom,1));max-width:none
-  }
-  /* bare de forstørrede: tonen ut mot høyre sier at dette er et utsnitt */
-  .ak .deskframe[style*="--zoom"] img{
-    -webkit-mask:linear-gradient(to right,#000 88%,transparent);
-    mask:linear-gradient(to right,#000 88%,transparent)
+    width:100%;max-width:100%;height:auto
   }
 }
 @media (max-width:980px){
   .ak .cross{
     --edgeY:calc(86svh - var(--lift) * 80svh);--frameTop:6svh;--frameH:70svh;height:95svh;--fpad:7px;--winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 2px + var(--fpad))
-  }
-  .ak .cross .desk{
-    display:none
-  }
-  .ak .cross .phone{
-    display:block
   }
   .ak .frame{
     width:min(100%,300px);border-radius:30px;padding:7px;
@@ -1112,9 +1101,6 @@ halvparten. Lyset kommer fra øvre venstre.
 }
 .ak .g-papir .shotfig:hover .phoneframe{
   border-color:var(--granskog)
-}
-.ak .ki__shots .phoneframe{
-  --ph:clamp(300px,30vw,430px)
 }
 .ak .quotes .rows>li{
   border-color:rgba(242,238,230,.16)
@@ -1193,36 +1179,6 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
     order:2
   }
 }
-.ak .s3__shot .deskframe{
-  border:1px solid rgba(242,238,230,.2);border-radius:2px;padding:8px;
-  background:rgba(242,238,230,.05);width:min(100%,980px);
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
-}
-.ak .s3__shot .phone{
-  display:none
-}
-@media (max-width:760px){
-  .ak .s3__shot .desk{
-    display:none
-  }
-  .ak .s3__shot .phone{
-    display:block
-  }
-  .ak .s3__shot .deskframe{
-    width:min(100%,420px)
-  }
-}
-.ak .s3__shot:hover .deskframe{
-  transform:translateY(-5px);border-color:var(--mose)
-}
-.ak .s3__metshot .deskframe{
-  border:1px solid rgba(242,238,230,.2);border-radius:2px;padding:7px;
-  background:rgba(242,238,230,.05);max-width:400px;
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
-}
-.ak .s3__metshot:hover .deskframe{
-  transform:translateY(-5px);border-color:var(--mose)
-}
 /* ============================================================
    §4 / §7 — tekst + telefon
    ============================================================ */
@@ -1252,9 +1208,10 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   .ak .split--rev .split__txt{
     order:0
   }
-  .ak .split__fig{
-    justify-items:start
-  }
+  /* Figuren var venstrestilt når kolonnene stables, for å følge tekstens venstrekant. Men
+     telefonen er smalere enn kolonnen, så den ble liggende i venstre hjørne med opptil 552 px
+     tomrom ved siden av (målt ved 980 px). Den følger nå `justify-items:center` fra
+     grunnregelen, som over bruddpunktet. */
 }
 /* ---- valgfri KI-hjelp: et smalt bånd, ikke et eget hovedsteg ---- */
 .ak .valgfri{
@@ -1640,16 +1597,32 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 .ak .phero--slik{
   border-bottom:1px solid rgba(242,238,230,.1)
 }
-/* ---- filmen øverst ---- */
-.ak .vid{
-  margin:0 auto;max-width:1100px
+/* ---- filmen i sidetoppen ----
+   Sidetoppen får to kolonner: teksten til venstre, filmen til høyre. Teksten står først i
+   markeringen, så under bruddpunktet legges de under hverandre med overskriften øverst.
+   `minmax(0,1fr)` i stedet for `1fr`, ellers kan videoen presse kolonnen bredere enn halve
+   bredden (rutenettsspor har `min-width:auto` som standard).
+   Bruddpunktet er 1024 px, ikke lavere: en kolonne er halve bredden, så et for tidlig bytte
+   gjør filmen mindre enn den var stablet (målt: 809 px stablet mot 390 px i to kolonner ved
+   900 px). Stablet får den en øvre bredde, så den ikke blir urimelig stor på mellomstore
+   skjermer. */
+.ak .phero__med{
+  display:grid;gap:clamp(28px,3.4vw,56px);align-items:center
+}
+.ak .phero__med .vid{
+  margin-inline:auto;max-width:760px
+}
+@media (min-width:1024px){
+  .ak .phero__med{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)
+  }
+  .ak .phero__med .vid{
+    margin-inline:0;max-width:none
+  }
 }
 .ak .vid__v{
   display:block;width:100%;height:auto;aspect-ratio:16/9;
   border:1px solid var(--rule);border-radius:2px;background:var(--natt)
-}
-.ak .vid .cap{
-  margin-top:clamp(12px,1.4vw,18px)
 }
 /* ---- en hoveddel ---- */
 .ak .del__h{
@@ -1737,14 +1710,20 @@ Da hopper ikke siden når man bytter trinn, og ingen av dem blir liggende i et t
 .ak .trinn__steg .deskframe img{
   max-height:clamp(174px,21vw,314px);width:auto
 }
-/* På smale skjermer gjelder mobilforstørrelsen (--zoom) i stedet: hele bildet skrumpet
-ned ville gitt uleselig skrift. Høydetaket er da av, så ingenting klippes på tvers. */
+/* På smale skjermer vises hele bildet i full bredde (se mobilregelen for .deskframe over),
+   så høydetaket og den felles høyden er av. `align-content:start` er nødvendig: trinnene
+   ligger oppå hverandre i samme rute, så ruten er like høy som det høyeste trinnet, og uten
+   den strakk radene i et kort trinn seg ut og la igjen et tomrom på ~400 px mellom
+   bildeteksten og «Du gjør». Slakken legger seg nå nederst i stedet. */
 @media (max-width:760px){
   .ak .trinn__steg .deskframe img{
     max-height:none
   }
   .ak .trinn__steg .deskframe{
     min-height:0
+  }
+  .ak .trinn__steg{
+    align-content:start
   }
 }
 .ak .trinn__steg{
