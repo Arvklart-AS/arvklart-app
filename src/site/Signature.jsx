@@ -11,8 +11,9 @@ import { L } from '../lib/lang'
 // Enhetsgruppen er tre ekte skjermbilder fra den offentlige demoen, tatt i samme økt. Rammene er
 // tegnet i CSS; skjerminnholdet er uendret. Under 980 px byttes riggen ut med ett telefonbilde.
 //
-// Utsnittene er beskjært, ikke redigert: nettbrettet viser skjemaet «Legg til gjenstand», PC-en
-// oversikten over boet ned til og med filtrene. Demodataene er urørt.
+// Utsnittene er beskjært, ikke redigert: nettbrettet viser galleriet fra rad to (uten gyngestolen),
+// PC-en oversikten over boet ned til «Alt i boet». Demodataene er urørt. Tatt på nytt i det mørke
+// uttrykket 23.11.2026, med samme filnavn og mål (se docs/ny-offentlig-nettside.md, 2.13).
 
 export default function Signature() {
   const cross = useRef(null)
@@ -121,8 +122,8 @@ export default function Signature() {
             <div className="dev__sk">
               <Img src="d-oversikt.webp" w={885} h={553}
                 alt={L(
-                  'Skjermbilde fra Arvklart-demoen på PC: oversikten over Fam. Hansen sitt bo med status for boet, varsel om gjenstander som ikke er besvart, snarveier til veiviser, arvinger og løsningsmetoder, og filtrene over gjenstandene.',
-                  'Screenshot from the Arvklart demo on a computer (Norwegian interface): the overview of the Hansen family estate with the status of the estate, a notice about items not yet answered, shortcuts to the guide, the heirs and the distribution methods, and the filters above the items.',
+                  'Skjermbilde fra Arvklart-demoen på PC: oversikten over Fam. Hansen sitt bo med hvor mange gjenstander som er fordelt, og «Anbefalt nå»: «Du har 10 gjenstander du ikke har tatt stilling til» med knappen «Gå gjennom nå».',
+                  'Screenshot from the Arvklart demo on a computer (Norwegian interface): the overview of the Hansen family estate with how many items have been divided, and «Anbefalt nå» (Recommended now): «Du har 10 gjenstander du ikke har tatt stilling til» (You have 10 items you have not answered) with the button «Gå gjennom nå» (Go through now).',
                 )} />
             </div>
           </div>
@@ -143,8 +144,8 @@ export default function Signature() {
             <div className="frame__win">
               <Img src="m-hero.webp" w={620} h={1342}
                 alt={L(
-                  'Skjermbilde fra Arvklart-demoen på mobil: oversikten over Fam. Hansen sitt bo med status for boet og snarveier.',
-                  'Screenshot from the Arvklart demo on a phone (Norwegian interface): the overview of the Hansen family estate with the status of the estate and shortcuts.',
+                  'Skjermbilde fra Arvklart-demoen på mobil: oversikten over Fam. Hansen sitt bo med hvor mange gjenstander som er fordelt, «Anbefalt nå» og starten på «Hva vil du gjøre?».',
+                  'Screenshot from the Arvklart demo on a phone (Norwegian interface): the overview of the Hansen family estate with how many items have been divided, «Anbefalt nå» (Recommended now) and the start of «Hva vil du gjøre?» (What do you want to do?).',
                 )} />
               <div className="frame__veil" aria-hidden="true" />
             </div>

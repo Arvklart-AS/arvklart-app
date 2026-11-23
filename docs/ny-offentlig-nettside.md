@@ -308,6 +308,24 @@ vises forstørret med uttoning mot høyre i stedet for skrumpet til uleselig skr
   norsk, også i den engelske versjonen. Det var et hull i den engelske dekningen jeg meldte som
   ferdig forrige runde. Rettet.
 
+### 2.13 Forsidens skjermbilder i det mørke uttrykket (23.11.2026)
+
+Skjermbildene på forsiden viste appen i det gamle, lyse uttrykket. De elleve bildene forsiden bruker
+(`d-oversikt`, `d-galleri`, `d-phone`, `m-hero`, `i-skjema`, `j-maleri`, `j-svar`, `j-onsker`,
+`p-metoder`, `m-dok`, `m-veiviser`) er tatt på nytt fra den offentlige demoen, med appen i det mørke
+uttrykket. Filnavn, pikselmål og utsnitt er de samme som før, så rammene i `site.css` og `width`/`height`
+i markupen er uendret. Bildene er beskåret og skalert, ikke redigert, og har ingen metadata.
+
+* Telefonbildene er tatt i 390 × 844 (2×), PC i 1280 bredde, nettbrettet i 820 bredde.
+* `d-galleri` viser fortsatt rad to og ned (uten gyngestolen, punkt 5.2). `d-oversikt` går nå ned til
+  «Alt i boet», fordi oversikten ikke lenger har filtre.
+* `p-metoder` krever at Mona har svart på alle gjenstandene (ellers viser «Løsningsmetoder» bare
+  ventesiden). Hun svarte «Ikke interessert» i demoen; det nullstilles ved neste demoinnlogging.
+* Alt-tekstene er oppdatert der innholdet er endret: PC- og mobiloversikten, skjemaet og veiviserens
+  nye overskrift.
+* Bildene på «Slik fungerer det» (`f-filtre`, `f-flere`, `i-legg-til`, `j-verdi`, `m-fordeling`,
+  `m-godkjenning`, plakatbildet) er ikke tatt på nytt i denne runden.
+
 ---
 
 ## 3. Testresultater
