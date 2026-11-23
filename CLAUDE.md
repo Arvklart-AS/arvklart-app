@@ -41,31 +41,47 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - `scripts/smoke-browser.mjs` (`.github/workflows/smoke.yml`) er en røyktest i ekte nettleser mot forhåndsvisningen og produksjonen: forsiden, `/home`, `/app` uten innlogging, innlogging med feil passord, nytt passord, invitasjon, veiviseren (i siden, uten iframe; `/veiviser.html` gir 308), personvern og demoen med navigering i demo-boet. Ingen ekte kontoer; den rapporterer bare
 
 ## Fargepalett — bruk alltid disse
+Fargene er fra «Fargepalett.pdf» (designsystemet «Arvklart» → Farger). **Den innloggede appen er mørk**, i samme uttrykk som arvklart.no (`src/site/site.css`):
 ```
-#1F221E  natt (toppmenyen i appen og headeren på markedssidene)
-#3A2F26  espresso (primær bakgrunn, knapper, tekst på lyse flater)
-#FBF9F5  snow (side-bakgrunn)
-#E8DFD0  sand (kort, input-bakgrunn)
-#D9CFC0  grense/border
-#75604B  mørk latte (sekundær tekst; 5,7:1 på snow, 4,5:1 på sand)
-#9C8267  latte (bare ikoner, diagramflater og dekor; for lys som tekst)
-#9A8B78  feltkant (input/select/textarea; 3,3:1 mot hvit)
-#5C4530  valnøtt (primær tekst i lys kontekst)
-#5F6E52  mørk sage (suksess, aksent)
-#8B9A7D  sage
-#DCE3D2  tåkesage (subtil bakgrunn)
+#1F221E  natt (bakgrunn og toppmenyen)
+#272A25  flate (kort; Natt løftet litt)
+#30342D  flate høy (bokser, dialoger, menyer, bildebakgrunn)
+#F2EEE6  lin (tekst, og fylte knapper med Natt-tekst)
+#B9B4A8  lin dempet (sekundærtekst; 8,5:1 mot Natt)
+rgba(242,238,230,.14)  hårstreker   rgba(242,238,230,.4)  feltkanter (3:1)
+#9DAA8C  mose (aksent, «ferdig», fokusring)
+#C79A6B  messing lys (overlinjene)    #D7BA9A  ordfarge (fremhevet ord i store overskrifter)
+#E08A7A  rust lys (feil og sletting)  #2F4A43  granskog (mørk grønn flate, f.eks. demobanneret)
 ```
+Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som også bestemmer hvilke sider som er lyse (`isLightAppPath`) og har den globale CSS-en (`appDarkCss`: Bodoni Moda fra `/fonter`, fokusring, mørke skjemafelt, lyset øverst). Oversikten i boet og gjenstandslisten bruker klassene i `src/lib/estateThemeCss.js` (prefiks `bo-`); de andre sidene har fargene i inline style.
 
-Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
-`/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
-av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
-og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
+**Lyse sider:** sidene som også vises for utloggede (innlogging, nytt passord, invitasjon, personvern, kontakt, veiviseren, guidene, forsiden) og PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) bruker produktpaletten (lys): papir `#F5F2EB`, kalk `#EAE5DA`, blekk `#1F2326`, skifer `#575B5E`, granskog `#2F4A43`, messing `#8A5A34`, strek `#CFC8BA`, rust `#9A3B2E`.
 
-Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` i `index.html` (mørke flater setter lys ring selv). Hvit tekst bare på `#5F6E52` eller mørkere, ikke på `#8B9A7D`.
+Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
+
+**Toppmenyen er alltid `#1F221E`, uansett bo.** `TopBar.jsx` har riktignok
+`estate?.branding_color || '#1F221E'`, men `App.jsx` sender aldri `estate` til komponenten
+(`<TopBar profile session onToast />`, det eneste stedet den brukes), så uttrykket faller alltid
+tilbake på standarden. Det har aldri vært sendt — ikke før den mørke appen heller. Teksten er
+hardkodet lys (`#F5F2EB`); `tc()` i samme fil velger lys eller mørk tekst etter lysheten i fargen,
+men brukes bare på avatarfargen.
+
+Derfor: **`estates.branding_color` påvirker ikke toppmenyen.** Den leses bare ett sted som synes —
+den lille ruten på bo-kortet på `/app` (`EstatesPage.jsx`). «Merkevare» på `/estate/:id/admin`
+skriver verdien, men den slår altså ikke ut i toppen av appen slik siden kan gi inntrykk av.
+Migreringen `20261120170000_header_farge` (ikke kjørt) ville bare endret den lille ruten.
+Skal «Merkevare» virke på toppmenyen, må `estate` sendes til `TopBar` **og** tekstfargen velges
+med `tc()`, ellers blir lys tekst på lys flate.
+
+Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
+
+**Uttrykket (som arvklart.no):** overskrifter i Bodoni Moda (`'Bodoni Moda', 'Times New Roman', serif`, med `font-optical-sizing: none`), en overlinje over sideoverskriften (`<Overline>` i `src/components/UI.jsx`), pilleknapper (`borderRadius: '999px'`), hårstreker og nummererte rader med pluss/minus på oversikten.
+
+**Bilde ved hver handling:** der man gjør noe med en gjenstand (løsningsmetoder, fordelingen, ingen vil ha, sveiping, dialoger), vises bildet av gjenstanden med `ItemThumb` eller `ItemHead` (`src/components/ItemThumb.jsx`). Et trykk viser bildet stort, med lenke til gjenstanden; i dialoger brukes `still`, så det ikke åpnes et vindu oppå.
 
 ## Typografi
 - `fontFamily: 'Karla, sans-serif'` — brødtekst og UI
-- `fontFamily: "'Fraunces', serif"` — overskrifter/display
+- `fontFamily: "'Bodoni Moda', 'Times New Roman', serif"` — overskrifter/display i appen (som arvklart.no). Fraunces brukes fortsatt på noen offentlige sider
 
 ## Filer som IKKE skal røres uten diskusjon
 - `src/lib/supabase.js` — Supabase-klient, endringer kan bryte auth
@@ -111,6 +127,11 @@ Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:foc
   - Koden trekker ikke fra noe i tillegg. Den gjør bare intervallet bredere og senker sikkerheten når grunnlaget er usikkert.
   - For lite grunnlag gir `status: 'insufficient'` med tips og ingen verdi (aldri 0 kr).
   - AI-ens anslag lagres i `ai_analysis.valuation`, adskilt fra `estimated_value`.
+- Visning av anslaget (`src/lib/valueAdvice.js`, testet i `test/lib/valueAdvice.test.js`; grunnlaget er kalibreringen mot 20 solgte gjenstander i `eval/`, der AI-en bommet mest, og oftest for lavt, på sølv, smykker og kunst):
+  - Anslaget vises som spenn (`formatRange`), aldri som ett tall og aldri med «sikkerhet».
+  - `valueAdvice` gir `instead` for en ren AI-gjetning (`method: model`) over 10 000 kr, i kategoriene kunst, smykker/ur og samleobjekter, eller når gjenstanden kan være sølv eller gull (`preciousMetal`). Da vises ikke noe beløp, det lagres ikke i `estimated_value`, og familien rådes til å få det vurdert eller legge inn en solgt pris (`appraiseText`). Bygger anslaget på familiens sammenligninger, vises beløpet med en merknad (`suggest`).
+  - `preciousMetal` leser materialet (familiens rettelse først), stempler og gull-/sølvsmed. «Er det ekte sølv?» (`src/components/MetalQuestion.jsx`) spør om stempel og vekt, og svaret lagres som familiens rettelse av materialet. «Forsølvet»/«plett» fra familien opphever regelen; «vet ikke» gjør det ikke.
+  - Holdes AI-tallet tilbake (`withheldFor`), kan arvingene foreslå en verdi selv under «Hva er den verdt?» på gjenstandssiden (`vote_item_value`, som et verdiforslag).
 - Storage: `estate-docs` er privat (`documents/<bo-id>/…`, åpnes med `createSignedUrl`); `item-images` vises med tidsbegrensede, signerte URL-er via `<StoredImage>` (`src/components/StoredImage.jsx`, `src/lib/imageUrls.js`). Databasen lagrer fortsatt den offentlige URL-en som identifikator. Bøtten gjøres privat i S3, så bruk aldri `<img src={item.image_url}>` direkte. Nye filer lagres under `<bo-id>/…` (`src/lib/images.js`)
 
 ## Demokonto
@@ -146,11 +167,12 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
 | Rute | Komponent | Beskrivelse |
 |------|-----------|-------------|
 | `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app`. Designet ligger i `src/site/` |
-| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret) |
+| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret). Produktfilmen står i sidetoppen, i høyre kolonne ved siden av overskriften (`aside` på `PageHero`): uten lyd, uten autostart og uten løkke, og tekstalternativet (WCAG 1.2.1) er de fire delene under |
 | `/om-oss` | AboutPage | Teamet bak Arvklart (forhåndsrendret) |
 | `/kontakt` | ContactPage | Kontakt, e-post med ferdig emne (forhåndsrendret; ingen skjema) |
 | `/app` | EstatesPage | Liste over brukerens bo (inngangen til appen) |
-| `/estate/:id` | EstatePage | Bo-oversikt |
+| `/estate/:id` | EstatePage | Bo-oversikten: hvor langt boet har kommet, «Anbefalt nå» (én handling) og fire nedtrekksgrupper (Gjenstander, Fordeling, Arvinger, Praktisk) med lenker til egne sider. Hva administrator, arving og demo ser, og hva som anbefales, står i `src/lib/estateOverview.js` (testet i `test/estate/overview.test.js`). Demoen viser ikke sidene som er sperret for den (`notForDemo`), og kan prøve AI, men ikke lagre |
+| `/estate/:id/gjenstander` | EstateItemsPage | Alle gjenstandene med store bilder. Søk, «Vis» (alle, mine ønsker, ettertraktede, noen vil ha, ingen vil ha, tildelt) og kategori står i adressen (`?vis=…&kategori=…&sok=…`, `src/lib/itemFilters.js`), og «Analyse» (`?visning=analyse`) viser fordelingen per kategori og status. Gjenstandssiden går tilbake hit med samme utvalg (`state.back`) |
 | `/estate/:id/add` | AddItemPage | Legg til gjenstand (inkl. AI-analyse) |
 | `/estate/:id/add-many` | AddItemsPage | Legg til opptil 20 gjenstander: kamera i appen (ett bilde = én gjenstand, «Flere bilder av denne» for flere), kamerarull/filer/dra-og-slipp, AI analyserer alle (ett kall per gjenstand, høyst fire samtidig). Analysen låser bare kortene den gjelder, og etter første «Analyser med AI» analyseres nye bilder av seg selv. AI lagrer aldri selv: brukeren ser over kortene og trykker «Godkjenn og lagre alle» |
 | `/estate/:id/swipe` | SwipePage | Ta stilling til gjenstander (vil ha / nei takk) |
@@ -161,6 +183,7 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
 | `/guider/:slug` | ArticlePage | SEO-guider fra `content/guider/*.md` (forhåndsrendret; utkast og ukjente gir 404) |
 | `/personvern` | PrivacyPage | Personvernerklæring + vilkår (offentlig) |
 | `/konto` | AccountPage | Dataeksport og kontosletting |
+| `/founder` | FounderPage | Founder-dashboardet (tofaktor): oversikt, planer, founders, sletting av bo og kundekontoer |
 | `/logg-inn` | LoginPage | Innlogging/registrering |
 
 ## Founder-dashboard (`/founder`)
@@ -179,5 +202,6 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
   - Bo brukeren er alene om, slettes med alle filer.
   - I delte bo gis administratorrollen videre. Navn, verdiforslag, stemmer og AI-rettelser fjernes fra gjenstandene, mens gjenstandene og bildene blir værende som boets innhold.
   - Appen får faste feilkoder, aldri råtekst.
-- Sletting av avsluttede bo (`estates.closed_at`): edge-funksjonen `cleanup-closed-estates` (data, filer og tilbakemeldinger knyttet til boet; sletter bo avsluttet for over 12 mnd) er **ikke i drift** (ingen cron, `cleanup_runs` ikke kjørt i prod). Appen og personvernerklæringen lover derfor ingen automatisk sletting: et avsluttet bo oppbevares til administratoren ber Arvklart slette det, eller til eneste medlem sletter kontoen. Ikke lov en frist i tekstene før en rutine med ansvarlig, kontrollintervall og logg i `cleanup_runs` er satt i drift og testet; kjøringer skal logges i `cleanup_runs`. Foreldreløse bilder ryddes bare manuelt med `cleanup-orphan-images` (dry_run + bekreftelse). Se `supabase/README.md`
+- Sletting av et bo eller en kundekonto på forespørsel: bare founders med tofaktor, fra `/founder` (fanen «Sletting (GDPR)», `src/components/FounderGdprPanel.jsx`: status, søk, rutine, slettelogg via `{ action: 'overview' }`, avsluttede bo og forslaget til lagringstider; eller «Boer»/«Brukere» → «Slett …», `src/components/FounderDeleteDialog.jsx`, edge-funksjonen `founder-delete`, logikken i `_shared/founderDelete.ts`). Alltid dry run først og bekreftelse med boets navn eller kontoens e-post; aldri demoboet, demokontoene, egen konto eller en annen founder. En konto slettes som ved egen sletting (`deleteAccountData`). Filer som også brukes av et annet bo, slettes aldri (`withoutSharedFiles` i `_shared/estateFiles.ts`). Hver sletting logges i `founder_audit_log` (bare id-er og antall) før den starter. Administratoren av et bo kan ikke slette boet selv. Rutine, kart over hva som slettes og forslag til lagringstider (ikke vedtatt): `docs/sletting-av-bo.md`. Tester: `test/functions/founderDelete.test.js`, `test/lib/founderGdpr.test.js`, `test/e2e/founder.mjs`, `test/db/cleanup.mjs`
+- Sletting av avsluttede bo (`estates.closed_at`): edge-funksjonen `cleanup-closed-estates` (data, filer og tilbakemeldinger knyttet til boet) er **ikke i drift** (ingen cron, `cleanup_runs` ikke kjørt i prod) og har ingen standard lagringstid: uten `CLOSED_ESTATE_RETENTION_MONTHS` nekter den å kjøre (fail closed). Appen og personvernerklæringen lover derfor ingen automatisk sletting: et avsluttet bo oppbevares til administratoren ber Arvklart slette det, eller til eneste medlem sletter kontoen. Ikke lov en frist i tekstene før en rutine med ansvarlig, kontrollintervall og logg i `cleanup_runs` er satt i drift og testet; kjøringer skal logges i `cleanup_runs`. Foreldreløse bilder ryddes bare manuelt med `cleanup-orphan-images` (dry_run + bekreftelse). Se `supabase/README.md`
 - Behandlingsansvarlig: `COMPANY` i `OtherPages.jsx` er **Arvklart AS, org.nr. 938 816 085**, verifisert 19.11.2026 mot Enhetsregisteret (`data.brreg.no/enhetsregisteret/api/enheter/938816085`: aksjeselskap, registrert 05.11.2026, Tertnesgrenden 13, 5113 Tertnes). De samme opplysningene står i bunnteksten på de offentlige sidene (`src/site/SiteLayout.jsx`); `test/seo/nettsted.test.js` sjekker at de to stemmer overens

@@ -13,13 +13,13 @@ import MarketCompare from '../components/MarketCompare'
 import ItemHistory from '../components/ItemHistory'
 import AgreedValue from '../components/AgreedValue'
 import { withCorrections } from '../lib/aiCorrections'
-import { formatRange } from '../lib/valueAdvice'
+import { formatRange, withheldFor } from '../lib/valueAdvice'
 import { assignItems, unassignItem } from '../lib/assignments'
 import { recipientsOf, recipientOf, isUnconfirmedAssignment } from '../lib/recipients'
 import { pendingMembersFor } from '../lib/estateProgress'
 import StoredImage from '../components/StoredImage'
 
-const tc = c => { if(!c)return'#FBF9F5'; const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16); return(0.299*r+0.587*g+0.114*b)/255>0.55?'#3A2F26':'#FBF9F5' }
+const tc = c => { if(!c)return'#F5F2EB'; const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16); return(0.299*r+0.587*g+0.114*b)/255>0.55?'#1F2326':'#F5F2EB' }
 
 export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
   const { id, itemId } = useParams()
@@ -48,6 +48,11 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
   const [withdrawn, setWithdrawn] = useState(null) // { reason } etter «Trekk ønsket mitt», til angring
   const commentsEndRef = useRef(null)
   const location = useLocation()
+  // «← Tilbake» går til gjenstandslisten med samme utvalg som før (EstateItemsPage sender det med i state.back).
+  // Åpnet fra et annet sted (lenke, ny fane) går den til hele listen.
+  const backTo = typeof location.state?.back === 'string' && location.state.back.startsWith(`/estate/${id}/`)
+    ? location.state.back
+    : `/estate/${id}/gjenstander`
   // Lenken «Kommenter» (…#kommentarer) ruller ned til kommentarfeltet når siden er lastet
   useEffect(() => {
     if (!loading && location.hash === '#kommentarer') document.getElementById('kommentarer')?.scrollIntoView({ block: 'start' })
@@ -83,8 +88,8 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
 
   useEffect(() => { commentsEndRef.current?.scrollIntoView({ behavior:'smooth' }) }, [comments.length])
 
-  if (loading) return <div style={{ padding:'80px', textAlign:'center', color:'#75604B', fontFamily:'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
-  if (!item) return <div style={{ padding:'80px', textAlign:'center', color:'#75604B', fontFamily:'Karla, sans-serif' }}>{L('Gjenstand ikke funnet.', 'Item not found.')}</div>
+  if (loading) return <div style={{ padding:'80px', textAlign:'center', color:'#B9B4A8', fontFamily:'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
+  if (!item) return <div style={{ padding:'80px', textAlign:'center', color:'#B9B4A8', fontFamily:'Karla, sans-serif' }}>{L('Gjenstand ikke funnet.', 'Item not found.')}</div>
 
   const cat = item.categories || { emoji:'', label:L('Annet', 'Other') }
   const myInterest = item.interests?.find(x => x.user_id === session.user.id)
@@ -158,7 +163,7 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
   const undoPass = () => run(() => removePass(itemId, session.user.id), L('Angret', 'Undone'), L('Kunne ikke angre. Prøv igjen.', 'Could not undo. Please try again.'))
 
   // Stemmen lagres av databasen (vote_item_value): én stemme per person, og ingen kan endre andres
-  const handleEstimateVote = async (vote, suggested) => {
+  const handleEstimateVote = async (vote, suggested, okText = L('Stemme registrert', 'Vote registered')) => {
     if (busy) return
     const suggestedValue = parseNOK(suggested)
     if (vote === 'disagree' && suggested && suggestedValue === null) { onToast(L('Skriv estimatet som et beløp, f.eks. 1500', 'Enter the estimate as an amount, e.g. 1500'), 'error'); return }
@@ -166,7 +171,7 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
     const { data, error } = await supabase.rpc('vote_item_value', { p_item: itemId, p_vote: vote, p_value: vote === 'disagree' ? suggestedValue : null })
     setBusy(false)
     if (error) { onToast(L('Kunne ikke lagre stemmen. Prøv igjen.', 'Could not save your vote. Please try again.'), 'error'); return }
-    if (data?.ok) onToast(L('Stemme registrert', 'Vote registered'))
+    if (data?.ok) onToast(okText)
     load()
   }
 
@@ -208,17 +213,17 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
     if (error || !data?.length) { onToast(L('Kunne ikke slette gjenstanden. Bare admin og den som la den inn kan slette den.', 'Could not delete the item. Only an admin and the person who added it can delete it.'), 'error'); return }
     await removeImages(allImages)
     onToast(L('Gjenstand slettet', 'Item deleted'))
-    navigate(`/estate/${id}`)
+    navigate(backTo)
   }
 
   return (
     <div style={{ maxWidth:'700px', margin:'0 auto', padding:'28px 16px', fontFamily:'Karla, sans-serif' }}>
 
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'4px' }}>
-        <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#75604B', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>
+        <button onClick={() => navigate(backTo)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>
           {L('← Tilbake', '← Back')}
         </button>
-        {canEdit && <button onClick={() => navigate(`/estate/${id}/item/${itemId}/edit`)} style={{ background:'none', border:'1px solid #D9CFC0', borderRadius:'8px', color:'#5C4530', cursor:'pointer', fontSize:'0.8125rem', padding:'6px 14px', fontFamily:'Karla, sans-serif', marginBottom:'16px' }}>
+        {canEdit && <button onClick={() => navigate(`/estate/${id}/item/${itemId}/edit`)} style={{ background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', color:'#F2EEE6', cursor:'pointer', fontSize:'0.8125rem', padding:'6px 14px', fontFamily:'Karla, sans-serif', marginBottom:'16px' }}>
           {L('Rediger', 'Edit')}
         </button>}
       </div>
@@ -226,7 +231,7 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
       {/* Image carousel */}
       {allImages.length > 0 ? (
         <div style={{ marginBottom:'24px', position:'relative' }}>
-          <div style={{ background:'#E8DFD0', borderRadius:'14px', height:'280px', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', position:'relative' }}>
+          <div style={{ background:'#30342D', borderRadius:'14px', height:'280px', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden', position:'relative' }}>
             <StoredImage src={allImages[currentImageIndex]} alt={item.title} style={{ width:'100%', height:'100%', objectFit:'contain' }} />
             {allImages.length > 1 && currentImageIndex > 0 && (
               <button onClick={() => setCurrentImageIndex(i => i-1)} style={{ position:'absolute', left:'8px', top:'50%', transform:'translateY(-50%)', background:'rgba(0,0,0,0.5)', color:'#fff', border:'none', borderRadius:'50%', width:'40px', height:'40px', fontSize:'1.375rem', cursor:'pointer' }}>‹</button>
@@ -244,24 +249,24 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
             <div style={{ display:'flex', justifyContent:'center', gap:'0', marginTop:'6px' }}>
               {allImages.map((_, i) => (
                 <button key={i} onClick={() => setCurrentImageIndex(i)} aria-label={L(`Bilde ${i + 1}`, `Photo ${i + 1}`)} aria-pressed={i===currentImageIndex} style={{ minWidth:'32px', height:'32px', border:'none', background:'none', cursor:'pointer', padding:0, display:'inline-flex', alignItems:'center', justifyContent:'center' }}>
-                  <span style={{ display:'block', width: i===currentImageIndex?'20px':'10px', height:'10px', borderRadius:'5px', background: i===currentImageIndex?'#3A2F26':'#9A8B78', transition:'all 0.2s' }} />
+                  <span style={{ display:'block', width: i===currentImageIndex?'20px':'10px', height:'10px', borderRadius:'5px', background: i===currentImageIndex?'#F2EEE6':'rgba(242, 238, 230, 0.4)', transition:'all 0.2s' }} />
                 </button>
               ))}
             </div>
           )}
         </div>
       ) : (
-        <div style={{ background:'#E8DFD0', borderRadius:'14px', height:'280px', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'24px' }}>
-          <span style={{ fontSize:'3rem', color:'#75604B' }}>{cat.emoji || '·'}</span>
+        <div style={{ background:'#30342D', borderRadius:'14px', height:'280px', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'24px' }}>
+          <span style={{ fontSize:'3rem', color:'#B9B4A8' }}>{cat.emoji || '·'}</span>
         </div>
       )}
 
-      <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'14px', padding:'28px', marginBottom:'20px' }}>
+      <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'14px', padding:'28px', marginBottom:'20px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'8px' }}>
-          <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.5rem', fontWeight:'400', color:'#3A2F26', margin:0 }}>{item.title}</h1>
-          <span style={{ fontSize:'0.75rem', color:'#75604B', background:'#E8DFD0', padding:'4px 12px', borderRadius:'20px', marginLeft:'12px', whiteSpace:'nowrap' }}>{categoryLabel(cat.label)}</span>
+          <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.75rem, 1.3rem + 2vw, 2.5rem)', lineHeight:1.1, letterSpacing:'-0.02em', fontWeight:'400', color:'#F2EEE6', margin:0 }}>{item.title}</h1>
+          <span style={{ fontSize:'0.75rem', color:'#B9B4A8', background:'#30342D', padding:'4px 12px', borderRadius:'20px', marginLeft:'12px', whiteSpace:'nowrap' }}>{categoryLabel(cat.label)}</span>
         </div>
-        <p style={{ color:'#75604B', fontSize:'0.8125rem', marginBottom:'8px' }}>
+        <p style={{ color:'#B9B4A8', fontSize:'0.8125rem', marginBottom:'8px' }}>
           {L('Lagt inn av', 'Added by')} {item.added_by_name || L('ukjent', 'unknown')} · {new Date(item.created_at).toLocaleDateString(locale(), { day:'numeric', month:'long', year:'numeric' })}
         </p>
         {/* Fordelingsverdien (F3): adskilt fra anslaget og forslagene under; settes bare av administrator */}
@@ -275,19 +280,19 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
           const range = item.ai_analysis?.valuation?.estimate
           const showRange = range && Number(range.likely) === parseNOK(item.estimated_value) && formatRange(range.low, range.high)
           return (
-            <div style={{ background:'#DCE3D2', border:'1px solid #B8C8A8', borderRadius:'10px', padding:'14px', marginBottom:'12px' }}>
-              <div style={{ fontSize:'0.75rem', color:'#3A5A30', fontWeight:'500', marginBottom:'4px' }}>{L('Verdiestimat (veiledende)', 'Value estimate (indicative)')}</div>
-              <div style={{ fontSize:'1.25rem', color:'#3A2F26', fontFamily:'Fraunces, serif', marginBottom: showRange ? '2px' : '8px' }}>
+            <div style={{ background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', padding:'14px', marginBottom:'12px' }}>
+              <div style={{ fontSize:'0.75rem', color:'#9DAA8C', fontWeight:'500', marginBottom:'4px' }}>{L('Verdiestimat (veiledende)', 'Value estimate (indicative)')}</div>
+              <div style={{ fontSize:'1.25rem', color:'#F2EEE6', fontFamily:"'Bodoni Moda', 'Times New Roman', serif", marginBottom: showRange ? '2px' : '8px' }}>
                 {showRange || formatNOK(item.estimated_value)}
               </div>
-              {showRange && <div style={{ fontSize:'0.75rem', color:'#3A5A30', marginBottom:'8px' }}>{L(`Sannsynlig spenn · lagret som ${formatNOK(item.estimated_value)}`, `Likely range · saved as ${formatNOK(item.estimated_value)}`)}</div>}
+              {showRange && <div style={{ fontSize:'0.75rem', color:'#9DAA8C', marginBottom:'8px' }}>{L(`Sannsynlig spenn · lagret som ${formatNOK(item.estimated_value)}`, `Likely range · saved as ${formatNOK(item.estimated_value)}`)}</div>}
               {item.estimate_reasoning && (
-                <p style={{ fontSize:'0.75rem', color:'#5C4530', lineHeight:'1.5', marginBottom:'8px', marginTop:'-2px' }}>
+                <p style={{ fontSize:'0.75rem', color:'#F2EEE6', lineHeight:'1.5', marginBottom:'8px', marginTop:'-2px' }}>
                   {item.estimate_reasoning}
                 </p>
               )}
               {item.estimate_confidence === 'low' && (
-                <div style={{ fontSize:'0.75rem', color:'#7A5A2A', background:'#FBF0DC', border:'1px solid #E8D4A0', borderRadius:'7px', padding:'8px 10px', marginBottom:'8px' }}>
+                <div style={{ fontSize:'0.75rem', color:'#C79A6B', background:'#30342D', border:'1px solid #C79A6B', borderRadius:'7px', padding:'8px 10px', marginBottom:'8px' }}>
                   {L(
                     'Estimatet er usikkert — gjenstanden kan ha spesiell verdi. Sjekk gjerne på Finn.no eller spør en fagperson.',
                     'The estimate is uncertain — the item may have special value. Consider checking on Finn.no or asking an expert.'
@@ -295,12 +300,12 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
                 </div>
               )}
               {totalVotes > 0 && (
-                <div style={{ fontSize:'0.75rem', color:'#5C4530', marginBottom:'8px' }}>
+                <div style={{ fontSize:'0.75rem', color:'#F2EEE6', marginBottom:'8px' }}>
                   {L('Enig', 'Agree')}: {item.value_agree_count || 0} · {L('Uenig', 'Disagree')}: {item.value_disagree_count || 0} ({totalVotes} {totalVotes === 1 ? L('stemme', 'vote') : L('stemmer', 'votes')})
                 </div>
               )}
               {suggestions.length > 0 && (
-                <div style={{ fontSize:'0.75rem', color:'#5C4530', marginBottom:'8px' }}>
+                <div style={{ fontSize:'0.75rem', color:'#F2EEE6', marginBottom:'8px' }}>
                   {suggestions.map((s, i) => (
                     <div key={i}>{s.name} {L('foreslår', 'suggests')} {formatNOK(s.value)}</div>
                   ))}
@@ -310,13 +315,13 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
                 <div>
                   <div style={{ display:'flex', gap:'6px', marginBottom: showSuggestInput ? '8px' : '0' }}>
                     <button onClick={() => { handleEstimateVote('agree'); setShowSuggestInput(false) }} style={{
-                      flex:1, padding:'8px', border:'1px solid #B8C8A8', borderRadius:'7px',
-                      background:'#5F6E52', cursor:'pointer', fontSize:'0.8125rem', color:'#fff', fontFamily:'Karla, sans-serif',
+                      flex:1, padding:'8px', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'7px',
+                      background:'#F2EEE6', cursor:'pointer', fontSize:'0.8125rem', color:'#1F221E', fontFamily:'Karla, sans-serif',
                     }}>{L('Enig', 'Agree')}</button>
                     <button onClick={() => setShowSuggestInput(!showSuggestInput)} style={{
-                      flex:1, padding:'8px', border:'1px solid #B8C8A8', borderRadius:'7px',
-                      background: showSuggestInput ? '#A97C3F' : '#fff', cursor:'pointer', fontSize:'0.8125rem',
-                      color: showSuggestInput ? '#fff' : '#3A2F26', fontFamily:'Karla, sans-serif',
+                      flex:1, padding:'8px', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'7px',
+                      background: showSuggestInput ? '#C79A6B' : '#272A25', cursor:'pointer', fontSize:'0.8125rem',
+                      color: showSuggestInput ? '#1F221E' : '#F2EEE6', fontFamily:'Karla, sans-serif',
                     }}>{L('Uenig', 'Disagree')}</button>
                   </div>
                   {showSuggestInput && (
@@ -326,27 +331,67 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
                         value={suggestedValue}
                         onChange={e => setSuggestedValue(e.target.value)}
                         placeholder={L('Ditt estimat (NOK)', 'Your estimate (NOK)')}
-                        style={{ flex:1, padding:'8px 12px', border:'1px solid #B8C8A8', borderRadius:'7px', fontSize:'0.875rem', background:'#fff', color:'#3A2F26', fontFamily:'Karla, sans-serif' }}
+                        style={{ flex:1, padding:'8px 12px', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'7px', fontSize:'0.875rem', background:'#272A25', color:'#F2EEE6', fontFamily:'Karla, sans-serif' }}
                       />
                       <button onClick={() => { handleEstimateVote('disagree', suggestedValue); setShowSuggestInput(false); setSuggestedValue('') }} style={{
-                        padding:'8px 14px', background:'#A97C3F', color:'#fff', border:'none', borderRadius:'7px',
+                        padding:'8px 14px', background:'#C79A6B', color:'#1F221E', border:'none', borderRadius:'7px',
                         cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', whiteSpace:'nowrap',
                       }}>{L('Send inn', 'Submit')}</button>
                     </div>
                   )}
                 </div>
               ) : (
-                <div style={{ fontSize:'0.75rem', color:'#5C4530' }}>{L('Du har stemt.', 'You have voted.')}</div>
+                <div style={{ fontSize:'0.75rem', color:'#F2EEE6' }}>{L('Du har stemt.', 'You have voted.')}</div>
               )}
             </div>
           )
         })()}
-        {item.description && <p style={{ color:'#5C4530', lineHeight:'1.8', marginBottom:'24px', fontSize:'0.9375rem' }}>{item.description}</p>}
+        {/* AI-en gir ikke tall for kunst, smykker, sølv og gull (valueAdvice): arvingene kan likevel foreslå en verdi.
+            Lagres med vote_item_value som et forslag (teller som «Uenig» i databasen); administrator setter fordelingsverdien. */}
+        {!item.estimated_value && (withheldFor(item.ai_analysis) || (item.value_suggestions || []).length > 0) && (() => {
+          const hasVoted = (item.value_voter_ids || []).includes(session.user.id)
+          const suggestions = item.value_suggestions || []
+          const submit = e => {
+            e.preventDefault()
+            if (parseNOK(suggestedValue) === null) { onToast(L('Skriv forslaget som et beløp, f.eks. 3900', 'Enter the suggestion as an amount, e.g. 3900'), 'error'); return }
+            handleEstimateVote('disagree', suggestedValue, L('Forslaget ditt er registrert', 'Your suggestion has been registered'))
+            setSuggestedValue('')
+          }
+          return (
+            <section aria-labelledby="suggest-value-title" style={{ background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', padding:'14px', marginBottom:'12px' }}>
+              <h2 id="suggest-value-title" style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontWeight:400, fontSize:'1.25rem', color:'#F2EEE6', margin:'0 0 6px' }}>{L('Hva er den verdt?', 'What is it worth?')}</h2>
+              <p style={{ fontSize:'0.8125rem', color:'#B9B4A8', lineHeight:'1.5', margin:'0 0 8px' }}>
+                {L('AI-en gir ikke et tall for kunst, smykker, sølv og gull, fordi den ofte bommer der. Har du en formening, et takstbeløp eller en solgt pris, kan du foreslå en verdi. Administrator setter fordelingsverdien.',
+                  'The AI does not give a figure for art, jewellery, silver and gold, because it is often far off there. If you have an idea, an appraisal or a sold price, you can suggest a value. The administrator sets the distribution value.')}
+              </p>
+              {suggestions.length > 0 && (
+                <div style={{ fontSize:'0.8125rem', color:'#F2EEE6', marginBottom:'8px' }}>
+                  {suggestions.map((s, i) => <div key={i}>{s.name} {L('foreslår', 'suggests')} {formatNOK(s.value)}</div>)}
+                </div>
+              )}
+              {isDemo ? null : hasVoted ? (
+                <p style={{ fontSize:'0.8125rem', color:'#B9B4A8', margin:0 }}>{L('Du har foreslått en verdi.', 'You have suggested a value.')}</p>
+              ) : (
+                <form onSubmit={submit} style={{ display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'flex-end' }}>
+                  <label htmlFor="suggest-value" style={{ display:'grid', gap:'4px', fontSize:'0.8125rem', fontWeight:600, color:'#F2EEE6', flex:'1 1 180px' }}>
+                    {L('Ditt forslag i kroner', 'Your suggestion in NOK')}
+                    <input id="suggest-value" inputMode="numeric" value={suggestedValue} onChange={e => setSuggestedValue(e.target.value)} autoComplete="off"
+                      style={{ minHeight:'44px', padding:'8px 12px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.9375rem', background:'#272A25', color:'#F2EEE6', fontFamily:'Karla, sans-serif', boxSizing:'border-box', width:'100%' }} />
+                  </label>
+                  <button type="submit" disabled={busy} style={{ minHeight:'44px', padding:'10px 18px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius:'999px', fontWeight:600, cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+                    {L('Foreslå verdi', 'Suggest value')}
+                  </button>
+                </form>
+              )}
+            </section>
+          )
+        })()}
+        {item.description && <p style={{ color:'#F2EEE6', lineHeight:'1.8', marginBottom:'24px', fontSize:'0.9375rem' }}>{item.description}</p>}
 
         {/* AI-vurderingen fra da gjenstanden ble lagt inn: bare til opplysning, adskilt fra det som er registrert */}
         {item.ai_analysis?.ai && (
-          <details style={{ marginBottom:'24px', background:'#FBF9F5', border:'1px solid #E8DFD0', borderRadius:'10px', padding:'0 14px' }}>
-            <summary style={{ cursor:'pointer', fontSize:'0.875rem', color:'#5C4530', padding:'12px 0', minHeight:'44px', boxSizing:'border-box' }}>{L('Hva AI-en så', 'What the AI saw')}</summary>
+          <details style={{ marginBottom:'24px', background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', padding:'0 14px' }}>
+            <summary style={{ cursor:'pointer', fontSize:'0.875rem', color:'#F2EEE6', padding:'12px 0', minHeight:'44px', boxSizing:'border-box' }}>{L('Hva AI-en så', 'What the AI saw')}</summary>
             <div style={{ paddingBottom:'14px' }}>
               {correcting ? (
                 <AiCorrectionsForm record={item.ai_analysis} saving={busy} onSave={saveCorrections} onCancel={() => setCorrecting(false)} />
@@ -354,7 +399,7 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
                 <>
                   <AnalysisDetails analysis={item.ai_analysis} heading={false} />
                   {canCorrect && (
-                    <button onClick={() => setCorrecting(true)} style={{ marginTop:'12px', background:'none', border:'1px solid #D9CFC0', borderRadius:'8px', color:'#5C4530', cursor:'pointer', fontSize:'0.8125rem', padding:'10px 14px', minHeight:'44px', fontFamily:'Karla, sans-serif' }}>
+                    <button onClick={() => setCorrecting(true)} style={{ marginTop:'12px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', color:'#F2EEE6', cursor:'pointer', fontSize:'0.8125rem', padding:'10px 14px', minHeight:'44px', fontFamily:'Karla, sans-serif' }}>
                       {L('Rett opplysningene', 'Correct the details')}
                     </button>
                   )}
@@ -371,60 +416,60 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
         <ItemHistory itemId={itemId} members={members} refreshKey={`${item.status}:${item.assigned_heir_id}:${item.interests?.length || 0}`} />
 
         {isAssigned && unconfirmed ? (
-          <div role="status" style={{ padding:'16px', background:'#FBF9F5', border:'1px solid #C8BEA0', borderRadius:'10px', marginBottom:'24px' }}>
-            <div style={{ fontSize:'0.875rem', color:'#3A2F26', fontWeight:'500', marginBottom:'4px' }}>
+          <div role="status" style={{ padding:'16px', background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', marginBottom:'24px' }}>
+            <div style={{ fontSize:'0.875rem', color:'#F2EEE6', fontWeight:'500', marginBottom:'4px' }}>
               {item.assigned_to
                 ? L(`Tildelt kontoen til ${accountName}`, `Assigned to ${accountName}'s account`)
                 : L('Tildelt en konto som senere er slettet', 'Assigned to an account that has since been deleted')}
             </div>
-            <p style={{ fontSize:'0.8125rem', color:'#5C4530', lineHeight:1.6, margin:0 }}>
+            <p style={{ fontSize:'0.8125rem', color:'#F2EEE6', lineHeight:1.6, margin:0 }}>
               {L('Mottakeren er ikke bekreftet som en person på listen over personer i boet. Familien bekrefter hvem som skal ha gjenstanden.', 'The recipient is not confirmed as a person on the list of people in the estate. The family confirms who should have the item.')}
               {!isAdmin && ' ' + L('Det gjør administratoren av boet.', 'The estate administrator does this.')}
             </p>
             {isAdmin && !isDemo && !showConfirm && (
-              <button onClick={() => setShowConfirm(true)} style={{ marginTop:'10px', minHeight:'44px', padding:'8px 14px', background:'#5F6E52', color:'#fff', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Bekreft mottaker', 'Confirm recipient')}</button>
+              <button onClick={() => setShowConfirm(true)} style={{ marginTop:'10px', minHeight:'44px', padding:'8px 14px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Bekreft mottaker', 'Confirm recipient')}</button>
             )}
             {isAdmin && showConfirm && (
               <div style={{ marginTop:'12px' }}>
-                <p style={{ fontSize:'0.8125rem', color:'#5C4530', marginBottom:'8px' }}>{L('Hvem skal ha den?', 'Who should have it?')}</p>
+                <p style={{ fontSize:'0.8125rem', color:'#F2EEE6', marginBottom:'8px' }}>{L('Hvem skal ha den?', 'Who should have it?')}</p>
                 {!people.length && (
-                  <p style={{ fontSize:'0.8125rem', color:'#3A2F26', lineHeight:1.6 }}>
+                  <p style={{ fontSize:'0.8125rem', color:'#F2EEE6', lineHeight:1.6 }}>
                     {L('Legg først inn personene som kan få gjenstander under «Arvinger».', 'First add the people who can receive items under «Heirs».')}{' '}
-                    <button onClick={() => navigate(`/estate/${id}/heirs`)} style={{ background:'none', border:'none', padding:0, color:'#3A2F26', textDecoration:'underline', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Gå til «Arvinger»', 'Go to «Heirs»')}</button>
+                    <button onClick={() => navigate(`/estate/${id}/heirs`)} style={{ background:'none', border:'none', padding:0, color:'#C79A6B', textDecoration:'underline', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Gå til «Arvinger»', 'Go to «Heirs»')}</button>
                   </p>
                 )}
                 {people.map(h => (
-                  <button key={h.id} onClick={() => handleConfirm(h.id)} disabled={busy} style={{ display:'flex', alignItems:'center', gap:'10px', width:'100%', minHeight:'44px', padding:'10px 14px', background:'#fff', border:'1px solid #B8C8A8', borderRadius:'8px', cursor:'pointer', textAlign:'left', fontFamily:'Karla, sans-serif', marginBottom:'6px' }}>
-                    <span style={{ fontSize:'0.875rem', color:'#3A2F26' }}>{h.name}</span>
-                    {h.user_id && h.user_id === item.assigned_to && <span style={{ fontSize:'0.6875rem', color:'#3A5A30', marginLeft:'auto' }}>{L('kontoen den er tildelt', 'the account it is assigned to')}</span>}
+                  <button key={h.id} onClick={() => handleConfirm(h.id)} disabled={busy} style={{ display:'flex', alignItems:'center', gap:'10px', width:'100%', minHeight:'44px', padding:'10px 14px', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'8px', cursor:'pointer', textAlign:'left', fontFamily:'Karla, sans-serif', marginBottom:'6px' }}>
+                    <span style={{ fontSize:'0.875rem', color:'#F2EEE6' }}>{h.name}</span>
+                    {h.user_id && h.user_id === item.assigned_to && <span style={{ fontSize:'0.6875rem', color:'#9DAA8C', marginLeft:'auto' }}>{L('kontoen den er tildelt', 'the account it is assigned to')}</span>}
                   </button>
                 ))}
-                <button onClick={() => setShowConfirm(false)} style={{ minHeight:'40px', padding:'6px 12px', background:'none', border:'none', color:'#5C4530', textDecoration:'underline', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+                <button onClick={() => setShowConfirm(false)} style={{ minHeight:'40px', padding:'6px 12px', background:'none', border:'none', color:'#C79A6B', textDecoration:'underline', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
               </div>
             )}
           </div>
         ) : isAssigned ? (
-          <div style={{ padding:'16px', background:'#DCE3D2', border:'1px solid #B8C8A8', borderRadius:'10px', marginBottom:'24px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'12px', flexWrap:'wrap' }}>
-            <div style={{ fontSize:'0.875rem', color:'#3A2F26', fontWeight:'500' }}>
+          <div style={{ padding:'16px', background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', marginBottom:'24px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'12px', flexWrap:'wrap' }}>
+            <div style={{ fontSize:'0.875rem', color:'#F2EEE6', fontWeight:'500' }}>
               {L('Tildelt', 'Assigned to')} {recipient?.user_id && recipient.user_id === session.user.id ? L('deg', 'you') : recipient?.name || L('en arving', 'an heir')}
             </div>
             {isAdmin && (
-              <button onClick={handleUnassign} disabled={busy} style={{ fontSize:'0.8125rem', color:'#5C4530', background:'#fff', border:'1px solid #B8C8A8', padding:'6px 12px', borderRadius:'6px', cursor:'pointer', fontFamily:'Karla, sans-serif' }}>
+              <button onClick={handleUnassign} disabled={busy} style={{ fontSize:'0.8125rem', color:'#F2EEE6', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', padding:'6px 12px', borderRadius:'6px', cursor:'pointer', fontFamily:'Karla, sans-serif' }}>
                 {L('Angre tildeling', 'Undo assignment')}
               </button>
             )}
           </div>
         ) : showWithdrawConfirm ? (
-          <div style={{ padding:'18px', background:'#E8DFD0', border:'1px solid #C8BEA0', borderRadius:'10px', marginBottom:'24px' }}>
-            <div style={{ fontSize:'0.9375rem', color:'#3A2F26', marginBottom:'12px', fontWeight:'500' }}>{L('Vil du angre interessen din?', 'Do you want to withdraw your interest?')}</div>
+          <div style={{ padding:'18px', background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', marginBottom:'24px' }}>
+            <div style={{ fontSize:'0.9375rem', color:'#F2EEE6', marginBottom:'12px', fontWeight:'500' }}>{L('Vil du angre interessen din?', 'Do you want to withdraw your interest?')}</div>
             <div style={{ display:'flex', gap:'10px' }}>
-              <button onClick={() => setShowWithdrawConfirm(false)} style={{ flex:1, padding:'11px', background:'#fff', border:'1px solid #D9CFC0', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif', color:'#5C4530' }}>{L('Nei, behold', 'No, keep it')}</button>
-              <button onClick={confirmWithdraw} disabled={busy} style={{ flex:1, padding:'11px', background:'#8B3A3A', color:'#fff', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Ja, angre', 'Yes, withdraw')}</button>
+              <button onClick={() => setShowWithdrawConfirm(false)} style={{ flex:1, padding:'11px', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6' }}>{L('Nei, behold', 'No, keep it')}</button>
+              <button onClick={confirmWithdraw} disabled={busy} style={{ flex:1, padding:'11px', background:'#E08A7A', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Ja, angre', 'Yes, withdraw')}</button>
             </div>
           </div>
         ) : myInterest ? (
           <div style={{ marginBottom:'24px' }}>
-            <button onClick={handleInterest} style={{ width:'100%', padding:'14px', background:'#E8DFD0', color:'#3A2F26', border:'1px solid #3A2F26', borderRadius:'10px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif', marginBottom:'10px' }}>
+            <button onClick={handleInterest} style={{ width:'100%', padding:'14px', background:'#30342D', color:'#F2EEE6', border:'1px solid #9DAA8C', borderRadius: '999px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif', marginBottom:'10px' }}>
               {L('Du er interessert — klikk for å angre', 'You are interested — click to withdraw')}
             </button>
             <ReasonEditor key={itemId} itemId={itemId} userId={session.user.id} savedReason={myInterest.reason || null}
@@ -432,105 +477,105 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
           </div>
         ) : showReason ? (
           <div style={{ marginBottom:'24px' }}>
-            <label htmlFor="itemdetail-f1" style={{ display:'block', fontSize:'0.875rem', color:'#5C4530', marginBottom:'10px' }}>{L('Hvorfor vil du ha denne?', 'Why do you want this?')} <span style={{ color:'#75604B' }}>{L('(valgfri)', '(optional)')}</span></label>
+            <label htmlFor="itemdetail-f1" style={{ display:'block', fontSize:'0.875rem', color:'#F2EEE6', marginBottom:'10px' }}>{L('Hvorfor vil du ha denne?', 'Why do you want this?')} <span style={{ color:'#B9B4A8' }}>{L('(valgfri)', '(optional)')}</span></label>
             <textarea id="itemdetail-f1" value={reason} onChange={e => setReason(e.target.value)} placeholder={L('f.eks. Jeg husker denne fra barndommen…', 'e.g. I remember this from my childhood…')} rows={3} maxLength={1000}
-              style={{ width:'100%', padding:'12px 14px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.875rem', fontFamily:'Karla, sans-serif', color:'#3A2F26', background:'#FBF9F5', resize:'vertical', boxSizing:'border-box' }} />
+              style={{ width:'100%', padding:'12px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.875rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6', background:'#1F221E', resize:'vertical', boxSizing:'border-box' }} />
             <div style={{ display:'flex', gap:'10px', marginTop:'10px' }}>
-              <button onClick={() => setShowReason(false)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid #D9CFC0', borderRadius:'8px', cursor:'pointer', color:'#5C4530', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
-              <button onClick={handleInterest} disabled={busy} style={{ flex:2, padding:'11px', background:'#3A2F26', color:'#FBF9F5', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Registrer interesse', 'Register interest')}</button>
+              <button onClick={() => setShowReason(false)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', color:'#F2EEE6', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+              <button onClick={handleInterest} disabled={busy} style={{ flex:2, padding:'11px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Registrer interesse', 'Register interest')}</button>
             </div>
           </div>
         ) : myPass ? (
-          <button onClick={undoPass} disabled={busy} style={{ width:'100%', padding:'14px', background:'#FBF9F5', color:'#5C4530', border:'1px solid #D9CFC0', borderRadius:'10px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif', marginBottom:'24px' }}>
+          <button onClick={undoPass} disabled={busy} style={{ width:'100%', padding:'14px', background:'#1F221E', color:'#F2EEE6', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif', marginBottom:'24px' }}>
             {L('Du skal ikke ha denne — klikk for å angre', 'You do not want this — click to undo')}
           </button>
         ) : (
           <div style={{ display:'flex', gap:'10px', marginBottom:'24px' }}>
-            <button onClick={handleInterest} style={{ flex:2, padding:'14px', background:'#3A2F26', color:'#FBF9F5', border:'none', borderRadius:'10px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif' }}>
+            <button onClick={handleInterest} style={{ flex:2, padding:'14px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif' }}>
               {L('Registrer interesse', 'Register interest')}
             </button>
-            <button onClick={handlePass} disabled={busy} style={{ flex:1, padding:'14px', background:'#fff', color:'#5C4530', border:'1px solid #D9CFC0', borderRadius:'10px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif' }}>
+            <button onClick={handlePass} disabled={busy} style={{ flex:1, padding:'14px', background:'#272A25', color:'#F2EEE6', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif' }}>
               {L('Ikke interessert', 'Not interested')}
             </button>
           </div>
         )}
 
-        <div style={{ borderTop:'1px solid #E8DFD0', paddingTop:'20px', marginBottom:'16px' }}>
+        <div style={{ borderTop:'1px solid rgba(242, 238, 230, 0.14)', paddingTop:'20px', marginBottom:'16px' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'14px' }}>
-            <h3 style={{ fontSize:'0.8125rem', color:'#75604B', fontWeight:'400', textTransform:'uppercase', letterSpacing:'1px' }}>
+            <h3 style={{ fontSize:'0.8125rem', color:'#B9B4A8', fontWeight:'400', textTransform:'uppercase', letterSpacing:'1px' }}>
               {contested ? L('Flere ønsker denne', 'Several want this') : L('Interesserte', 'Interested')} ({item.interests?.length || 0})
             </h3>
             {isAdmin && !isAssigned && (
-              <button onClick={() => { if (!showAssign) load(); setShowAssign(!showAssign); setAssignPick(null) }} style={{ fontSize:'0.8125rem', color:'#5F6E52', background:'none', border:'1px solid #B8C8A8', padding:'5px 12px', borderRadius:'6px', cursor:'pointer', fontFamily:'Karla, sans-serif' }}>
+              <button onClick={() => { if (!showAssign) load(); setShowAssign(!showAssign); setAssignPick(null) }} style={{ fontSize:'0.8125rem', color:'#9DAA8C', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', padding:'5px 12px', borderRadius:'6px', cursor:'pointer', fontFamily:'Karla, sans-serif' }}>
                 {L('Tildel', 'Assign')}
               </button>
             )}
           </div>
           {showAssign && (
-            <div style={{ background:'#DCE3D2', border:'1px solid #B8C8A8', borderRadius:'10px', padding:'16px', marginBottom:'16px' }}>
-              <p style={{ fontSize:'0.8125rem', color:'#5C4530', marginBottom:'12px' }}>{L('Hvem skal ha den?', 'Who should have it?')}</p>
+            <div style={{ background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', padding:'16px', marginBottom:'16px' }}>
+              <p style={{ fontSize:'0.8125rem', color:'#F2EEE6', marginBottom:'12px' }}>{L('Hvem skal ha den?', 'Who should have it?')}</p>
               {pending.length > 0 && (
-                <div role="status" style={{ background:'#F5E8D5', border:'1px solid #D9B98C', borderRadius:'8px', padding:'10px 12px', marginBottom:'12px', fontSize:'0.8125rem', color:'#3A2F26', lineHeight:1.6 }}>
+                <div role="status" style={{ background:'#30342D', border:'1px solid #C79A6B', borderRadius:'8px', padding:'10px 12px', marginBottom:'12px', fontSize:'0.8125rem', color:'#F2EEE6', lineHeight:1.6 }}>
                   <strong style={{ fontWeight:'600' }}>{L('Disse har ikke svart på denne gjenstanden:', 'These people have not answered on this item:')}</strong> {pendingNames}.{' '}
                   {L('Tildeler du nå, registreres det at de ikke hadde svart. Det betyr ikke at de har sagt nei takk.', 'If you assign it now, it is recorded that they had not answered. It does not mean they said no thanks.')}
                 </div>
               )}
               {assignPick && (
                 <div style={{ display:'flex', gap:'8px', flexWrap:'wrap', alignItems:'center', marginBottom:'12px' }}>
-                  <button onClick={() => handleAssign(assignPick)} disabled={busy} style={{ minHeight:'44px', padding:'10px 14px', background:'#3A2F26', color:'#FBF9F5', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+                  <button onClick={() => handleAssign(assignPick)} disabled={busy} style={{ minHeight:'44px', padding:'10px 14px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
                     {L(`Tildel til ${people.find(h => h.id === assignPick)?.name || ''} før alle har svart`, `Assign to ${people.find(h => h.id === assignPick)?.name || ''} before everyone has answered`)}
                   </button>
-                  <button onClick={() => setAssignPick(null)} style={{ minHeight:'44px', padding:'10px 14px', background:'none', border:'1px solid #9A8B78', borderRadius:'8px', cursor:'pointer', color:'#5C4530', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+                  <button onClick={() => setAssignPick(null)} style={{ minHeight:'44px', padding:'10px 14px', background:'none', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius: '999px', cursor:'pointer', color:'#F2EEE6', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
                 </div>
               )}
               {!people.length && (
-                <p style={{ fontSize:'0.8125rem', color:'#3A2F26', lineHeight:1.6 }}>
+                <p style={{ fontSize:'0.8125rem', color:'#F2EEE6', lineHeight:1.6 }}>
                   {L('Legg først inn personene som kan få gjenstander under «Arvinger».', 'First add the people who can receive items under «Heirs».')}{' '}
-                  <button onClick={() => navigate(`/estate/${id}/heirs`)} style={{ background:'none', border:'none', padding:0, color:'#3A2F26', textDecoration:'underline', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Gå til «Arvinger»', 'Go to «Heirs»')}</button>
+                  <button onClick={() => navigate(`/estate/${id}/heirs`)} style={{ background:'none', border:'none', padding:0, color:'#C79A6B', textDecoration:'underline', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Gå til «Arvinger»', 'Go to «Heirs»')}</button>
                 </p>
               )}
               {people.map(h => (
-                <button key={h.id} onClick={() => (pending.length ? setAssignPick(h.id) : handleAssign(h.id))} aria-pressed={assignPick === h.id} disabled={busy} style={{ display:'flex', alignItems:'center', gap:'10px', width:'100%', minHeight:'44px', padding:'10px 14px', background:'#fff', border:'1px solid #B8C8A8', borderRadius:'8px', cursor:'pointer', textAlign:'left', fontFamily:'Karla, sans-serif', marginBottom:'6px' }}>
-                  <div aria-hidden="true" style={{ width:'28px', height:'28px', borderRadius:'50%', background:'#DCE3D2', border:'1px solid #D9CFC0', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.6875rem', color:'#3A2F26', fontWeight:'500' }}>
+                <button key={h.id} onClick={() => (pending.length ? setAssignPick(h.id) : handleAssign(h.id))} aria-pressed={assignPick === h.id} disabled={busy} style={{ display:'flex', alignItems:'center', gap:'10px', width:'100%', minHeight:'44px', padding:'10px 14px', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'8px', cursor:'pointer', textAlign:'left', fontFamily:'Karla, sans-serif', marginBottom:'6px' }}>
+                  <div aria-hidden="true" style={{ width:'28px', height:'28px', borderRadius:'50%', background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.6875rem', color:'#F2EEE6', fontWeight:'500' }}>
                     {(h.name||'?')[0].toUpperCase()}
                   </div>
-                  <span style={{ fontSize:'0.875rem', color:'#3A2F26' }}>{h.name}</span>
-                  {h.user_id && item.interests?.some(x => x.user_id === h.user_id) && <span style={{ fontSize:'0.6875rem', color:'#3A5A30', marginLeft:'auto' }}>{L('ønsker den', 'wants it')}</span>}
+                  <span style={{ fontSize:'0.875rem', color:'#F2EEE6' }}>{h.name}</span>
+                  {h.user_id && item.interests?.some(x => x.user_id === h.user_id) && <span style={{ fontSize:'0.6875rem', color:'#9DAA8C', marginLeft:'auto' }}>{L('ønsker den', 'wants it')}</span>}
                 </button>
               ))}
             </div>
           )}
           {contested && (
-            <p style={{ fontSize:'0.8125rem', color:'#5C4530', lineHeight:1.6, margin:'-6px 0 12px' }}>
+            <p style={{ fontSize:'0.8125rem', color:'#F2EEE6', lineHeight:1.6, margin:'-6px 0 12px' }}>
               {L('Snakk sammen først: se hvorfor hver enkelt ønsker den. Kanskje noen vil la en annen få den. Dere kan skrive i kommentarfeltet under.',
                 'Talk first: see why each of you wants it. Perhaps someone will let another have it. You can write in the comments below.')}
             </p>
           )}
           {withdrawn && !isAssigned && (
-            <div role="status" style={{ display:'flex', alignItems:'center', gap:'10px', flexWrap:'wrap', padding:'12px 14px', background:'#DCE3D2', border:'1px solid #B8C8A8', borderRadius:'10px', marginBottom:'12px', fontSize:'0.8125rem', color:'#3A2F26' }}>
+            <div role="status" style={{ display:'flex', alignItems:'center', gap:'10px', flexWrap:'wrap', padding:'12px 14px', background:'#30342D', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', marginBottom:'12px', fontSize:'0.8125rem', color:'#F2EEE6' }}>
               <span style={{ flex:1 }}>{L('Du har trukket ønsket ditt, så de andre kan få den.', 'You have withdrawn your wish so the others can have it.')}</span>
-              <button onClick={undoWithdraw} disabled={busy} style={{ padding:'8px 14px', minHeight:'40px', background:'#fff', border:'1px solid #B8C8A8', borderRadius:'8px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#3A2F26' }}>{L('Angre', 'Undo')}</button>
+              <button onClick={undoWithdraw} disabled={busy} style={{ padding:'8px 14px', minHeight:'40px', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6' }}>{L('Angre', 'Undo')}</button>
             </div>
           )}
           {!item.interests?.length ? (
             <div>
-              <p style={{ color:'#75604B', fontSize:'0.875rem', fontStyle:'italic', marginBottom:'16px' }}>{L('Ingen har vist interesse ennå.', 'No one has shown interest yet.')}</p>
+              <p style={{ color:'#B9B4A8', fontSize:'0.875rem', fontStyle:'italic', marginBottom:'16px' }}>{L('Ingen har vist interesse ennå.', 'No one has shown interest yet.')}</p>
             </div>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
               {item.interests.map(x => (
-                <div key={x.id} style={{ display:'flex', gap:'14px', alignItems:'flex-start', padding:'14px 16px', background:'#FBF9F5', border:'1px solid #D9CFC0', borderRadius:'10px' }}>
-                  <div style={{ width:'36px', height:'36px', borderRadius:'50%', background:x.profiles?.avatar_color||'#DCE3D2', border:tc(x.profiles?.avatar_color||'#DCE3D2')==='#3A2F26'?'1px solid #D9CFC0':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.875rem', color:tc(x.profiles?.avatar_color||'#DCE3D2'), fontWeight:'500', flexShrink:0 }}>
+                <div key={x.id} style={{ display:'flex', gap:'14px', alignItems:'flex-start', padding:'14px 16px', background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px' }}>
+                  <div style={{ width:'36px', height:'36px', borderRadius:'50%', background:x.profiles?.avatar_color||'#EAE5DA', border:tc(x.profiles?.avatar_color||'#EAE5DA')==='#1F2326'?'1px solid #CFC8BA':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.875rem', color:tc(x.profiles?.avatar_color||'#EAE5DA'), fontWeight:'500', flexShrink:0 }}>
                     {(x.profiles?.display_name||'?')[0].toUpperCase()}
                   </div>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:'0.875rem', color:'#3A2F26', marginBottom:'4px', fontWeight:'500' }}>
+                    <div style={{ fontSize:'0.875rem', color:'#F2EEE6', marginBottom:'4px', fontWeight:'500' }}>
                       {x.profiles?.display_name}
-                      {x.user_id === session.user.id && <span style={{ color:'#75604B', fontSize:'0.75rem', fontWeight:'400', marginLeft:'6px' }}>{L('(deg)', '(you)')}</span>}
+                      {x.user_id === session.user.id && <span style={{ color:'#B9B4A8', fontSize:'0.75rem', fontWeight:'400', marginLeft:'6px' }}>{L('(deg)', '(you)')}</span>}
                     </div>
-                    {x.reason && <div style={{ fontSize:'0.8125rem', color:'#5C4530', fontStyle:'italic', lineHeight:1.6 }}>"{x.reason}"</div>}
+                    {x.reason && <div style={{ fontSize:'0.8125rem', color:'#F2EEE6', fontStyle:'italic', lineHeight:1.6 }}>"{x.reason}"</div>}
                     {contested && x.user_id === session.user.id && (
-                      <button onClick={withdrawWish} disabled={busy} style={{ marginTop:'8px', padding:'8px 14px', minHeight:'40px', background:'#fff', border:'1px solid #D9CFC0', borderRadius:'8px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#5C4530' }}>
+                      <button onClick={withdrawWish} disabled={busy} style={{ marginTop:'8px', padding:'8px 14px', minHeight:'40px', background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6' }}>
                         {L('Trekk ønsket mitt', 'Withdraw my wish')}
                       </button>
                     )}
@@ -542,46 +587,46 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
         </div>
 
         {canDelete && (
-          <div style={{ borderTop:'1px solid #E8DFD0', paddingTop:'16px' }}>
+          <div style={{ borderTop:'1px solid rgba(242, 238, 230, 0.14)', paddingTop:'16px' }}>
             {!showDeleteConfirm ? (
-              <button onClick={() => setShowDeleteConfirm(true)} style={{ background:'none', border:'none', color:'#8B3A3A', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>
+              <button onClick={() => setShowDeleteConfirm(true)} style={{ background:'none', border:'none', color:'#E08A7A', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>
                 {L('Slett gjenstand…', 'Delete item…')}
               </button>
             ) : (
               <div style={{ display:'flex', gap:'10px', alignItems:'center', flexWrap:'wrap' }}>
-                <span style={{ fontSize:'0.8125rem', color:'#5C4530' }}>{L('Er du sikker? Kan ikke angres.', 'Are you sure? This cannot be undone.')}</span>
-                <button onClick={handleDelete} disabled={busy} style={{ padding:'7px 16px', background:'#8B3A3A', color:'#fff', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Slett', 'Delete')}</button>
-                <button onClick={() => setShowDeleteConfirm(false)} style={{ padding:'7px 16px', background:'none', border:'1px solid #D9CFC0', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#5C4530' }}>{L('Avbryt', 'Cancel')}</button>
+                <span style={{ fontSize:'0.8125rem', color:'#F2EEE6' }}>{L('Er du sikker? Kan ikke angres.', 'Are you sure? This cannot be undone.')}</span>
+                <button onClick={handleDelete} disabled={busy} style={{ padding:'7px 16px', background:'#E08A7A', color:'#1F221E', border:'none', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>{L('Slett', 'Delete')}</button>
+                <button onClick={() => setShowDeleteConfirm(false)} style={{ padding:'7px 16px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'6px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6' }}>{L('Avbryt', 'Cancel')}</button>
               </div>
             )}
           </div>
         )}
       </div>
 
-      <div style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'14px', padding:'24px' }}>
-        <h3 id="kommentarer" style={{ fontFamily:'Fraunces, serif', fontSize:'1.125rem', fontWeight:'400', color:'#3A2F26', marginBottom:'16px' }}>
+      <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'14px', padding:'24px' }}>
+        <h3 id="kommentarer" style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.125rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'16px' }}>
           {L('Kommentarer', 'Comments')} ({comments.length})
         </h3>
         <div style={{ display:'flex', flexDirection:'column', gap:'12px', marginBottom:'16px', maxHeight:'360px', overflowY:'auto' }}>
           {comments.length === 0 ? (
-            <p style={{ color:'#75604B', fontSize:'0.875rem', fontStyle:'italic' }}>{L('Ingen kommentarer ennå.', 'No comments yet.')}</p>
+            <p style={{ color:'#B9B4A8', fontSize:'0.875rem', fontStyle:'italic' }}>{L('Ingen kommentarer ennå.', 'No comments yet.')}</p>
           ) : comments.map(c => (
             <div key={c.id} style={{ display:'flex', gap:'10px', alignItems:'flex-start' }}>
-              <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:c.profiles?.avatar_color||'#DCE3D2', border:tc(c.profiles?.avatar_color||'#DCE3D2')==='#3A2F26'?'1px solid #D9CFC0':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', color:tc(c.profiles?.avatar_color||'#DCE3D2'), fontWeight:'500', flexShrink:0 }}>
+              <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:c.profiles?.avatar_color||'#EAE5DA', border:tc(c.profiles?.avatar_color||'#EAE5DA')==='#1F2326'?'1px solid #CFC8BA':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', color:tc(c.profiles?.avatar_color||'#EAE5DA'), fontWeight:'500', flexShrink:0 }}>
                 {(c.profiles?.display_name||'?')[0].toUpperCase()}
               </div>
-              <div style={{ flex:1, background:'#FBF9F5', border:'1px solid #D9CFC0', borderRadius:'10px', padding:'10px 14px' }}>
+              <div style={{ flex:1, background:'#1F221E', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'10px', padding:'10px 14px' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'4px' }}>
-                  <span style={{ fontSize:'0.8125rem', fontWeight:'500', color:'#3A2F26' }}>{c.profiles?.display_name}</span>
-                  <span style={{ fontSize:'0.6875rem', color:'#75604B' }}>{new Date(c.created_at).toLocaleDateString(locale(), { day:'numeric', month:'short' })}</span>
+                  <span style={{ fontSize:'0.8125rem', fontWeight:'500', color:'#F2EEE6' }}>{c.profiles?.display_name}</span>
+                  <span style={{ fontSize:'0.6875rem', color:'#B9B4A8' }}>{new Date(c.created_at).toLocaleDateString(locale(), { day:'numeric', month:'short' })}</span>
                 </div>
-                <p style={{ fontSize:'0.875rem', color:'#5C4530', lineHeight:'1.6', margin:0 }}>{c.content}</p>
+                <p style={{ fontSize:'0.875rem', color:'#F2EEE6', lineHeight:'1.6', margin:0 }}>{c.content}</p>
                 {c.user_id === session.user.id && !isDemo && (
                   <button onClick={async () => {
                     const { error } = await deleteComment(c.id)
                     if (error) onToast(L('Kunne ikke slette kommentaren', 'Could not delete the comment'), 'error')
                     load()
-                  }} style={{ background:'none', border:'none', color:'#75604B', cursor:'pointer', fontSize:'0.75rem', marginTop:'4px', fontFamily:'Karla, sans-serif' }}>{L('slett', 'delete')}</button>
+                  }} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.75rem', marginTop:'4px', fontFamily:'Karla, sans-serif' }}>{L('slett', 'delete')}</button>
                 )}
               </div>
             </div>
@@ -589,10 +634,10 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
           <div ref={commentsEndRef} />
         </div>
         {isDemo ? (
-          <p style={{ color:'#75604B', fontSize:'0.8125rem', fontStyle:'italic' }}>{L('Kommentarer er slått av i demoen.', 'Comments are turned off in the demo.')}</p>
+          <p style={{ color:'#B9B4A8', fontSize:'0.8125rem', fontStyle:'italic' }}>{L('Kommentarer er slått av i demoen.', 'Comments are turned off in the demo.')}</p>
         ) : (
         <div style={{ display:'flex', gap:'8px', alignItems:'flex-end' }}>
-          <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:profile?.avatar_color||'#DCE3D2', border:tc(profile?.avatar_color||'#DCE3D2')==='#3A2F26'?'1px solid #D9CFC0':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', color:tc(profile?.avatar_color||'#DCE3D2'), fontWeight:'500', flexShrink:0 }}>
+          <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:profile?.avatar_color||'#EAE5DA', border:tc(profile?.avatar_color||'#EAE5DA')==='#1F2326'?'1px solid #CFC8BA':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', color:tc(profile?.avatar_color||'#EAE5DA'), fontWeight:'500', flexShrink:0 }}>
             {(profile?.display_name||'?')[0].toUpperCase()}
           </div>
           <div style={{ flex:1 }}>
@@ -601,11 +646,11 @@ export default function ItemDetailPage({ session, profile, onToast, isDemo }) {
             <textarea className="comment-input" value={commentText} onChange={e => setCommentText(e.target.value)}
               onKeyDown={e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleComment()} }}
               placeholder={L('Skriv en kommentar… (Enter for å sende)', 'Write a comment… (Enter to send)')} rows={2} maxLength={2000}
-              style={{ width:'100%', padding:'10px 14px', border:'1px solid #9A8B78', borderRadius:'8px', fontSize:'0.875rem', fontFamily:'Karla, sans-serif', color:'#3A2F26', background:'#FBF9F5', resize:'none', boxSizing:'border-box' }} />
+              style={{ width:'100%', padding:'10px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.875rem', fontFamily:'Karla, sans-serif', color:'#F2EEE6', background:'#1F221E', resize:'none', boxSizing:'border-box' }} />
           </div>
           <button onClick={handleComment} disabled={!commentText.trim()||submittingComment} style={{
-            padding:'10px 14px', background:commentText.trim()?'#3A2F26':'#D9CFC0', color:'#FBF9F5',
-            border:'none', borderRadius:'8px', cursor:commentText.trim()?'pointer':'not-allowed',
+            padding:'10px 14px', background:commentText.trim()?'#F2EEE6':'rgba(242, 238, 230, 0.14)', color:'#1F221E',
+            border:'none', borderRadius: '999px', cursor:commentText.trim()?'pointer':'not-allowed',
             fontSize:'0.875rem', fontFamily:'Karla, sans-serif',
           }}>Send</button>
         </div>

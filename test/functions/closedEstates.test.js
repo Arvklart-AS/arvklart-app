@@ -42,7 +42,7 @@ const req = (headers = {}, { method = 'POST', query = '', body } = {}) =>
   new Request(`https://x/functions/v1/cleanup-closed-estates${query}`, { method, headers, body: body ? JSON.stringify(body) : undefined })
 const call = (fake, request, extra = {}) => {
   const lines = []
-  return mod.handleCleanupClosedEstates(request, { secret: SECRET, admin: () => fake.client, now: NOW, log: l => lines.push(l), ...extra })
+  return mod.handleCleanupClosedEstates(request, { secret: SECRET, retentionMonths: 12, admin: () => fake.client, now: NOW, log: l => lines.push(l), ...extra })
     .then(r => ({ ...r, lines }))
 }
 
@@ -57,12 +57,12 @@ describe('tilgang', { skip: !TS && 'Node uten TypeScript-støtte' }, () => {
     ['CRON_SECRET er for kort (fail closed)', { 'x-cron-secret': 'kort' }, 'kort'],
   ]) {
     test(`avviser ${name} med 401 uten å røre databasen`, async () => {
-      const r = await mod.handleCleanupClosedEstates(req(headers), { secret, admin: untouched, now: NOW })
+      const r = await mod.handleCleanupClosedEstates(req(headers), { secret, retentionMonths: 12, admin: untouched, now: NOW })
       assert.equal(r.status, 401)
     })
   }
   test('riktig hemmelighet, men GET → 405', async () => {
-    const r = await mod.handleCleanupClosedEstates(req({ 'x-cron-secret': SECRET }, { method: 'GET' }), { secret: SECRET, admin: untouched, now: NOW })
+    const r = await mod.handleCleanupClosedEstates(req({ 'x-cron-secret': SECRET }, { method: 'GET' }), { secret: SECRET, retentionMonths: 12, admin: untouched, now: NOW })
     assert.equal(r.status, 405)
   })
   test('hemmeligheten havner ikke i svar eller logg', async () => {
@@ -152,7 +152,28 @@ describe('sletting', { skip: !TS && 'Node uten TypeScript-støtte' }, () => {
     assert.equal(fake.db.cleanup_runs[0].deleted_count, 0)
   })
 
-  test('grensen er 12 måneder fra kjøretidspunktet', () => {
-    assert.equal(mod.cutoffDate(NOW).toISOString(), '2025-10-08T03:17:00.000Z')
+  test('grensen regnes fra kjøretidspunktet med den konfigurerte lagringstiden', () => {
+    assert.equal(mod.cutoffDate(NOW, 12).toISOString(), '2025-10-08T03:17:00.000Z')
+    assert.equal(mod.cutoffDate(NOW, 3).toISOString(), '2026-07-08T03:17:00.000Z')
+  })
+})
+
+describe('lagringstid (fail closed)', { skip: !TS && 'Node uten TypeScript-støtte' }, () => {
+  const untouched = () => { throw new Error('databasen skal ikke røres') }
+  for (const [name, value] of [['mangler', undefined], ['tom', ''], ['null', '0'], ['negativ', '-1'], ['desimal', '1.5'], ['tekst', '12mnd'], ['for lang', '121']]) {
+    test(`lagringstid ${name} → 503 uten å røre databasen, også som dry_run`, async () => {
+      const months = mod.parseRetentionMonths(value)
+      assert.equal(months, null)
+      for (const opts of [{}, { query: '?dry_run=1' }]) {
+        const r = await mod.handleCleanupClosedEstates(req({ 'x-cron-secret': SECRET }, opts), { secret: SECRET, retentionMonths: months, admin: untouched, now: NOW })
+        assert.equal(r.status, 503)
+        assert.equal(r.body.error, 'retention_not_configured')
+      }
+    })
+  }
+  test('gyldige verdier leses som hele måneder', () => {
+    assert.equal(mod.parseRetentionMonths('12'), 12)
+    assert.equal(mod.parseRetentionMonths(' 36 '), 36)
+    assert.equal(mod.parseRetentionMonths('120'), 120)
   })
 })

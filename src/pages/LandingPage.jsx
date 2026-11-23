@@ -177,8 +177,8 @@ export default function LandingPage({ loggedIn = false }) {
             <figure className="split__fig">
               <div className="phoneframe">
                 <Img src="m-veiviser.webp" w={620} h={1272}
-                  alt={L('Skjermbilde fra demoen: veiviseren «Fra dødsfall til fordelt bo — steg for steg» med kortet «Hvem arver – og hvor mye?».',
-                    'Screenshot from the demo: the guide «Fra dødsfall til fordelt bo» (From death to a settled estate) with the card «Hvem arver – og hvor mye?» (Who inherits, and how much?).')} />
+                  alt={L('Skjermbilde fra demoen: veiviseren «Arveveiviser: fra dødsfall til fordelt bo, steg for steg» med kortet «Hvem arver – og hvor mye?».',
+                    'Screenshot from the demo: the guide «Arveveiviser: fra dødsfall til fordelt bo, steg for steg» (Inheritance guide: from death to a settled estate, step by step) with the card «Hvem arver – og hvor mye?» (Who inherits, and how much?).')} />
               </div>
               <Cap>{L('Veiviserens inngang og faseoversikt.', 'The guide’s entry point and overview of phases.')}</Cap>
             </figure>

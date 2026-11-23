@@ -1,8 +1,9 @@
 // Minimal Supabase-klient i minnet for testene av edge-funksjonenes slettelogikk.
-// Støtter bare det de bruker: select/eq/lt/order/range/maybeSingle/single, count (head), insert, update, delete,
+// Støtter bare det de bruker: select/eq/neq/in/not/lt/order/range/limit/maybeSingle/single, count (head), insert, update, delete,
+// auth.admin (getUserById, deleteUser),
 // og Storage list (sider sortert på navn, mapper og filer), copy og remove. Alle endringer logges i `mutations`.
 
-export function fakeSupabase({ tables = {}, storage = {}, failRemove = () => false, failCopy = () => false, onList = () => {}, failInsert = false, failDeleteUser = false, rpcResults = {} } = {}) {
+export function fakeSupabase({ tables = {}, storage = {}, failRemove = () => false, failCopy = () => false, onList = () => {}, failInsert = false, failDeleteUser = false, rpcResults = {}, users = [] } = {}) {
   const db = Object.fromEntries(Object.entries(tables).map(([t, rows]) => [t, rows.map(r => ({ ...r }))]))
   const buckets = Object.fromEntries(Object.entries(storage).map(([b, files]) => [b, new Map(Object.entries(files))]))
   const mutations = []
@@ -16,7 +17,7 @@ export function fakeSupabase({ tables = {}, storage = {}, failRemove = () => fal
 
   function query(table) {
     const filters = []
-    let op = 'select', payload = null, countHead = false, range = null, order = null, single = null, returning = false
+    let op = 'select', payload = null, countHead = false, range = null, order = null, desc = false, limit = null, single = null, returning = false
     const rows = () => (db[table] ||= [])
     const match = r => filters.every(f => f(r))
     const run = async () => {
@@ -41,9 +42,10 @@ export function fakeSupabase({ tables = {}, storage = {}, failRemove = () => fal
         return { data: null, error: null }
       }
       let out = rows().filter(match)
-      if (order) out = [...out].sort((a, b) => (a[order] > b[order] ? 1 : a[order] < b[order] ? -1 : 0))
+      if (order) out = [...out].sort((a, b) => (a[order] > b[order] ? 1 : a[order] < b[order] ? -1 : 0) * (desc ? -1 : 1))
       if (countHead) return { data: null, count: out.length, error: null }
       if (range) out = out.slice(range[0], range[1] + 1)
+      if (limit != null) out = out.slice(0, limit)
       if (single === 'maybe') return { data: out[0] ?? null, error: null }
       if (single) return out.length === 1 ? { data: out[0], error: null } : { data: null, error: { message: 'not single' } }
       return { data: out.map(r => ({ ...r })), error: null }
@@ -54,10 +56,12 @@ export function fakeSupabase({ tables = {}, storage = {}, failRemove = () => fal
       update(patch) { op = 'update'; payload = patch; return b },
       delete() { op = 'delete'; return b },
       eq(col, val) { filters.push(r => r[col] === val); return b },
+      neq(col, val) { filters.push(r => r[col] !== val); return b },
       in(col, vals) { filters.push(r => vals.includes(r[col])); return b },
       not(col, op, val) { if (op === 'is' && val === null) filters.push(r => r[col] != null); return b },
       lt(col, val) { filters.push(r => r[col] != null && r[col] < val); return b },
-      order(col) { order = col; return b },
+      order(col, opts) { order = col; desc = opts?.ascending === false; return b },
+      limit(n) { limit = n; return b },
       range(a, z) { range = [a, z]; return b },
       maybeSingle() { single = 'maybe'; return run() },
       single() { single = true; return run() },
@@ -107,7 +111,12 @@ export function fakeSupabase({ tables = {}, storage = {}, failRemove = () => fal
   }
 
   const deletedUsers = []
-  const auth = { admin: { async deleteUser(id) {
+  const auth = { admin: {
+    async getUserById(id) {
+      const user = users.find(u => u.id === id && !deletedUsers.includes(id))
+      return user ? { data: { user }, error: null } : { data: { user: null }, error: { message: 'User not found' } }
+    },
+    async deleteUser(id) {
     if (failDeleteUser) return { data: null, error: { message: 'deleteUser feilet' } }
     deletedUsers.push(id); mutations.push({ op: 'deleteUser', id }); return { data: {}, error: null }
   } } }

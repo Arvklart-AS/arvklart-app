@@ -2,7 +2,7 @@
 // reglene (test/db/rls.sql); her sjekkes at appen bruker de sikre databasefunksjonene og viser det riktige.
 // Kjøres av test/e2e/run.sh.
 import { createRequire } from 'node:module'
-import { BASE, EST, UID, ITEM, FIXTURES, now, category, launch, checker, assert } from './fixtures.mjs'
+import { BASE, EST, UID, ITEM, FIXTURES, now, category, launch, checker, assert, DEMO } from './fixtures.mjs'
 const AXE = createRequire(import.meta.url).resolve('axe-core/axe.min.js')
 const axe = async page => {
   await page.addScriptTag({ path: AXE })
@@ -131,10 +131,14 @@ await check('F2 Løsningsmetoder for arving: begrunnelsene side om side, bare eg
   assert(!v.length, v.join('; '))
 }, { fixtures: asMember(withReasons) })
 
-await check('F2 «Dine valg» viser hvor mange av mine ønsker andre også har', async page => {
+await check('F2 «Anbefalt nå» viser hvor mange av mine ønsker andre også har, og leder til dem', async page => {
   await page.goto(`${BASE}/estate/${EST}`)
-  await page.getByRole('button', { name: '2 ønskes også av andre – snakk sammen' }).click()
-  await page.waitForFunction(() => document.activeElement?.dataset?.tab === 'contested', null, { timeout: 5000 })
+  await page.getByRole('heading', { name: '2 av ønskene dine ønskes også av andre' }).waitFor()
+  await page.getByRole('link', { name: 'Se gjenstandene →' }).click()
+  await page.waitForURL(`**/estate/${EST}/gjenstander?vis=ettertraktede`)
+  assert(await page.getByRole('combobox', { name: 'Vis' }).inputValue() === 'ettertraktede', '«Ettertraktede» er ikke valgt')
+  await page.getByRole('link', { name: /^Gyngestol/ }).waitFor()
+  await page.getByRole('link', { name: /^Maleri/ }).waitFor()
 }, { fixtures: asMember(withReasons) })
 
 // ── F3: fordelingsverdi adskilt fra AI-anslaget, og bekreftede arveandeler ─────
@@ -230,7 +234,8 @@ await check('F5 Fordelingen: per arving med sum og avvik fra lik andel, det som 
   await page.getByRole('region', { name: 'Kari' }).getByText(/ca\. .*1.?000.* mindre enn en lik andel/).waitFor()
   await page.getByRole('region', { name: 'Test' }).getByText(/mer enn en lik andel/).waitFor()
   await page.getByText('Gis bort: 1').waitFor()
-  await page.getByText('Maleri – ønskes av 2').waitFor()
+  // Gjenstanden står med bilde og navn, og hvor mange som ønsker den, under
+  await page.getByRole('listitem').filter({ hasText: 'Maleri' }).getByText('Ønskes av 2').waitFor()
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Last ned utkast (PDF)' }).click()])
   assert(/^fordeling-utkast-\d{4}-\d{2}-\d{2}\.pdf$/.test(download.suggestedFilename()), `filnavn: ${download.suggestedFilename()}`)
   const v = await axe(page)
@@ -474,7 +479,7 @@ await check('Fordelingen: eldre tildeling vises under kontoen med vei til bekref
   await page.goto(`${BASE}/estate/${EST}/fordeling`)
   const sec = page.getByRole('region', { name: 'Cato' })
   await sec.getByText(/ikke bekreftet som en person på listen/).waitFor()
-  await sec.getByRole('button', { name: 'Kommode' }).waitFor()
+  await sec.getByRole('button', { name: 'Kommode', exact: true }).waitFor() // ikke bildeknappen («Vis bilde av «Kommode» …»)
   await page.getByText(/Før forslaget kan legges frem, må familien bekrefte hvem som skal ha denne gjenstanden/).waitFor()
   assert(await page.getByRole('button', { name: 'Legg frem forslag' }).isDisabled(), 'forslag kunne legges frem')
   assert(!rpc.some(x => x.name === 'propose_distribution'), 'propose ble kalt')
@@ -505,7 +510,7 @@ const settledFx = () => ({
 await check('Løsningsmetoder: bare avklarte gjenstander er med; de som venter på svar, vises med navn og regnes ikke som nei takk', async page => {
   await page.goto(`${BASE}/estate/${EST}/conflicts`)
   await page.getByText(/1 gjenstand venter på svar og er ikke tatt med her/).waitFor()
-  await page.getByText(/Maleri: venter på Cia/).waitFor()
+  await page.getByRole('listitem').filter({ hasText: 'Maleri' }).getByText(/Venter på Cia/).waitFor()
   assert(await page.getByText('At noen ikke har svart, regnes ikke som nei takk.').count() === 1, 'mangler forklaringen om at manglende svar ikke er nei takk')
   assert(await page.getByRole('button', { name: 'Trekk vinner' }).count() === 1, 'gjenstanden som venter på svar, kan trekkes lodd om')
 }, { fixtures: settledFx() })
@@ -534,7 +539,8 @@ await check('Fordelingen: «Tildel alle som bare én ønsker» viser listen og s
   await page.getByText(/1 gjenstand som bare én ønsker, venter på svar fra andre/).waitFor()
   await page.getByRole('button', { name: 'Tildel 1 gjenstand som bare én ønsker' }).click()
   const dialog = page.getByRole('dialog', { name: 'Tildel det bare én ønsker' })
-  await dialog.getByText('Klokke → Kari').waitFor()
+  // Hver gjenstand står med bilde og navn, og mottakeren under
+  await dialog.getByRole('listitem').filter({ hasText: 'Klokke' }).getByText(/Til\s+Kari/).waitFor()
   assert(await dialog.getByText(/Lampe/).count() === 0, 'gjenstand som venter på svar, er med')
   const v = await axe(page)
   assert(!v.length, v.join('; '))
@@ -543,6 +549,19 @@ await check('Fordelingen: «Tildel alle som bare én ønsker» viser listen og s
   const a = rpc.find(c => c.name === 'assign_items')
   assert(a?.body.p_method === 'single' && a.body.p_assignments.length === 1 && a.body.p_assignments[0].item_id === 'it-3' && a.body.p_assignments[0].heir_id === H2, `feil kall: ${JSON.stringify(a?.body)}`)
 }, { fixtures: settledFx(), rpc: { assign_items: { body: { assigned: 1, skipped: [] } } } })
+
+await check('Demo: administrator kan prøve «Tildel alle som bare én ønsker» (nullstilles ved neste demoinnlogging)', async page => {
+  const { rpc } = watch(page)
+  await page.goto(`${BASE}/estate/${EST}/fordeling`)
+  await page.getByText(/Du ser på en/).waitFor()
+  await page.getByRole('button', { name: 'Tildel 1 gjenstand som bare én ønsker' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Tildel det bare én ønsker' })
+  await dialog.getByRole('listitem').filter({ hasText: 'Klokke' }).getByText(/Til\s+Kari/).waitFor()
+  await dialog.getByRole('button', { name: 'Tildel 1' }).click()
+  await page.getByText('1 gjenstand tildelt').waitFor()
+  const a = rpc.find(c => c.name === 'assign_items')
+  assert(a?.body.p_method === 'single' && a.body.p_assignments.length === 1, `feil kall: ${JSON.stringify(a?.body)}`)
+}, { fixtures: settledFx(), rpc: { assign_items: { body: { assigned: 1, skipped: [] } } }, ...DEMO })
 
 await check('Fordelingen: samlet tildeling som hoppes over, eller feiler, sies tydelig', async page => {
   await page.goto(`${BASE}/estate/${EST}/fordeling`)

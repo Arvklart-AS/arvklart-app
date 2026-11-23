@@ -1,5 +1,6 @@
 // Finner og sletter alle filer som hører til et bo: dokumenter, gjenstandsbilder og logo.
-// Brukes før et bo slettes (kontosletting og automatisk sletting av avsluttede bo).
+// Brukes før et bo slettes (kontosletting, sletting fra founder-dashboardet og den automatiske slettingen av
+// avsluttede bo, som ikke er i drift). Filer som også brukes av et annet bo, slettes aldri (withoutSharedFiles).
 // Testes i test/functions/estateFiles.test.js.
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -83,9 +84,50 @@ async function referencedFiles(admin: SupabaseClient, estateId: string) {
 
 const docsFolder = (estateId: string) => `documents/${estateId}`
 
+// Filer utenfor boets egne mapper (eldre bilder under items/, logoer, eldre dokumenter) kan også være brukt av et
+// annet bo, f.eks. når en gjenstand er kopiert. Slike filer slettes bare når ingen andre bo refererer dem.
+// Bare filene utenfor boets mapper sjekkes; boets egne mapper (<bo-id>/, documents/<bo-id>/) tilhører bare boet.
+export async function withoutSharedFiles(admin: SupabaseClient, estateId: string, docPaths: Set<string>, imagePaths: Set<string>) {
+  const outsideImages = [...imagePaths].filter(p => !p.startsWith(`${estateId}/`))
+  const outsideDocs = [...docPaths].filter(p => !p.startsWith(`${docsFolder(estateId)}/`))
+  const keep = { images: 0, documents: 0 }
+
+  if (outsideImages.length) {
+    const usedElsewhere = new Set<string>()
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data, error } = await admin.from('items').select('id, image_url, extra_images')
+        .neq('estate_id', estateId).order('id').range(from, from + PAGE_SIZE - 1)
+      if (error) throw error
+      for (const it of data || []) {
+        for (const url of [it.image_url, ...asArray(it.extra_images)]) {
+          const p = imagePathFromUrl(url)
+          if (p) usedElsewhere.add(p)
+        }
+      }
+      if ((data || []).length < PAGE_SIZE) break
+    }
+    const logos = await admin.from('estates').select('branding_logo').neq('id', estateId).not('branding_logo', 'is', null)
+    if (logos.error) throw logos.error
+    for (const e of logos.data || []) {
+      const p = imagePathFromUrl(e.branding_logo)
+      if (p) usedElsewhere.add(p)
+    }
+    for (const p of outsideImages) if (usedElsewhere.has(p)) { imagePaths.delete(p); keep.images++ }
+  }
+
+  for (let i = 0; i < outsideDocs.length; i += 100) {
+    const { data, error } = await admin.from('documents').select('file_path')
+      .neq('estate_id', estateId).in('file_path', outsideDocs.slice(i, i + 100))
+    if (error) throw error
+    for (const d of data || []) if (docPaths.delete(d.file_path)) keep.documents++
+  }
+  return keep
+}
+
 // Hva som ville blitt slettet (for dry_run): bare lesing, ingen endringer
 export async function countEstateFiles(admin: SupabaseClient, estateId: string) {
   const { docPaths, imagePaths } = await referencedFiles(admin, estateId)
+  await withoutSharedFiles(admin, estateId, docPaths, imagePaths)
   for (const p of await listFolder(admin, 'estate-docs', docsFolder(estateId))) docPaths.add(p)
   for (const p of await listFolder(admin, 'item-images', estateId)) imagePaths.add(p)
   return { documents: docPaths.size, images: imagePaths.size }
@@ -95,6 +137,7 @@ export async function countEstateFiles(admin: SupabaseClient, estateId: string) 
 // slik at boet ikke slettes og kan prøves igjen neste gang.
 export async function removeEstateFiles(admin: SupabaseClient, estateId: string) {
   const { docPaths, imagePaths } = await referencedFiles(admin, estateId)
+  await withoutSharedFiles(admin, estateId, docPaths, imagePaths)
   let removed = 0
   for (let pass = 1; ; pass++) {
     const docs = new Set([...docPaths, ...await listFolder(admin, 'estate-docs', docsFolder(estateId))])
