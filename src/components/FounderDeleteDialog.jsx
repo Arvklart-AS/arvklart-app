@@ -18,6 +18,7 @@ export function founderDeleteMessage(code) {
     case 'founder': return L('Kontoen er founder. Fjern founder-rollen først.', 'This account is a founder. Remove the founder role first.')
     case 'not_found': return L('Finnes ikke lenger. Den kan allerede være slettet.', 'No longer exists. It may already have been deleted.')
     case 'confirm_mismatch': return L('Teksten stemmer ikke. Ingenting er slettet.', 'The text does not match. Nothing was deleted.')
+    case 'unreachable': return L('Fikk ikke kontakt med slettefunksjonen (founder-delete). Den er trolig ikke rullet ut i Supabase. Ingenting er slettet.', 'Could not reach the delete function (founder-delete). It is probably not deployed in Supabase. Nothing was deleted.')
     case 'not_deployed': return L('Slettefunksjonen er ikke rullet ut i Supabase ennå (founder-delete). Ingenting er slettet.', 'The delete function is not deployed in Supabase yet (founder-delete). Nothing was deleted.')
     default: return L('Slettingen ble ikke fullført. Det som sto igjen, er urørt; prøv igjen.', 'The deletion did not complete. Anything left is untouched; try again.')
   }

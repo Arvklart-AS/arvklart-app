@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react'
 import { getFounderDashboard, setUserPlan } from '../lib/founder'
 import FounderManagement from '../components/FounderManagement'
 import FounderDeleteDialog from '../components/FounderDeleteDialog'
+import FounderGdprPanel from '../components/FounderGdprPanel'
+import { DEMO_ESTATE_ID } from '../lib/founderGdpr'
 import { L } from '../lib/lang'
-
-// Demoboet kan ikke slettes (edge-funksjonen avviser det også)
-const DEMO_ESTATE_ID = 'deed0001-0000-0000-0000-000000000001'
 
 const tc = c => { if(!c)return'#FBF9F5'; const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16); return(0.299*r+0.587*g+0.114*b)/255>0.55?'#3A2F26':'#FBF9F5' }
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts'
@@ -20,6 +19,8 @@ export default function FounderPage({ session, onToast }) {
   const [tab, setTab] = useState('overview')
   // { kind: 'estate' | 'user', id, label } når slettedialogen er åpen
   const [deleting, setDeleting] = useState(null)
+  // Økes etter hver sletting, så fanen «Sletting (GDPR)» henter loggen på nytt
+  const [gdprRefresh, setGdprRefresh] = useState(0)
 
   useEffect(() => {
     const load = async () => {
@@ -72,6 +73,7 @@ export default function FounderPage({ session, onToast }) {
       if (data) { setEstates(data.estates || []); setProfiles(data.profiles || []); setFeedback(data.feedback || []); setItemCount(data.item_count || 0) }
     }
     setDeleting(null)
+    setGdprRefresh(n => n + 1)
     onToast?.(kind === 'estate' ? L(`Boet «${label}» er slettet.`, `The estate “${label}” was deleted.`) : L('Kundekontoen er slettet.', 'The customer account was deleted.'))
   }
 
@@ -114,7 +116,7 @@ export default function FounderPage({ session, onToast }) {
 
       {/* Tabs */}
       <div className="fd-tabs" style={{ display:'flex', gap:'4px', borderBottom:'1px solid #D9CFC0', marginBottom:'24px' }}>
-        {[['overview','Oversikt'],['users','Brukere'],['feedback','Tilbakemelding'],['estates','Boer'],['founders','Founders']].map(([t,l])=>(
+        {[['overview','Oversikt'],['users','Brukere'],['feedback','Tilbakemelding'],['estates','Boer'],['founders','Founders'],['gdpr',L('Sletting (GDPR)','Deletion (GDPR)')]].map(([t,l])=>(
           <button key={t} onClick={()=>setTab(t)} style={{
             padding:'10px 18px', border:'none', background:'none', cursor:'pointer',
             fontSize:'0.875rem', fontFamily:'Karla, sans-serif',
@@ -245,6 +247,8 @@ export default function FounderPage({ session, onToast }) {
       )}
 
       {tab==='founders' && <FounderManagement session={session} onToast={onToast} />}
+
+      {tab==='gdpr' && <FounderGdprPanel estates={estates} profiles={profiles} selfId={session?.user?.id} refreshKey={gdprRefresh} onDelete={setDeleting} />}
 
       {tab==='estates' && (
         <div className="fd-table" style={{ background:'#fff', border:'1px solid #D9CFC0', borderRadius:'12px', overflow:'hidden' }}>

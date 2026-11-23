@@ -102,7 +102,7 @@ describe('founder-delete: tilgang', { skip }, () => {
     test(`${name} → ${status} og ingenting endres`, async () => {
       const fake = setup()
       const before = snapshot(fake)
-      for (const body of [{ kind: 'estate', id: A, dry_run: true }, { kind: 'estate', id: B, confirm: 'Bo Olsen' }, { kind: 'user', id: KARI, confirm: 'kari@test.no' }]) {
+      for (const body of [{ action: 'overview' }, { kind: 'estate', id: A, dry_run: true }, { kind: 'estate', id: B, confirm: 'Bo Olsen' }, { kind: 'user', id: KARI, confirm: 'kari@test.no' }]) {
         const r = await call(fake, who, body)
         assert.equal(r.status, status)
         assert.equal(r.body.code, code)
@@ -270,5 +270,39 @@ describe('founder-delete: kundekonto', { skip }, () => {
   test('ukjent konto → 404', async () => {
     const r = await call(setup(), 'founder', { kind: 'user', id: 'a0000000-0000-0000-0000-0000000000ff', dry_run: true })
     assert.equal(r.status, 404)
+  })
+})
+
+describe('founder-delete: oversikten i fanen «Sletting (GDPR)»', { skip }, () => {
+  const log = [
+    { id: 'l1', created_at: '2026-11-01T10:00:00Z', action: 'view_dashboard', founder_id: FOUNDER, details: null },
+    { id: 'l2', created_at: '2026-11-02T10:00:00Z', action: 'delete_estate', founder_id: FOUNDER, details: { estate_id: A, counts: { items: 2 }, status: 'ok' } },
+    { id: 'l3', created_at: '2026-11-03T10:00:00Z', action: 'delete_user', founder_id: FOUNDER2, target_user_id: null, details: { user_id: KARI, counts: { interests: 1 }, status: 'failed', error: 'storage: kunne ikke slette items/x.jpg' } },
+    { id: 'l4', created_at: '2026-11-04T10:00:00Z', action: 'set_plan', founder_id: FOUNDER, details: { plan: 'family' } },
+  ]
+
+  test('viser bare slettinger, nyeste først, uten feiltekst; avsluttede bo uten demoboet; ingenting endres', async () => {
+    const fake = setup()
+    fake.db.founder_audit_log.push(...log)
+    fake.db.estates.find(e => e.id === B).closed_at = '2026-01-15T00:00:00Z'
+    fake.db.estates.find(e => e.id === DEMO).closed_at = '2026-01-01T00:00:00Z'
+    const before = snapshot(fake)
+    const r = await call(fake, 'founder', { action: 'overview' })
+    assert.equal(r.status, 200)
+    assert.deepEqual(r.body.log, [
+      { id: 'l3', created_at: '2026-11-03T10:00:00Z', kind: 'user', founder_id: FOUNDER2, target_id: KARI, status: 'failed', counts: { interests: 1 } },
+      { id: 'l2', created_at: '2026-11-02T10:00:00Z', kind: 'estate', founder_id: FOUNDER, target_id: A, status: 'ok', counts: { items: 2 } },
+    ])
+    assert.ok(!JSON.stringify(r.body).includes('storage:'))
+    assert.deepEqual(r.body.closed_estates, [{ id: B, name: 'Bo Olsen', closed_at: '2026-01-15T00:00:00Z' }])
+    assert.equal(r.body.retention_months, null)
+    assert.equal(snapshot(fake), before)
+    assert.deepEqual(fake.mutations, [])
+  })
+
+  test('viser lagringstiden når den er satt', async () => {
+    const r = await call(setup(), 'founder', { action: 'overview' }, { extra: { retentionMonths: 12 } })
+    assert.equal(r.body.retention_months, 12)
+    assert.deepEqual(r.body.log, [])
   })
 })
