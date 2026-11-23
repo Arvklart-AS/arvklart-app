@@ -59,12 +59,19 @@ Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som 
 
 Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
 
-Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
-`/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
-av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin.
-**Teksten i toppmenyen er alltid lys** (`#F5F2EB`, hardkodet i `TopBar.jsx`), så en lys
-merkevarefarge gir for svak kontrast. `tc()` i samme fil velger lys eller mørk tekst etter lysheten
-i fargen, men brukes bare på avatarfargen — ikke på toppmenyen.
+**Toppmenyen er alltid `#1F221E`, uansett bo.** `TopBar.jsx` har riktignok
+`estate?.branding_color || '#1F221E'`, men `App.jsx` sender aldri `estate` til komponenten
+(`<TopBar profile session onToast />`, det eneste stedet den brukes), så uttrykket faller alltid
+tilbake på standarden. Det har aldri vært sendt — ikke før den mørke appen heller. Teksten er
+hardkodet lys (`#F5F2EB`); `tc()` i samme fil velger lys eller mørk tekst etter lysheten i fargen,
+men brukes bare på avatarfargen.
+
+Derfor: **`estates.branding_color` påvirker ikke toppmenyen.** Den leses bare ett sted som synes —
+den lille ruten på bo-kortet på `/app` (`EstatesPage.jsx`). «Merkevare» på `/estate/:id/admin`
+skriver verdien, men den slår altså ikke ut i toppen av appen slik siden kan gi inntrykk av.
+Migreringen `20261120170000_header_farge` (ikke kjørt) ville bare endret den lille ruten.
+Skal «Merkevare» virke på toppmenyen, må `estate` sendes til `TopBar` **og** tekstfargen velges
+med `tc()`, ellers blir lys tekst på lys flate.
 
 Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
 

@@ -1,9 +1,23 @@
+-- IKKE KJØRT, OG TRENGS TRULIG IKKE. Les dette først (rettet 23.11.2026):
+--
+-- Denne migreringen ble skrevet i den tro at toppmenyen i appen henter bakgrunnen fra
+-- «estates.branding_color», og at bo med en lagret farge derfor måtte oppdateres for at den nye
+-- headerfargen skulle synes. **Det er feil.** `TopBar.jsx` har riktignok
+-- `estate?.branding_color || '#1F221E'`, men `App.jsx` sender aldri `estate` til komponenten
+-- (`<TopBar profile session onToast />` er det eneste stedet den brukes, og propen har aldri vært
+-- sendt). Toppmenyen er derfor alltid standardfargen, uavhengig av hva som står i basen.
+--
+-- Den eneste synlige virkningen migreringen ville hatt, er den lille ruten på bo-kortet på `/app`
+-- (`EstatesPage.jsx`), som er det ene stedet fargen faktisk leses. Det er en ren kosmetisk detalj.
+-- Kjør den bare hvis dere vil at de rutene skal være like; headeren blir uansett den samme.
+--
+-- Opprinnelig beskrivelse:
+--
 -- Headerens bakgrunnsfarge: #1F221E, den samme som headeren på de offentlige sidene (--natt i
 -- src/site/site.css). Toppen av appen og toppen av markedssidene ser da like ut.
 --
 -- «branding_color» er en verdi per bo, ikke en konstant i koden. Koden er allerede endret, men den
--- slår bare inn der boet ikke har en lagret farge. Alle bo i produksjon har en lagret verdi, så
--- denne migreringen må til for at endringen skal synes på bo som finnes fra før.
+-- slår bare inn der boet ikke har en lagret farge.
 --
 -- Fargene i databasen i dag (lest 20.11.2026):
 --   #1a1410  kolonnens opprinnelige standard (supabase/legacy/01_setup.sql). Demo-boet og 7 andre
