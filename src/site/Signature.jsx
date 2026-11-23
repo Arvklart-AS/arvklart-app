@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { Img } from './Shot'
-import { L } from '../lib/lang'
+import { useEffect, useRef, useState } from 'react'
+import { L, isEn } from '../lib/lang'
 
 // SIGNATUREN — overgangen fra mørke til lys
 //
@@ -8,15 +7,53 @@ import { L } from '../lib/lang'
 // Uten dette skriptet står --lift på 1, som er sluttilstanden: produktet lyst, skarpt og lesbart.
 // Løkka går bare mens heroen eller overgangen er på skjermen, og stopper helt når den er i ro.
 //
-// Enhetsgruppen er tre ekte skjermbilder fra den offentlige demoen, tatt i samme økt. Rammene er
-// tegnet i CSS; skjerminnholdet er uendret. Under 980 px byttes riggen ut med ett telefonbilde.
+// I rammen står produktfilmen (47 sekunder, uten lyd), på norsk eller engelsk etter språkvalget.
 //
-// Utsnittene er beskjært, ikke redigert: nettbrettet viser galleriet fra rad to (uten gyngestolen),
-// PC-en oversikten over boet ned til «Alt i boet». Demodataene er urørt. Tatt på nytt i det mørke
-// uttrykket 23.11.2026, med samme filnavn og mål (se docs/ny-offentlig-nettside.md, 2.13).
+// INGEN VIDEOBYTES FØR NOEN TRYKKER. Først vises bare plakaten — 16:9 over 980 px, 4:5 under,
+// samme grense som skilte PC-riggen fra mobilbildet før. <video> settes ikke inn i det hele tatt
+// før knappen trykkes, så hverken filmen eller en <source> kan lastes i forkant.
+//
+// Tekstalternativet (WCAG 1.2.1, film uten lyd): plakaten har ekte alt-tekst, og filmen peker med
+// aria-describedby på en visuelt skjult beskrivelse. <video> har ingen alt-attributt, så dette er
+// det nærmeste som finnes.
+
+const PLAKAT = { bredde: 1280, hoyde: 720, mobilBredde: 720, mobilHoyde: 900 }
+
+// Filnavnene står i sin helhet, ikke satt sammen av biter: test/seo/nettsted.test.js leser
+// kildefilene og krever at hver fil i public/nettsted/ er i bruk, og den leter etter hele
+// filnavn i anførselstegn. En mal som `forsidefilm-${sp}.mp4` ville gjort filene «ubrukte».
+const FILM = {
+  no: {
+    pc: '/nettsted/forsidefilm-no.mp4',
+    mobil: '/nettsted/forsidefilm-no-mobil.mp4',
+    plakat: '/nettsted/forsidefilm-no-plakat.webp',
+    mobilplakat: '/nettsted/forsidefilm-no-mobil-plakat.webp',
+  },
+  en: {
+    pc: '/nettsted/forsidefilm-en.mp4',
+    mobil: '/nettsted/forsidefilm-en-mobil.mp4',
+    plakat: '/nettsted/forsidefilm-en-plakat.webp',
+    mobilplakat: '/nettsted/forsidefilm-en-mobil-plakat.webp',
+  },
+}
 
 export default function Signature() {
   const cross = useRef(null)
+  const video = useRef(null)
+  const [spiller, setSpiller] = useState(false)
+  const fil = isEn() ? FILM.en : FILM.no
+
+  // Filmen velges først når det trykkes: bredden kan ha endret seg siden siden ble lastet
+  const start = () => setSpiller(true)
+
+  useEffect(() => {
+    if (!spiller) return
+    const el = video.current
+    if (!el) return
+    const bred = window.matchMedia('(min-width: 981px)').matches
+    el.src = bred ? fil.pc : fil.mobil
+    el.play().catch(() => {}) // nekter nettleseren, står kontrollene der og brukeren kan trykke selv
+  }, [spiller, fil])
 
   useEffect(() => {
     const el = cross.current
@@ -98,6 +135,11 @@ export default function Signature() {
     }
   }, [])
 
+  const altTekst = L(
+    'Skjermbilde fra Arvklart-demoen: gjenstandsoversikten med middagsservise, oljemaleri og vase, og visningen der administratoren velger hvem som skal ha serviset.',
+    'Screenshot from the Arvklart demo: the item overview with a dinner service, an oil painting and a vase, and the view where the administrator chooses who should have the service.',
+  )
+
   return (
     <div className="cross" id="cross" ref={cross}>
       <div className="cross__bg" aria-hidden="true">
@@ -106,63 +148,70 @@ export default function Signature() {
       </div>
       <div className="rules" aria-hidden="true" />
       <figure className="cross__fig">
-        <div className="rigg">
-          <div className="dev dev--tab">
-            <div className="dev__sk">
-              <Img src="d-galleri.webp" w={400} h={533}
-                alt={L(
-                  'Skjermbilde fra Arvklart-demoen på nettbrett: gjenstandsgalleriet med bokhylle, oljemaleri, gifteringer, halskjede og familiealbum, med verdi og navn under hvert kort.',
-                  'Screenshot from the Arvklart demo on a tablet (Norwegian interface): the item gallery with a bookcase, an oil painting, wedding rings, a necklace and a family album, with a value and names under each card.',
-                )} />
-            </div>
-          </div>
-          <span className="rigg__gulv" aria-hidden="true" />
-          <div className="dev dev--lap">
-            <span className="dev__base" aria-hidden="true" />
-            <div className="dev__sk">
-              <Img src="d-oversikt.webp" w={885} h={553}
-                alt={L(
-                  'Skjermbilde fra Arvklart-demoen på PC: oversikten over Fam. Hansen sitt bo med hvor mange gjenstander som er fordelt, og «Anbefalt nå»: «Du har 10 gjenstander du ikke har tatt stilling til» med knappen «Gå gjennom nå».',
-                  'Screenshot from the Arvklart demo on a computer (Norwegian interface): the overview of the Hansen family estate with how many items have been divided, and «Anbefalt nå» (Recommended now): «Du har 10 gjenstander du ikke har tatt stilling til» (You have 10 items you have not answered) with the button «Gå gjennom nå» (Go through now).',
-                )} />
-            </div>
-          </div>
-          <div className="dev dev--phone">
-            <div className="dev__sk">
-              <Img src="d-phone.webp" w={470} h={1017}
-                alt={L(
-                  'Skjermbilde fra Arvklart-demoen på telefon: «Flere ønsker denne (2)» med begrunnelsene fra Lars Hansen og Kari Hansen om oljemaleriet.',
-                  'Screenshot from the Arvklart demo on a phone (Norwegian interface): «Flere ønsker denne (2)» (Several want this) with the explanations from Lars Hansen and Kari Hansen about the oil painting.',
-                )} />
-            </div>
-          </div>
-          <div className="rigg__veil" aria-hidden="true" />
-        </div>
-
-        <div className="rigg__mobil">
-          <div className="frame">
-            <div className="frame__win">
-              <Img src="m-hero.webp" w={620} h={1342}
-                alt={L(
-                  'Skjermbilde fra Arvklart-demoen på mobil: oversikten over Fam. Hansen sitt bo med hvor mange gjenstander som er fordelt, «Anbefalt nå» og starten på «Hva vil du gjøre?».',
-                  'Screenshot from the Arvklart demo on a phone (Norwegian interface): the overview of the Hansen family estate with how many items have been divided, «Anbefalt nå» (Recommended now) and the start of «Hva vil du gjøre?» (What do you want to do?).',
-                )} />
-              <div className="frame__veil" aria-hidden="true" />
-            </div>
-          </div>
+        <div className="film">
+          {spiller ? (
+            <video
+              ref={video}
+              className="film__media"
+              controls
+              playsInline
+              preload="none"
+              poster={fil.plakat}
+              aria-label={L('Film om hvordan Arvklart fungerer, 47 sekunder, uten lyd',
+                'Film about how Arvklart works, 47 seconds, without sound')}
+              aria-describedby="film-tekst"
+            />
+          ) : (
+            <>
+              <picture>
+                <source
+                  media="(min-width: 981px)"
+                  srcSet={fil.plakat}
+                  width={PLAKAT.bredde}
+                  height={PLAKAT.hoyde}
+                />
+                <img
+                  className="film__media"
+                  src={fil.mobilplakat}
+                  width={PLAKAT.mobilBredde}
+                  height={PLAKAT.mobilHoyde}
+                  /* Ikke lazy. Plakaten stikker inn i første visning (målt: 12 % synlig på
+                     1440x900, 31 % på 390x844) og er derfor LCP-elementet. `loading="lazy"`
+                     nedprioriterer nettopp det bildet LCP måles på, så den lastes ivrig med høy
+                     prioritet i stedet. Se PR-en for tallene før og etter. */
+                  fetchPriority="high"
+                  decoding="async"
+                  alt={altTekst}
+                />
+              </picture>
+              <button
+                type="button"
+                className="film__btn"
+                onClick={start}
+                /* Det tilgjengelige navnet må INNEHOLDE den synlige teksten (WCAG 2.5.3 «Label in
+                   Name»), ellers treffer ikke talestyring knappen når noen sier det de ser. axe
+                   fanget det: «Se video om hvordan …» begynner annerledes enn «Se video · 0:47».
+                   Derfor står den synlige teksten først, og resten som utdyping. */
+                aria-label={L('Se video · 0:47 – om hvordan Arvklart fungerer, uten lyd',
+                  'Watch video · 0:47 – about how Arvklart works, without sound')}
+              >
+                <span className="film__ikon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                    <path d="M9 7.5v9l7.5-4.5z" fill="currentColor" />
+                  </svg>
+                </span>
+                <span>{L('Se video · 0:47', 'Watch video · 0:47')}</span>
+              </button>
+            </>
+          )}
         </div>
       </figure>
-      {/* div, ikke figcaption: teksten står utenfor <figure> i pakkens markup, og en figcaption
-          må være første eller siste barn av en figure. Utseendet styres av klassen og er uendret. */}
-      <div className="cross__cap">
-        <span className="cap cap--c">
-          <span className="label">{L('Skjermbilde fra demoen', 'Screenshot from the demo (Norwegian interface)')}</span>
-          <i>{L(
-            'Eksempel fra Arvklart: gjenstander og familiens ønsker samlet i samme oversikt.',
-            'An example from Arvklart: the items and the family’s wishes gathered in one overview.',
-          )}</i>
-        </span>
-      </div>
+      {/* Tekstalternativet til filmen (WCAG 1.2.1). Skjult, fordi bildeteksten under rammen er
+          tatt bort – men den står i markupen og leses av skjermlesere via aria-describedby. */}
+      <p id="film-tekst" className="visuelt-skjult">{L(
+        'Filmen viser eksempelboet i Arvklart: en gjenstand legges inn med bilde, navn og kategori; familien får én felles oversikt over gjenstandene med verdianslag og hvem som ønsker hva; hver arving kan skrive hvorfor en gjenstand betyr noe; og til slutt velger administratoren hvem som skal ha den. Filmen er uten lyd.',
+        'The film shows the example estate in Arvklart: an item is added with a photo, a name and a category; the family gets one shared overview of the items with estimated values and who wants what; each heir can write why an item matters to them; and finally the administrator chooses who should have it. The film has no sound.',
+      )}</p>
     </div>
   )
 }

@@ -169,9 +169,15 @@ test('hvert produktutsnitt er merket som skjermbilde', () => {
   const shot = read('src/site/Shot.jsx')
   assert.match(shot, /Skjermbilde fra Arvklart/)
   assert.match(shot, /Skjermbilde fra demoen/)
-  // ingen <img> fra /nettsted/ utenom portretter og logoen uten en bildetekst i nærheten
-  const sider = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/site/Journey.jsx', 'src/site/Signature.jsx']
-  for (const p of sider) assert.match(read(p), /Cap|cap--c|label/, `${p}: mangler etiketter på skjermbildene`)
+  // ingen <img> fra /nettsted/ utenom portretter og logoen uten en bildetekst i nærheten.
+  //
+  // src/site/Signature.jsx står ikke her lenger: seksjonen viser ikke et statisk skjermbilde,
+  // men produktfilmen med plakat, og bildeteksten er tatt bort etter avtale. Plakaten har ekte
+  // alt-tekst, og filmen har aria-label og en skjult beskrivelse (aria-describedby), men ingen
+  // SYNLIG merking av at innholdet er fra eksempelboet. Det er en bevisst avveining, ikke noe
+  // testen har oversett. Regexen under ville dessuten gitt falsk pass på «aria-label».
+  const sider = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/site/Journey.jsx']
+  for (const p of sider) assert.match(read(p), /Cap|cap--c/, `${p}: mangler etiketter på skjermbildene`)
 })
 
 // ── Selskapsopplysninger og produktpåstander ────────────────────────────────────────────────────
@@ -244,8 +250,10 @@ test('ordskiftet kan stanses (WCAG 2.2.2), og knappen skjules ved redusert beveg
 
 test('color-mix har statisk fallback, og margene settes uttrykkelig', () => {
   const css = read('src/site/site.css')
-  // Hver color-mix-deklarasjon skal ha en fast verdi for samme variabel rett foran
-  for (const v of ['--ordfarge', '--skall', '--skallkant', '--skallmork']) {
+  // Hver color-mix-deklarasjon skal ha en fast verdi for samme variabel rett foran.
+  // --skall, --skallkant og --skallmork hørte til enhetsgruppen (.rigg) i signaturen, som er
+  // erstattet av produktfilmen. De finnes ikke lenger, så de står ikke her.
+  for (const v of ['--ordfarge']) {
     const faste = new RegExp(`${v}:#[0-9A-Fa-f]{6};`)
     assert.match(css, faste, `${v} mangler fallback uten color-mix()`)
   }

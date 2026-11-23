@@ -3,8 +3,8 @@
 // Se også test/seo/content.test.js (guidene) og test/e2e/seo.mjs (det bygde nettstedet).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { PUBLIC_PAGES, SITE_URL, SHELL_FILE, headTags, defaultHeadTags, organizationJsonLd, websiteJsonLd, prerenderFile } from '../../src/seo/pages.js'
+import { readFileSync, existsSync } from 'node:fs'
+import { PUBLIC_PAGES, SITE_URL, SHELL_FILE, headTags, defaultHeadTags, organizationJsonLd, websiteJsonLd, videoJsonLd, prerenderFile } from '../../src/seo/pages.js'
 import { injectHead, injectRoot, unescapeStyles } from '../../src/seo/vitePlugin.js'
 import { publicRegistry } from '../../src/seo/content.js'
 import { runHttpChecks, httpReport, domainChecks, isVercelProtection, REPORT_PATHS } from './httpChecks.mjs'
@@ -54,8 +54,24 @@ test('strukturerte data: WebSite og Organization bare på forsiden «/», med op
   assert.deepEqual(websiteJsonLd(), { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Arvklart', url: `${SITE_URL}/` })
   const home = headTags(PUBLIC_PAGES.find(p => p.path === '/'))
   const ld = [...home.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m => JSON.parse(m[1]))
-  assert.deepEqual(ld, [websiteJsonLd(), organizationJsonLd()])
+  assert.deepEqual(ld, [websiteJsonLd(), organizationJsonLd(), videoJsonLd()])
   assert.doesNotMatch(JSON.stringify(ld), /aggregateRating|review|offers|logo/i)
+
+  // VideoObject: feltene Google krever, og at filene faktisk finnes og peker på vårt domene.
+  const v = videoJsonLd()
+  for (const felt of ['name', 'description', 'thumbnailUrl', 'uploadDate', 'duration', 'contentUrl']) {
+    assert.ok(v[felt], `VideoObject mangler ${felt}`)
+  }
+  assert.match(v.duration, /^PT\d+S$/, 'duration skal være ISO 8601, f.eks. PT47S')
+  assert.match(v.uploadDate, /^\d{4}-\d{2}-\d{2}$/)
+  for (const u of [v.thumbnailUrl, v.contentUrl]) assert.ok(u.startsWith(`${SITE_URL}/nettsted/`), `${u} er ikke på vårt domene`)
+  for (const u of [v.thumbnailUrl, v.contentUrl]) {
+    assert.ok(existsSync(new URL(`../../public${u.slice(SITE_URL.length)}`, import.meta.url)), `${u} finnes ikke i public/`)
+  }
+  // Beskrivelsen skal være den samme som den skjulte teksten ved filmen, ellers beskriver
+  // strukturerte data noe annet enn siden viser.
+  assert.ok(readFileSync(new URL('../../src/site/Signature.jsx', import.meta.url), 'utf8').includes(v.description),
+    'VideoObject-beskrivelsen står ikke i Signature.jsx (aria-describedby-teksten)')
   for (const p of PUBLIC_PAGES.filter(p => p.path !== '/')) assert.doesNotMatch(headTags(p), /ld\+json/, `${p.path}: strukturerte data bare på forsiden`)
   assert.equal(headTags(PUBLIC_PAGES.find(p => p.path === '/')).match(/rel="canonical" href="([^"]+)"/)[1], `${SITE_URL}/`)
 })

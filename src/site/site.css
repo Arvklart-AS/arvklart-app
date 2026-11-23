@@ -890,7 +890,9 @@ flate som skyves opp; bildetekstens lysgrense er den samme flaten inne i rammen.
   /* toppen av selve skjermbildet, rammelinje og luft medregnet, slik at
   lysgrensen inne i rammen ligger på nøyaktig samme linje som ute på siden */
   --winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 1px + var(--fpad));
-  height:86svh;
+  /* 4svh topp + 62svh ramme + 6svh luft under. Seksjonen hadde 86svh da bildeteksten sto
+     under rammen; uten den ble det 180 px dødt rom. */
+  height:72svh;
   /* bildeteksten lander alltid i lyset */
   --ink:var(--blekk); --muted:var(--skifer); --accent:var(--granskog);
   --rule:rgba(128,126,116,.3);
@@ -912,148 +914,64 @@ flate som skyves opp; bildetekstens lysgrense er den samme flaten inne i rammen.
   display:grid;justify-items:center;margin:0;padding-inline:var(--pad)
 }
 /* ------------------------------------------------------------------
-ENHETSGRUPPEN I HEROEN
-Tre ekte skjermbilder fra den offentlige demoen, tatt i samme økt:
-boets oversikt på PC, gjenstandsgalleriet på nettbrett og
-begrunnelsene på telefon. Rammene er tegnet i CSS; skjerminnholdet
-er uendret.
+PRODUKTFILMEN
+Rammen er høydestyrt på PC, som enhetsgruppen var: høyden kommer fra
+--frameH, og bredden følger av 16:9. På mobil må det snus — 4:5 med
+høyden fra --frameH ville blitt 473 px bredt på en 390 px skjerm — så
+der er bredden 100 % og høyden følger av forholdet.
 
-Høyden på hver enhet kommer fra skjermens sideforhold pluss rammen,
-ikke fra et tall. Da stemmer forholdet mellom dem: et nettbrett i
-stående format er høyere enn en PC-skjerm, og telefonen er under
-halvparten. Lyset kommer fra øvre venstre.
+aspect-ratio settes på rammen i begge tilfeller, så plassen er tatt før
+plakaten er lastet og siden ikke hopper (CLS).
+
+Løftet (translate) er det samme som enhetsgruppen hadde, så overgangen
+mot lyset oppfører seg uendret.
 ------------------------------------------------------------------ */
-.ak .rigg{
-  position:relative;width:min(100%,1140px);height:var(--frameH);overflow:hidden;
+.ak .film{
+  /* max-width er taket på høyden, uttrykt i bredde: 4:5 av full bredde ville blitt 1103 px høyt
+     på en 980x900-skjerm, altså høyere enn vinduet. 76svh * 4/5 holder den innenfor. */
+  position:relative;width:100%;max-width:min(1140px,calc(76svh * 4 / 5));aspect-ratio:4/5;
   translate:0 calc((1 - var(--lift)) * 2.4svh);
-  /* Fallback uten color-mix(): sluttilstanden (--lift 1), altså den lyse enheten. Da mister
-     overgangen fargeskiftet på rammene, men enhetene er lyse og lesbare hele veien. */
-  --skall:#E6E2D8;
-  --skallkant:#C2BEB2;
-  --skallmork:#CDC8BC;
-  --skall:color-mix(in srgb, #E6E2D8 calc(var(--lift) * 100%), #2C2F2A);
-  --skallkant:color-mix(in srgb, #C2BEB2 calc(var(--lift) * 100%), rgba(242,238,230,.2));
-  --skallmork:color-mix(in srgb, #CDC8BC calc(var(--lift) * 100%), #23261F);
-  --skygge:rgba(20,24,20,calc(.42 * var(--lift)))
+  border-radius:4px;overflow:hidden;background:var(--natt)
 }
-/* underlaget: én myk kontaktskygge som binder de tre sammen */
-.ak .rigg__gulv{
-  position:absolute;left:8%;right:8%;bottom:9%;height:52px;z-index:0;
-  border-radius:50%;pointer-events:none;filter:blur(16px);
-  background:radial-gradient(ellipse at center, var(--skygge) 0%, transparent 70%)
+.ak .film__media{
+  display:block;width:100%;height:100%;object-fit:cover
 }
-.ak .dev{
-  position:absolute;background:var(--skall);border:1px solid var(--skallkant)
-}
-.ak .dev__sk{
-  position:relative;overflow:hidden;background:var(--papir)
-}
-.ak .dev__sk img{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:top center
-}
-/* PC: skjermpanel med hengselhakk, og en underdel bredere enn skjermen */
-.ak .dev--lap{
-  left:50%;top:8%;width:62%;translate:-50% 0;z-index:3;
-  border-radius:9px 9px 3px 3px;padding:11px 11px 16px;
-  box-shadow:0 24px 40px -28px var(--skygge)
-}
-.ak .dev--lap .dev__sk{
-  aspect-ratio:16/10;border-radius:2px
-}
-.ak .dev--lap::before{
-  content:'';position:absolute;left:50%;bottom:6px;translate:-50% 0;
-  width:54px;height:3px;border-radius:99px;background:var(--skallmork)
-}
-.ak .dev__base{
-  position:absolute;left:50%;top:100%;translate:-50% 0;
-  width:114%;height:15px;border-radius:0 0 12px 12px;
-  background:linear-gradient(180deg, var(--skall) 0%, var(--skallmork) 100%);
-  border:1px solid var(--skallkant);border-top:none;
-  box-shadow:0 14px 24px -14px var(--skygge)
-}
-.ak .dev__base::after{
-  content:'';position:absolute;left:50%;top:-1px;translate:-50% 0;
-  width:16%;height:5px;border-radius:0 0 6px 6px;background:var(--skallmork)
-}
-/* Nettbrett: stående, bak til venstre, hele silhuetten synlig */
-.ak .dev--tab{
-  left:1%;top:1%;width:28%;z-index:2;
-  border-radius:14px;padding:9px;
-  box-shadow:0 20px 36px -26px var(--skygge)
-}
-.ak .dev--tab .dev__sk{
-  aspect-ratio:3/4;border-radius:7px
-}
-/* Telefon: foran til høyre, minst */
-.ak .dev--phone{
-  right:2%;top:30%;width:14.5%;z-index:4;
-  border-radius:21px;padding:5px;
-  box-shadow:0 20px 32px -20px var(--skygge)
-}
-.ak .dev--phone .dev__sk{
-  aspect-ratio:9/19.5;border-radius:17px
-}
-.ak .dev--phone::before{
-  content:'';position:absolute;left:50%;top:11px;translate:-50% 0;z-index:2;
-  width:28%;height:4px;border-radius:99px;background:rgba(20,24,20,.4)
-}
-.ak .dev--phone::after{
-  content:'';position:absolute;right:-2px;top:24%;width:2px;height:7%;
-  border-radius:0 2px 2px 0;background:var(--skallmork)
-}
-.ak .rigg__veil{
-  position:absolute;left:0;right:0;top:0;height:300svh;z-index:5;
-  background:var(--natt);opacity:.8;pointer-events:none;
-  transform:translateY(calc(var(--edgeY) - var(--winTop) - 300svh));will-change:transform
-}
-.ak .rigg__veil::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:rgba(157,170,140,.6)
-}
-.ak .cross .rigg__mobil{
-  display:none
-}
-@media (max-width:980px){
-  .ak .cross .rigg{
-    display:none
-  }
-  .ak .cross .rigg__mobil{
-    display:block
+@media (min-width:981px){
+  .ak .film{
+    aspect-ratio:16/9;height:var(--frameH);width:auto;max-width:min(100%,1140px)
   }
 }
-.ak .frame{
-  position:relative;width:min(100%,300px);height:var(--frameH);
-  border:1px solid var(--strek);
-  border-radius:2px;padding:var(--fpad);background:var(--kalk);
-  translate:0 calc((1 - var(--lift)) * 2.4svh);
-  box-shadow:0 26px 56px -44px rgba(31,35,38,.5);
+/* Avspillingsknappen: en ekte knapp oppå plakaten, midt i rammen. Lys pille med mørkt,
+   rundt spillikon, som i designet. Fokusringen er tydelig mot den lyse pillen. */
+.ak .film__btn{
+  position:absolute;left:50%;top:50%;translate:-50% -50%;
+  display:inline-flex;align-items:center;gap:clamp(10px,1vw,14px);
+  padding:clamp(9px,.9vw,13px) clamp(20px,1.8vw,28px) clamp(9px,.9vw,13px) clamp(9px,.8vw,12px);
+  border:0;border-radius:999px;cursor:pointer;
+  background:#F5F2EB;color:#1F2326;
+  font-family:var(--sans);font-size:clamp(1rem,.95rem + .35vw,1.3rem);font-weight:500;
+  box-shadow:0 6px 22px -8px rgba(20,24,20,.45);
+  white-space:nowrap;
+  transition:box-shadow var(--t-m) var(--ease),transform var(--t-s) var(--ease)
 }
-.ak .frame::before{
-  content:'';position:absolute;inset:-1px;z-index:0;border-radius:inherit;
-  background:var(--natt);border:1px solid rgba(242,238,230,.24);
-  opacity:calc(1 - var(--lift));pointer-events:none
+.ak .film__btn:hover{
+  box-shadow:0 12px 34px -10px rgba(20,24,20,.6);transform:translateY(-1px)
 }
-.ak .frame__win{
-  position:relative;z-index:1;width:100%;height:100%;overflow:hidden;
-  border-radius:1px;background:var(--papir)
+.ak .film__btn:focus-visible{
+  outline:3px solid var(--granskog);outline-offset:3px
 }
-.ak .frame img{
-  width:100%;height:100%;object-fit:cover;object-position:top center
+.ak .film__ikon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:clamp(38px,3.2vw,46px);height:clamp(38px,3.2vw,46px);
+  border-radius:50%;background:#1F2326;color:#F5F2EB;flex:none
 }
-.ak .frame__veil{
-  position:absolute;left:0;right:0;top:0;height:300svh;background:var(--natt);opacity:.8;
-  transform:translateY(calc(var(--edgeY) - var(--winTop) - 300svh));will-change:transform
-}
-.ak .frame__veil::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:rgba(157,170,140,.6)
-}
-.ak .cross__cap{
-  position:absolute;z-index:4;left:0;right:0;top:calc(var(--frameTop) + var(--frameH) + 26px);
-  padding-inline:var(--pad);
-  opacity:clamp(0,calc(var(--lift) * 2.6 - 1.6),1);
-  transition:opacity var(--t-m) var(--ease)
+@media (prefers-reduced-motion: reduce){
+  .ak .film__btn{
+    transition:none
+  }
+  .ak .film__btn:hover{
+    transform:none
+  }
 }
 .ak .cap--c{
   justify-items:center;text-align:center;margin-inline:auto
@@ -1071,20 +989,11 @@ halvparten. Lyset kommer fra øvre venstre.
 }
 @media (max-width:980px){
   .ak .cross{
-    --edgeY:calc(86svh - var(--lift) * 80svh);--frameTop:6svh;--frameH:70svh;height:95svh;--fpad:7px;--winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 2px + var(--fpad))
-  }
-  .ak .frame{
-    width:min(100%,300px);border-radius:30px;padding:7px;
-    border-width:2px;height:var(--frameH)
-  }
-  .ak .frame__win{
-    border-radius:24px
-  }
-  .ak .frame__veil{
-    border-radius:24px
-  }
-  .ak .cross__cap{
-    top:calc(var(--frameTop) + var(--frameH) + 20px)
+    --edgeY:calc(86svh - var(--lift) * 80svh);--frameTop:6svh;--frameH:70svh;--fpad:7px;--winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 2px + var(--fpad));
+    /* Under bruddpunktet er filmen breddestyrt (4:5 av tilgjengelig bredde), ikke høydestyrt,
+       så høyden regnes ut i stedet for å settes i svh: topp + rammens høyde + luft. --pad er
+       --gut her (maxw-grenen slår aldri inn så smalt), derfor det samme uttrykket. */
+    height:calc(6svh + min((100vw - 2 * clamp(20px,5vw,72px)) * 1.25, 76svh) + 4svh)
   }
   .ak .cap{
     max-width:none
@@ -1578,9 +1487,6 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   }
   .ak .st{
     animation:none !important
-  }
-  .ak .dev{
-    box-shadow:0 18px 34px -30px rgba(31,35,38,.4)
   }
   .ak .btn:hover,.ak .row:hover,.ak .faq details>summary:hover,.ak .ul:hover,.ak .brand:hover,.ak .rail__b:hover,.ak .sh:hover .sh__f,.ak .team li:hover .portrait--foto,.ak .shotfig:hover .phoneframe,.ak .menu>summary:hover{
     transform:none
