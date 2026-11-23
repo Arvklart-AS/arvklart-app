@@ -62,7 +62,7 @@ export default function DistributionPage({ session, onToast, isDemo }) {
 
   if (!data) return <div style={{ padding: '80px', textAlign: 'center', color: '#B9B4A8', fontFamily: 'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
   const s = summarizeDistribution(data)
-  const canAssign = data.isAdmin && !isDemo && data.estate?.status !== 'closed'
+  const canAssign = data.isAdmin && data.estate?.status !== 'closed' // også i demoen: tildelingene nullstilles ved neste demoinnlogging
   const single = canAssign ? singleInterestAssignments(data.items, data.members, data.passes, data.heirs) : null
   const notSettled = s.pending.length + s.unwanted.undecided.length
 
