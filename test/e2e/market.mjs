@@ -1,6 +1,8 @@
 // Akseptansetester for «Sammenlign med markedet» på gjenstandssiden (M1): søkelenker, familiens egne
 // sammenligninger og verdianslaget fra estimate-value, i Chromium med simulert Supabase. Kjøres av test/e2e/run.sh.
 import { BASE, EST, UID, ITEM, FIXTURES, launch, checker, assert } from './fixtures.mjs'
+import { METAL_PRICES } from '../../src/lib/metalPrices.js'
+import { metalValue } from '../../src/lib/metalValue.js'
 
 const browser = await launch()
 const results = []
@@ -127,6 +129,36 @@ await check('Kan være sølv: spørsmålet om stempel på gjenstandssiden, og sv
   assert(sent[0]?.ai_analysis?.corrections?.material?.value === 'Forsølvet (plett)', `feil rettelse: ${JSON.stringify(sent[0])}`)
   assert(sent[0].ai_analysis.ai.identification.material.value === 'Sølv, oksidert', 'AI-forslaget ble endret')
 }, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: brooch }] } })
+
+// Metallverdien når familien har oppgitt stempel og vekt (src/lib/metalValue.js), med prisen som ligger i repoet.
+// Er prisen eldre enn 30 dager, settes klokken tilbake til dagen etter prisdatoen, så testen ikke blir rød når prisen
+// blir for gammel til å vises. Aldri fram i tid: innloggingen i testoppsettet går ut etter en time.
+const priceClock = page => {
+  const at = METAL_PRICES.date ? Date.parse(`${METAL_PRICES.date}T12:00:00Z`) + 86_400_000 : null
+  return at && Date.now() - at > 30 * 86_400_000 ? page.clock.setFixedTime(at) : null
+}
+const answeredBrooch = { ...brooch, corrections: { material: { value: 'Sølv 830S, 166 g', by: UID, at: '2026-11-21T00:00:00Z' } } }
+await check('Metallverdi: «Ca. … i metall» med dato og lenken til MetalCharts når stempel og vekt er oppgitt, for alle i boet', async page => {
+  await priceClock(page)
+  await open(page)
+  await page.getByRole('link', { name: /Søk på FINN/ }).waitFor()
+  assert(await page.getByRole('heading', { name: 'Er det ekte sølv?' }).count() === 0, 'spørsmålet vises etter svar')
+  const note = page.getByRole('heading', { name: /i metall$/ })
+  if (!METAL_PRICES.date) return assert(await note.count() === 0, 'metallverdi uten pris')
+  await note.waitFor()
+  const expected = metalValue(answeredBrooch, { today: new Date(`${METAL_PRICES.date}T12:00:00Z`) }).value
+  const shown = Number((await note.textContent()).replace(/\D/g, ''))
+  assert(shown === expected, `viser ${shown}, ventet ${expected}`)
+  const link = page.getByRole('link', { name: /Metallpriser fra MetalCharts/ })
+  assert(await link.getAttribute('href') === 'https://metalcharts.org', 'mangler kildelenken')
+}, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: answeredBrooch }], estate_members: [{ ...FIXTURES.estate_members[0], role: 'member' }] } })
+
+await check('Metallverdi: vises ikke når vekten mangler', async page => {
+  await priceClock(page)
+  await open(page)
+  await page.getByRole('link', { name: /Søk på FINN/ }).waitFor()
+  assert(await page.getByRole('heading', { name: /i metall$/ }).count() === 0, 'metallverdi uten vekt')
+}, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: { ...brooch, corrections: { material: { value: 'Sølv 830S', by: UID, at: '2026-11-21T00:00:00Z' } } } }] } })
 
 // Uten AI-tall (sølv, kunst, smykker) kan arvingene likevel foreslå en verdi; sølja fra kalibreringen
 const votes = page => {

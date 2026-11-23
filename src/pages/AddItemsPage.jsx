@@ -21,6 +21,7 @@ import { withCorrections } from '../lib/aiCorrections'
 import CameraCapture from '../components/CameraCapture'
 import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
 import MetalQuestion from '../components/MetalQuestion'
+import MetalValueNote from '../components/MetalValueNote'
 import { Overline } from '../components/UI'
 
 const MAX_ITEMS = 20
@@ -1080,6 +1081,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
         </p>
       )}
       {metal && !metal.answered && !disabled && <MetalQuestion metal={metal} idPrefix={`metal-${d.key}`} onAnswer={text => saveFix({ material: text })} />}
+      {metal?.answered && <MetalValueNote record={d.analysis} idPrefix={`metal-value-${d.key}`} />}
       {(d.estimate || d.estimating) && valueField}
       {d.appraise && !d.estimate && !d.estimating && (
         <div role="status" style={{ fontSize: '0.8125rem', color: '#F2EEE6', background: '#30342D', border: '2px solid #C79A6B', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>

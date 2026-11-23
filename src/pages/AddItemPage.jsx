@@ -11,6 +11,7 @@ import { aiErrorMessage, analyzeItemPhotos, callEdgeFunction, valuationRecord } 
 import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
 import { withCorrections } from '../lib/aiCorrections'
 import MetalQuestion from '../components/MetalQuestion'
+import MetalValueNote from '../components/MetalValueNote'
 import { aiAnalysisRecord, aiSuggestion, applyAiSuggestion } from '../lib/itemAiHelpers'
 import { CONDITION_OPTIONS, multipleItemsText } from '../lib/analysisView'
 import AnalysisDetails from '../components/AnalysisDetails'
@@ -447,6 +448,7 @@ export default function AddItemPage({ session, profile, onToast, isDemo }) {
 
         {/* Verdiestimat-knapp */}
         {metal && !metal.answered && <MetalQuestion metal={metal} idPrefix="additem-metal" onAnswer={answerMetal} />}
+        {metal?.answered && <MetalValueNote record={analysis} idPrefix="additem-metal-value" />}
         {title.trim() && !consentFor && !aiEstimate && (
           <p style={{ fontSize: '0.8125rem', color: '#B9B4A8', lineHeight: 1.5, margin: 0 }}>
             {L('Anslaget blir sikrere når materiale, stempel, merke og modell står i beskrivelsen.', 'The estimate is more reliable when material, hallmark, brand and model are in the description.')}
