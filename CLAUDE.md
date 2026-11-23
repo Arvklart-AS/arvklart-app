@@ -118,6 +118,11 @@ Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:foc
   - Koden trekker ikke fra noe i tillegg. Den gjør bare intervallet bredere og senker sikkerheten når grunnlaget er usikkert.
   - For lite grunnlag gir `status: 'insufficient'` med tips og ingen verdi (aldri 0 kr).
   - AI-ens anslag lagres i `ai_analysis.valuation`, adskilt fra `estimated_value`.
+- Visning av anslaget (`src/lib/valueAdvice.js`, testet i `test/lib/valueAdvice.test.js`; grunnlaget er kalibreringen mot 20 solgte gjenstander i `eval/`, der AI-en bommet mest, og oftest for lavt, på sølv, smykker og kunst):
+  - Anslaget vises som spenn (`formatRange`), aldri som ett tall og aldri med «sikkerhet».
+  - `valueAdvice` gir `instead` for en ren AI-gjetning (`method: model`) over 10 000 kr, i kategoriene kunst, smykker/ur og samleobjekter, eller når gjenstanden kan være sølv eller gull (`preciousMetal`). Da vises ikke noe beløp, det lagres ikke i `estimated_value`, og familien rådes til å få det vurdert eller legge inn en solgt pris (`appraiseText`). Bygger anslaget på familiens sammenligninger, vises beløpet med en merknad (`suggest`).
+  - `preciousMetal` leser materialet (familiens rettelse først), stempler og gull-/sølvsmed. «Er det ekte sølv?» (`src/components/MetalQuestion.jsx`) spør om stempel og vekt, og svaret lagres som familiens rettelse av materialet. «Forsølvet»/«plett» fra familien opphever regelen; «vet ikke» gjør det ikke.
+  - Holdes AI-tallet tilbake (`withheldFor`), kan arvingene foreslå en verdi selv under «Hva er den verdt?» på gjenstandssiden (`vote_item_value`, som et verdiforslag).
 - Storage: `estate-docs` er privat (`documents/<bo-id>/…`, åpnes med `createSignedUrl`); `item-images` vises med tidsbegrensede, signerte URL-er via `<StoredImage>` (`src/components/StoredImage.jsx`, `src/lib/imageUrls.js`). Databasen lagrer fortsatt den offentlige URL-en som identifikator. Bøtten gjøres privat i S3, så bruk aldri `<img src={item.image_url}>` direkte. Nye filer lagres under `<bo-id>/…` (`src/lib/images.js`)
 
 ## Demokonto

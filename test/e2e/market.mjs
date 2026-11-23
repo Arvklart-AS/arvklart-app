@@ -75,6 +75,87 @@ await check('Arving på andres gjenstand: ser sammenligningene og søkelenkene, 
 }, { fixtures: { ...withRefs([ref(1, 900)]).fixtures, items: [{ ...withRefs([ref(1, 900)]).fixtures.items[0], added_by: 'annen' }],
   estate_members: [{ ...FIXTURES.estate_members[0], role: 'member' }] } })
 
+await check('AI-gjetning på kunst: «få den vurdert» i stedet for et tall, ingen «Bruk som verdi», og veien til en solgt pris', async page => {
+  const sent = patches(page)
+  await page.route('https://test.supabase.co/functions/v1/estimate-value', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: {
+    v: 3, status: 'ok', method: 'model', price_type: 'estimated_price', market_area: 'NO', currency: 'NOK',
+    estimate: { low: 3000, likely: 8000, high: 25000 }, confidence: 'low', uncertainty: { widened: true, reasons: ['not_identified'] },
+    basis: { used_analysis: true, identified: [], specificity: 'generic', category_key: 'art' },
+    reasoning: 'Usignert oljemaleri.', references: [], queries: ['Oljemaleri'], links: [], summary: { low_nok: 3000, likely_nok: 8000, high_nok: 25000 },
+  } }) }))
+  await page.addInitScript(() => localStorage.setItem('aiConsented', 'true'))
+  await open(page)
+  await page.getByRole('button', { name: /Anslå verdi/ }).click()
+  await page.getByText('Kan ha reell verdi – få den vurdert').waitFor()
+  assert(await page.getByRole('button', { name: /som verdi$/ }).count() === 0, '«Bruk som verdi» vises')
+  assert(await page.getByText(/8\s?000/).count() === 0, 'beløpet vises')
+  await page.getByRole('button', { name: 'Legg inn en solgt pris' }).click()
+  await page.getByLabel('Hva er det?').waitFor()
+  assert(sent.length === 0, 'noe ble lagret')
+})
+
+await check('Spennet er hovedtallet: AI-anslag på vanlig innbo vises som «fra–til»', async page => {
+  await page.route('https://test.supabase.co/functions/v1/estimate-value', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: {
+    v: 3, status: 'ok', method: 'model', price_type: 'estimated_price', market_area: 'NO', currency: 'NOK',
+    estimate: { low: 400, likely: 700, high: 1100 }, confidence: 'medium', uncertainty: { widened: false, reasons: [] },
+    basis: { used_analysis: true, identified: [], specificity: 'generic', category_key: 'furniture' },
+    reasoning: 'Brukt gyngestol.', references: [], queries: ['Gyngestol'], links: [], summary: { low_nok: 400, likely_nok: 700, high_nok: 1100 },
+  } }) }))
+  await page.addInitScript(() => localStorage.setItem('aiConsented', 'true'))
+  await open(page)
+  await page.getByRole('button', { name: /Anslå verdi/ }).click()
+  await page.getByText(/400.*–.*1\s?100/).first().waitFor()
+  await page.getByText('Sannsynlig spenn', { exact: false }).waitFor()
+  assert(await page.getByText(/sikkerhet/i).count() === 0, '«sikkerhet» vises fortsatt')
+})
+
+// Sølja fra kalibreringen: bildeanalysen sa «Sølv, oksidert»
+const brooch = { v: 2, meta: {}, review: {}, corrections: {}, valuation: null, ai: {
+  suggestion: { title: 'Sølje', description: 'Bunadsølje.', category: null, category_key: 'jewelry_watches', confidence: 'medium' },
+  identification: { object_type: { value: 'Sølje', basis: 'observed', evidence: '' }, brand: { value: 'Sylvsmidja', basis: 'probable', evidence: '' }, manufacturer: null, model: null, variant: null,
+    material: { value: 'Sølv, oksidert', basis: 'probable', evidence: '' }, colour: null, period: null, designer_or_artist: null, model_number: null },
+  unknown: [], marks: [], size_class: 'small', condition_suggestion: 'good', condition_observations: [], condition_not_visible: [], condition_confidence: 'low',
+  multiple_items: { detected: false, count: null, note: null }, photo_suggestions: [], search_query: 'Sylvsmidja sølje',
+} }
+
+await check('Kan være sølv: spørsmålet om stempel på gjenstandssiden, og svaret lagres som familiens rettelse', async page => {
+  const sent = patches(page)
+  await open(page)
+  await page.getByRole('heading', { name: 'Er det ekte sølv?' }).waitFor()
+  await page.getByRole('button', { name: 'Forsølvet eller plett' }).click()
+  for (let i = 0; i < 50 && !sent.length; i++) await page.waitForTimeout(100)
+  assert(sent[0]?.ai_analysis?.corrections?.material?.value === 'Forsølvet (plett)', `feil rettelse: ${JSON.stringify(sent[0])}`)
+  assert(sent[0].ai_analysis.ai.identification.material.value === 'Sølv, oksidert', 'AI-forslaget ble endret')
+}, { fixtures: { items: [{ ...FIXTURES.items[0], ai_analysis: brooch }] } })
+
+// Uten AI-tall (sølv, kunst, smykker) kan arvingene likevel foreslå en verdi; sølja fra kalibreringen
+const votes = page => {
+  const bodies = []
+  page.on('request', r => { if (r.url().includes('/rest/v1/rpc/vote_item_value')) bodies.push(JSON.parse(r.postData() || '{}')) })
+  return bodies
+}
+const noValue = analysis => ({ fixtures: { items: [{ ...FIXTURES.items[0], estimated_value: null, ai_analysis: analysis }], estate_members: [{ ...FIXTURES.estate_members[0], role: 'member' }] },
+  rpc: { vote_item_value: { status: 200, body: { ok: true } } } })
+
+await check('Hva er den verdt?: arvingen kan foreslå en verdi på sølv uten AI-tall; tomt beløp sender ingenting', async page => {
+  const sent = votes(page)
+  await page.goto(`${BASE}/estate/${EST}/item/${ITEM}`)
+  await page.getByRole('heading', { name: 'Hva er den verdt?' }).waitFor()
+  await page.getByRole('button', { name: 'Foreslå verdi' }).click()
+  await page.getByText('Skriv forslaget som et beløp', { exact: false }).waitFor()
+  assert(sent.length === 0, 'tomt forslag ble sendt')
+  await page.getByLabel('Ditt forslag i kroner').fill('3 900')
+  await page.getByRole('button', { name: 'Foreslå verdi' }).click()
+  await page.getByText('Forslaget ditt er registrert').waitFor()
+  assert(sent[0]?.p_vote === 'disagree' && sent[0]?.p_value === 3900, `feil forslag: ${JSON.stringify(sent[0])}`)
+}, noValue(brooch))
+
+await check('Hva er den verdt?: vises ikke for vanlig innbo uten AI-tall', async page => {
+  await page.goto(`${BASE}/estate/${EST}/item/${ITEM}`)
+  await page.getByText('Gyngestol').first().waitFor()
+  assert(await page.getByRole('heading', { name: 'Hva er den verdt?' }).count() === 0, 'boksen vises for vanlig innbo')
+}, noValue({ ...brooch, ai: { ...brooch.ai, suggestion: { ...brooch.ai.suggestion, category_key: 'furniture' }, identification: { ...brooch.ai.identification, brand: null, material: { value: 'Eik', basis: 'probable', evidence: '' } } } }))
+
 await browser.close()
 console.log(results.join('\n'))
 process.exit(results.some(r => r.startsWith('FAIL')) ? 1 : 0)

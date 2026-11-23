@@ -19,6 +19,8 @@ import AnalysisDetails from '../components/AnalysisDetails'
 import AiCorrectionsForm from '../components/AiCorrectionsForm'
 import { withCorrections } from '../lib/aiCorrections'
 import CameraCapture from '../components/CameraCapture'
+import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
+import MetalQuestion from '../components/MetalQuestion'
 import { Overline } from '../components/UI'
 
 const MAX_ITEMS = 20
@@ -32,6 +34,7 @@ const newDraft = () => ({
   key: nextKey++, photos: [], title: '', categoryId: '', condition: 'unknown', description: '', // tilstand er ukjent til noen vurderer den
   value: '', status: 'idle', // idle | analyzing | analyzed | failed | saving | saveFailed | saved
   estimate: null, estimating: false, // AI-verdianslag bare når brukeren ber om det (se estimateApplies)
+  appraise: null, // «få det vurdert» i stedet for et tall (src/lib/valueAdvice.js): { title, body }
   analysis: null, aiFilled: {}, // AI-vurderingen (lagres i ai_analysis) og feltene AI-en har fylt inn
 })
 
@@ -452,7 +455,7 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
   const estimateValues = async (consented = aiConsented, onlyKey = null) => {
     if (!consented) { setAskConsent({ kind: 'estimate', key: onlyKey }); return }
     // «Anslå verdi for alle» hopper over kort som fikk «for lite informasjon»; de kan prøves igjen på kortet
-    let targets = draftsRef.current.filter(d => canEstimate(d) && (onlyKey ? d.key === onlyKey : !d.estimate && !d.estimateMissing))
+    let targets = draftsRef.current.filter(d => canEstimate(d) && (onlyKey ? d.key === onlyKey : !d.estimate && !d.estimateMissing && !d.appraise))
     if (isDemo) {
       if (demoRemaining === 0) { setDemoBlocked(true); return }
       targets = targets.slice(0, demoRemaining)
@@ -472,11 +475,19 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
         // For lite grunnlag: ingen verdi (aldri 0 kr), men tips om hva som kan hjelpe
         if (insufficient) { update(d.key, { estimating: false, estimateMissing: insufficient.missing }); return }
         if (!estimate.likely) throw new Error('no estimate')
+        // Usikker kategori eller høyt beløp som ren AI-gjetning: ikke noe tall, verdien står tom (ukjent)
+        const advice = valueAdvice(estimate.valuation, d.analysis)
+        if (advice === 'instead') {
+          // Står et tidligere AI-tall i feltet, tømmes det (ellers ville det blitt lagret som familiens egen verdi)
+          update(d.key, cur => ({ estimating: false, estimateMissing: null, estimate: null, appraise: appraiseText(estimate.valuation, d.analysis), value: cur.estimate && String(cur.value) === String(cur.estimate.value) ? '' : cur.value }))
+          return
+        }
         update(d.key, cur => ({
           estimating: false,
           estimateMissing: null,
+          appraise: null,
           value: String(estimate.likely),
-          estimate: { ...estimate, value: String(estimate.likely), basis: { title: cur.title, condition: cur.condition, categoryId: cur.categoryId } },
+          estimate: { ...estimate, advice, value: String(estimate.likely), basis: { title: cur.title, condition: cur.condition, categoryId: cur.categoryId } },
         }))
       } catch (e) {
         failed++
@@ -692,12 +703,13 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
 
       {/* Tilbud om verdianslag etter analysen: et synlig, frivillig valg */}
       {(() => {
-        const n = drafts.filter(d => canEstimate(d) && !d.estimate && !d.estimateMissing).length
+        const n = drafts.filter(d => canEstimate(d) && !d.estimate && !d.estimateMissing && !d.appraise).length
         if (merging || busy || !n || !drafts.some(d => d.status === 'analyzed')) return null
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px', fontSize: '0.9375rem', color: '#F2EEE6' }}>
             <span style={{ flex: '1 1 220px', lineHeight: 1.5 }}>
               {L('Vil du ha et grovt verdianslag? Verdien er valgfri og bare veiledende.', 'Would you like a rough value estimate? The value is optional and for guidance only.')}
+              <span style={{ display: 'block', fontSize: '0.8125rem', color: MUTED }}>{L('Anslaget blir sikrere når materiale, stempel, merke og modell er lagt inn (Rett opplysningene på kortet).', 'The estimate is more reliable when material, hallmark, brand and model have been added (Correct the details on the card).')}</span>
               <span style={{ display: 'block', fontSize: '0.8125rem', color: MUTED }}>{L(`Bruker ${n} AI-forsøk.`, `Uses ${n} AI attempts.`)}</span>
             </span>
             <button onClick={() => estimateValues()} style={{ ...smallBtn, background: '#272A25', color: '#F2EEE6', fontWeight: '600' }}>
@@ -986,9 +998,11 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
   const saveFix = values => {
     setFixing(false)
     const next = withCorrections(d.analysis, values, userId)
-    if (next) onChange(aiValue ? { analysis: next, estimate: null, estimateMissing: null, value: '' } : { analysis: next, estimate: null, estimateMissing: null })
+    if (next) onChange(aiValue ? { analysis: next, estimate: null, estimateMissing: null, appraise: null, value: '' } : { analysis: next, estimate: null, estimateMissing: null, appraise: null })
   }
   const multiple = ai ? multipleItemsText(ai) : ''
+  // Kan være sølv eller gull: spør om stempel og vekt (svaret lagres som rettelse av materialet, som saveFix)
+  const metal = preciousMetal(d.analysis)
   const fieldNames = { title: L('navn', 'name'), categoryId: L('kategori', 'category'), condition: L('tilstand', 'condition'), description: L('beskrivelse', 'description') }
   const aiFields = Object.keys(fieldNames).filter(f => d.aiFilled?.[f] !== undefined && d[f] === d.aiFilled[f]).map(f => fieldNames[f])
   const photoTip = !disabled && d.photos.length < MAX_PHOTOS ? ai?.photo_suggestions?.[0]?.reason : null
@@ -1001,8 +1015,9 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
       {aiValue && (
         <div id={`est-${d.key}`} style={{ fontSize: '0.8125rem', color: '#F2EEE6', marginTop: '4px', lineHeight: 1.5 }}>
           {L('Veiledende AI-anslag, ikke en dokumentert markedsverdi', 'Indicative AI estimate, not a documented market value')}
-          {d.estimate.low && d.estimate.high ? ` (${formatNOK(d.estimate.low)} – ${formatNOK(d.estimate.high)})` : ''}
+          {d.estimate.low && d.estimate.high ? <>{'. '}<strong style={{ color: '#F2EEE6' }}>{L('Sannsynlig spenn', 'Likely range')}: {formatRange(d.estimate.low, d.estimate.high)}</strong></> : ''}
           {'. '}{L('Du kan endre eller tømme feltet.', 'You can change or clear the field.')}
+          {d.estimate.advice === 'suggest' && <> {suggestText(d.estimate.valuation, d.analysis)}</>}
         </div>
       )}
     </div>
@@ -1064,7 +1079,14 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
           {multiple}{d.photos.length > 1 ? ` ${L('Du kan også dele opp kortet nedenfor.', 'You can also split the card below.')}` : ''}
         </p>
       )}
+      {metal && !metal.answered && !disabled && <MetalQuestion metal={metal} idPrefix={`metal-${d.key}`} onAnswer={text => saveFix({ material: text })} />}
       {(d.estimate || d.estimating) && valueField}
+      {d.appraise && !d.estimate && !d.estimating && (
+        <div role="status" style={{ fontSize: '0.8125rem', color: '#F2EEE6', background: '#30342D', border: '2px solid #C79A6B', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
+          <strong style={{ color: '#F2EEE6' }}>{d.appraise.title}.</strong> {d.appraise.body}{' '}
+          {L('Verdien står tom (ukjent) når du lagrer.', 'The value is left empty (unknown) when you save.')}
+        </div>
+      )}
       {d.estimateMissing && !d.estimate && !d.estimating && (
         <p style={{ fontSize: '0.8125rem', color: '#F2EEE6', background: '#1F221E', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
           {L('For lite informasjon til å anslå verdi.', 'Too little information to estimate a value.')}
@@ -1099,7 +1121,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
 
       {!disabled && (
         <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
-          {d.title.trim() && !d.estimate && !d.estimating && <button onClick={onEstimate} style={smallBtn}>{L('Anslå verdi (AI)', 'Estimate value (AI)')}</button>}
+          {d.title.trim() && !d.estimate && !d.estimating && !d.appraise && <button onClick={onEstimate} style={smallBtn}>{L('Anslå verdi (AI)', 'Estimate value (AI)')}</button>}
           {d.photos.length > 1 && <button onClick={onSplit} style={smallBtn}>{L('Del opp: ett bilde per gjenstand', 'Split: one photo per item')}</button>}
           {onMergeUp && <button onClick={onMergeUp} style={smallBtn}>{L('↑ Samme gjenstand som over', '↑ Same item as above')}</button>}
           <button onClick={onRemove} style={{ ...smallBtn, color: '#C79A6B' }}>{L('Fjern', 'Remove')}</button>
