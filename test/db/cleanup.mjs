@@ -9,6 +9,7 @@ import { fakeSupabase, manyFiles } from '../functions/fakeSupabase.js'
 
 const TS = !!process.features?.typescript
 const { handleCleanupClosedEstates } = TS ? await import('../../supabase/functions/_shared/closedEstates.ts') : {}
+const { handleFounderDelete } = TS ? await import('../../supabase/functions/_shared/founderDelete.ts') : {}
 
 const SECRET = 'super-secret-jwt-token-with-at-least-32-characters'
 const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url')
@@ -44,7 +45,7 @@ test('sletter bo avsluttet for over 12 måneder med alt innhold, og logger kjør
   const admin = { from: t => db.from(t), storage: storage.client.storage }
   const run = (query = '') => handleCleanupClosedEstates(
     new Request(`https://x/cleanup${query}`, { method: 'POST', headers: { 'x-cron-secret': CRON } }),
-    { secret: CRON, admin: () => admin, log: () => {} })
+    { secret: CRON, retentionMonths: 12, admin: () => admin, log: () => {} })
 
   // dry_run: viser boet, endrer ingenting
   const dry = await run('?dry_run=1')
@@ -74,4 +75,67 @@ test('sletter bo avsluttet for over 12 måneder med alt innhold, og logger kjør
 
   await must(db.from('estates').delete().eq('id', RECENT))
   await must(db.from('cleanup_runs').delete().gt('id', 0))
+})
+
+// Sletting fra founder-dashboardet (founder-delete) mot ekte Postgres: kaskaden går gjennom tildelinger til personer,
+// fordelingsloggen, godkjenningsversjoner med svar og fullmakter, uten at sperrene på arvinger og godkjenninger
+// stopper den. Det andre boet, kontoene og delte filer består, og slettingen logges i founder_audit_log uten navn.
+test('founder-delete sletter ett bo med godkjenninger, fullmakter og logg; andre bo og delte filer består', { skip: !TS && 'Node uten TypeScript-støtte' }, async () => {
+  const FOUNDER = '00000000-0000-0000-0000-0000000000e1'
+  const REP = '00000000-0000-0000-0000-0000000000f1'
+  const A = '66666666-0000-0000-0000-00000000000a'
+  const B = '66666666-0000-0000-0000-00000000000b'
+  const IMG = 'https://p.supabase.co/storage/v1/object/public/item-images/'
+  await must(db.from('founders').upsert({ user_id: FOUNDER }, { onConflict: 'user_id' }))
+  await must(db.from('estates').insert([
+    { id: A, name: 'Dødsbo A', owner_id: OWNER, invite_code: 'FDA001' },
+    { id: B, name: 'Bo B', owner_id: OWNER, invite_code: 'FDB001' },
+  ]))
+  await must(db.from('estate_members').insert([{ estate_id: A, user_id: OWNER, role: 'admin' }, { estate_id: B, user_id: OWNER, role: 'admin' }]))
+  const [heir] = await must(db.from('heirs').insert({ estate_id: A, name: 'Arving A', email: 'a@test.no', must_approve: true, user_id: OWNER }).select('id'))
+  const [item] = await must(db.from('items').insert({ estate_id: A, title: 'Stol', added_by: OWNER, image_url: IMG + 'items/delt.jpg' }).select('id'))
+  await must(db.from('items').update({ status: 'assigned', assigned_to: OWNER, assigned_heir_id: heir.id }).eq('id', item.id))
+  const [itemB] = await must(db.from('items').insert({ estate_id: B, title: 'Klokke', added_by: OWNER, image_url: IMG + 'items/delt.jpg' }).select('id'))
+  await must(db.from('interests').insert({ item_id: item.id, user_id: OWNER }))
+  await must(db.from('estate_events').insert({ estate_id: A, item_id: item.id, actor: OWNER, kind: 'assigned', data: { heir_id: heir.id } }))
+  const [rep] = await must(db.from('heir_representatives').insert({ estate_id: A, heir_id: heir.id, user_id: REP, kind: 'fullmakt', basis: 'Skriftlig fullmakt datert i dag' }).select('id'))
+  const [version] = await must(db.from('distribution_versions').insert({ estate_id: A, version_no: 1, snapshot: {}, state_hash: 'x', required: [{ heir_id: heir.id }], created_by: OWNER }).select('id'))
+  await must(db.from('distribution_responses').insert({ version_id: version.id, heir_id: heir.id, heir_name: 'Arving A', responder: REP, representative_id: rep.id, decision: 'approve', item_id: item.id }))
+  await must(db.from('ai_usage').insert({ user_id: OWNER, fn: 'analyze-item', estate_id: A, session_id: 'founder-delete-test' }))
+
+  const storage = fakeSupabase({ storage: { 'item-images': { ...manyFiles(A, 3), ...manyFiles(B, 1), 'items/delt.jpg': {} }, 'estate-docs': {} } })
+  const admin = { from: t => db.from(t), storage: storage.client.storage }
+  const auth = `Bearer ${b64({ alg: 'none' })}.${b64({ sub: FOUNDER, aal: 'aal2' })}.x`
+  const call = body => handleFounderDelete(new Request('https://x/founder-delete', { method: 'POST', headers: { Authorization: auth }, body: JSON.stringify(body) }), {
+    preflight: () => null, getUser: async () => ({ id: FOUNDER }), admin: () => admin,
+    json: (b, status = 200) => new Response(JSON.stringify(b), { status }), safeError: e => String(e?.message ?? e),
+  })
+
+  const dry = await (await call({ kind: 'estate', id: A, dry_run: true })).json()
+  assert.equal(dry.confirm_with, 'Dødsbo A')
+  assert.deepEqual(dry.counts.files, { documents: 0, images: 3 }, 'det delte bildet telles ikke med')
+
+  const res = await call({ kind: 'estate', id: A, confirm: 'Dødsbo A' })
+  assert.equal(res.status, 200, await res.clone().text())
+  for (const [table, col, val] of [['estates', 'id', A], ['items', 'estate_id', A], ['heirs', 'estate_id', A], ['estate_members', 'estate_id', A],
+    ['estate_events', 'estate_id', A], ['heir_representatives', 'estate_id', A], ['distribution_versions', 'estate_id', A],
+    ['distribution_responses', 'version_id', version.id], ['interests', 'item_id', item.id]]) {
+    assert.equal((await must(db.from(table).select('*').eq(col, val))).length, 0, `${table} fra bo A er borte`)
+  }
+  assert.equal((await must(db.from('items').select('id').eq('id', itemB.id))).length, 1, 'gjenstanden i bo B står')
+  assert.equal((await must(db.from('estate_members').select('user_id').eq('estate_id', B))).length, 1)
+  assert.ok(storage.buckets['item-images'].has('items/delt.jpg'), 'bildet bo B bruker, står')
+  assert.equal([...storage.buckets['item-images'].keys()].filter(p => p.startsWith(A)).length, 0)
+  const [usage] = await must(db.from('ai_usage').select('estate_id').eq('session_id', 'founder-delete-test'))
+  assert.equal(usage.estate_id, null, 'AI-bruken følger kontoen, ikke boet (on delete set null)')
+  const [log] = await must(db.from('founder_audit_log').select('*').eq('action', 'delete_estate'))
+  assert.equal(log.founder_id, FOUNDER)
+  assert.equal(log.details.status, 'ok')
+  assert.equal(log.details.estate_id, A)
+  assert.ok(!JSON.stringify(log).includes('Dødsbo'), 'loggen har ikke navnet på boet')
+
+  await must(db.from('ai_usage').delete().eq('session_id', 'founder-delete-test'))
+  await must(db.from('estates').delete().eq('id', B))
+  await must(db.from('founder_audit_log').delete().eq('founder_id', FOUNDER))
+  await must(db.from('founders').delete().eq('user_id', FOUNDER))
 })

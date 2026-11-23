@@ -44,8 +44,9 @@ Fra sikkerhetsgjennomgangen 2026-10-11. Må settes for hånd i Supabase Dashboar
 | `analyze-item` | AI-analyse av bilde av en gjenstand (Claude Haiku, teller mot AI-kvoten) | `ANTHROPIC_API_KEY`, valgfri `AI_MODEL` |
 | `estimate-value` | AI-verdiestimat (Claude Haiku, teller mot AI-kvoten) | `ANTHROPIC_API_KEY`, valgfri `AI_MODEL` |
 | `delete-account` | Sletting av egen konto (GDPR) | – |
+| `founder-delete` | Sletting av et bo eller en kundekonto fra `/founder` (bare founders med tofaktor; se `docs/sletting-av-bo.md`) | – |
 | `demo-login` | «Prøv demo»: nullstiller demo-boet og logger inn (bare den merkede demokontoen Mona; feiler nullstillingen, slipper ingen inn) | `DEMO_PASSWORD`, `DEMO_USER_ID` (anbefalt; ellers letes det etter merket) |
-| `cleanup-closed-estates` | Sletter bo som har vært avsluttet i over 12 måneder (daglig, cron) | `CRON_SECRET` |
+| `cleanup-closed-estates` | Sletter bo avsluttet lenger enn lagringstiden. **Ikke i drift**, og nekter å kjøre uten lagringstid | `CRON_SECRET`, `CLOSED_ESTATE_RETENTION_MONTHS` |
 | `cleanup-orphan-images` | Manuell opprydding av foreldreløse bilder (aldri cron) | `CRON_SECRET` |
 
 `SUPABASE_URL`, `SUPABASE_ANON_KEY` og `SUPABASE_SERVICE_ROLE_KEY` legges inn av Supabase automatisk.
@@ -59,6 +60,7 @@ Fra sikkerhetsgjennomgangen 2026-10-11. Må settes for hånd i Supabase Dashboar
 supabase functions deploy analyze-item --no-verify-jwt --use-api
 supabase functions deploy estimate-value --use-api
 supabase functions deploy delete-account --no-verify-jwt --use-api
+supabase functions deploy founder-delete --no-verify-jwt --use-api
 supabase functions deploy demo-login --no-verify-jwt --use-api
 supabase functions deploy cleanup-closed-estates --no-verify-jwt --use-api
 supabase functions deploy cleanup-orphan-images --no-verify-jwt --use-api
@@ -68,7 +70,7 @@ supabase secrets set DEMO_USER_ID='<bruker-id-en til Mona (vises av scripts/demo
 supabase secrets set CRON_SECRET="$(openssl rand -hex 32)"
 ```
 
-Funksjonene `analyze-item`, `estimate-value` og `delete-account` krever innlogget bruker. Sjekk `verify_jwt` per funksjon med `supabase functions list` før deploy, og behold innstillingen som står i prod. `demo-login` og cleanup-funksjonene kalles uten brukerøkt og har derfor `--no-verify-jwt`. Cleanup-funksjonene sjekker i stedet headeren `x-cron-secret` (minst 32 tegn; mangler `CRON_SECRET` eller er den for kort, avvises alle kall). Hemmeligheten sendes bare som header, aldri i URL-en (URL-er logges av Supabase), og skrives aldri ut i svar eller logg.
+Funksjonene `analyze-item`, `estimate-value`, `delete-account` og `founder-delete` krever innlogget bruker (`founder-delete` i tillegg founder-rolle og tofaktor, `aal2`). Sjekk `verify_jwt` per funksjon med `supabase functions list` før deploy, og behold innstillingen som står i prod. `demo-login` og cleanup-funksjonene kalles uten brukerøkt og har derfor `--no-verify-jwt`. Cleanup-funksjonene sjekker i stedet headeren `x-cron-secret` (minst 32 tegn; mangler `CRON_SECRET` eller er den for kort, avvises alle kall). Hemmeligheten sendes bare som header, aldri i URL-en (URL-er logges av Supabase), og skrives aldri ut i svar eller logg.
 
 ### AI-modell
 
@@ -123,13 +125,17 @@ Malene for e-postene fra Supabase Auth ligger i `supabase/templates/`. Repoet er
 - **Test:** `go run test/emails/render.go` kjører i CI og sjekker at malene kan tolkes med Go sine maler, og at de gir norsk som standard og engelsk med `lang = "en"`.
 - **Før lansering:** de engelske tekstene skal gjennomgås språklig og juridisk.
 
-## Automatisk sletting av avsluttede bo
+## Sletting av bo og kontoer
 
-Personvernerklæringen lover at avsluttede bo slettes etter 12 måneder. En administrator avslutter boet under «Administrer», og da settes `closed_at`.
+Et bo slettes på forespørsel fra founder-dashboardet (`/founder`, `founder-delete`); rutinen, hva som slettes og forslaget til lagringstider står i `docs/sletting-av-bo.md`.
 
-`cleanup-closed-estates` sletter bo med `status = 'closed'` og `closed_at` eldre enn 12 måneder. For hvert bo, i denne rekkefølgen:
+## Automatisk sletting av avsluttede bo (ikke i drift)
 
-1. **Filer:** dokumenter (`estate-docs/documents/<bo-id>/`), bilder i `item-images/<bo-id>/`, og eldre bilder og logo som boet peker på. Mappene listes side for side og sjekkes på nytt etter slettingen (opptil tre runder). Står noe igjen, stoppes slettingen av dette boet.
+**Ikke i drift, og ingenting er lovet:** personvernerklæringen sier at et avsluttet bo oppbevares til det slettes, og at det ikke finnes automatisk sletting. Lagringstiden er ikke vedtatt, så funksjonen har ingen standard og svarer `503 retention_not_configured` (også ved dry run) til hemmeligheten `CLOSED_ESTATE_RETENTION_MONTHS` (heltall 1–120) er satt. En administrator avslutter boet under «Administrer», og da settes `closed_at`.
+
+`cleanup-closed-estates` sletter bo med `status = 'closed'` og `closed_at` eldre enn lagringstiden. For hvert bo, i denne rekkefølgen:
+
+1. **Filer:** dokumenter (`estate-docs/documents/<bo-id>/`), bilder i `item-images/<bo-id>/`, og eldre bilder, dokumenter og logo som boet peker på, men bare når ingen andre bo bruker dem. Mappene listes side for side og sjekkes på nytt etter slettingen (opptil tre runder). Står noe igjen, stoppes slettingen av dette boet.
 2. **Tilbakemeldinger** (`feedback`) knyttet til boet.
 3. **Boet.** Gjenstander, interesser, kommentarer, dokumentrader, arvinger, oppgaver og medlemskap går med via `on delete cascade`.
 
