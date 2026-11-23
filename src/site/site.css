@@ -1061,17 +1061,15 @@ halvparten. Lyset kommer fra øvre venstre.
 .ak .cap--c{
   justify-items:center;text-align:center;margin-inline:auto
 }
+/* På smale skjermer sto skjermbildene før forstørret (`--zoom`) og klippet, med en maske som
+   tonet ut mot høyre. Det ga uleselige utsnitt: på 390 px ble bildene 498–1060 px brede, så
+   opptil 63 % av innholdet lå utenfor skjermen, og man så bare en bit av en knapp. Nå vises
+   hele bildet i full bredde. Skriften inni blir liten, men bildene er illustrasjoner — det er
+   «Du gjør»/«Da skjer» og brødteksten som bærer meningen. `--zoom` gjelder fortsatt ingenting
+   over 760 px, der bildene uansett vises i sin helhet. */
 @media (max-width:760px){
-  .ak .deskframe{
-    overflow:hidden
-  }
   .ak .deskframe img{
-    width:calc(100% * var(--zoom,1));max-width:none
-  }
-  /* bare de forstørrede: tonen ut mot høyre sier at dette er et utsnitt */
-  .ak .deskframe[style*="--zoom"] img{
-    -webkit-mask:linear-gradient(to right,#000 88%,transparent);
-    mask:linear-gradient(to right,#000 88%,transparent)
+    width:100%;max-width:100%;height:auto
   }
 }
 @media (max-width:980px){
@@ -1252,9 +1250,10 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   .ak .split--rev .split__txt{
     order:0
   }
-  .ak .split__fig{
-    justify-items:start
-  }
+  /* Figuren var venstrestilt når kolonnene stables, for å følge tekstens venstrekant. Men
+     telefonen er smalere enn kolonnen, så den ble liggende i venstre hjørne med opptil 552 px
+     tomrom ved siden av (målt ved 980 px). Den følger nå `justify-items:center` fra
+     grunnregelen, som over bruddpunktet. */
 }
 /* ---- valgfri KI-hjelp: et smalt bånd, ikke et eget hovedsteg ---- */
 .ak .valgfri{
@@ -1753,14 +1752,20 @@ Da hopper ikke siden når man bytter trinn, og ingen av dem blir liggende i et t
 .ak .trinn__steg .deskframe img{
   max-height:clamp(174px,21vw,314px);width:auto
 }
-/* På smale skjermer gjelder mobilforstørrelsen (--zoom) i stedet: hele bildet skrumpet
-ned ville gitt uleselig skrift. Høydetaket er da av, så ingenting klippes på tvers. */
+/* På smale skjermer vises hele bildet i full bredde (se mobilregelen for .deskframe over),
+   så høydetaket og den felles høyden er av. `align-content:start` er nødvendig: trinnene
+   ligger oppå hverandre i samme rute, så ruten er like høy som det høyeste trinnet, og uten
+   den strakk radene i et kort trinn seg ut og la igjen et tomrom på ~400 px mellom
+   bildeteksten og «Du gjør». Slakken legger seg nå nederst i stedet. */
 @media (max-width:760px){
   .ak .trinn__steg .deskframe img{
     max-height:none
   }
   .ak .trinn__steg .deskframe{
     min-height:0
+  }
+  .ak .trinn__steg{
+    align-content:start
   }
 }
 .ak .trinn__steg{
