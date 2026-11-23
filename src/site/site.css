@@ -1055,9 +1055,6 @@ halvparten. Lyset kommer fra øvre venstre.
   opacity:clamp(0,calc(var(--lift) * 2.6 - 1.6),1);
   transition:opacity var(--t-m) var(--ease)
 }
-.ak .cross .phone{
-  display:none
-}
 .ak .cap--c{
   justify-items:center;text-align:center;margin-inline:auto
 }
@@ -1075,12 +1072,6 @@ halvparten. Lyset kommer fra øvre venstre.
 @media (max-width:980px){
   .ak .cross{
     --edgeY:calc(86svh - var(--lift) * 80svh);--frameTop:6svh;--frameH:70svh;height:95svh;--fpad:7px;--winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 2px + var(--fpad))
-  }
-  .ak .cross .desk{
-    display:none
-  }
-  .ak .cross .phone{
-    display:block
   }
   .ak .frame{
     width:min(100%,300px);border-radius:30px;padding:7px;
@@ -1110,9 +1101,6 @@ halvparten. Lyset kommer fra øvre venstre.
 }
 .ak .g-papir .shotfig:hover .phoneframe{
   border-color:var(--granskog)
-}
-.ak .ki__shots .phoneframe{
-  --ph:clamp(300px,30vw,430px)
 }
 .ak .quotes .rows>li{
   border-color:rgba(242,238,230,.16)
@@ -1190,36 +1178,6 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   .ak .tabs .rows{
     order:2
   }
-}
-.ak .s3__shot .deskframe{
-  border:1px solid rgba(242,238,230,.2);border-radius:2px;padding:8px;
-  background:rgba(242,238,230,.05);width:min(100%,980px);
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
-}
-.ak .s3__shot .phone{
-  display:none
-}
-@media (max-width:760px){
-  .ak .s3__shot .desk{
-    display:none
-  }
-  .ak .s3__shot .phone{
-    display:block
-  }
-  .ak .s3__shot .deskframe{
-    width:min(100%,420px)
-  }
-}
-.ak .s3__shot:hover .deskframe{
-  transform:translateY(-5px);border-color:var(--mose)
-}
-.ak .s3__metshot .deskframe{
-  border:1px solid rgba(242,238,230,.2);border-radius:2px;padding:7px;
-  background:rgba(242,238,230,.05);max-width:400px;
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
-}
-.ak .s3__metshot:hover .deskframe{
-  transform:translateY(-5px);border-color:var(--mose)
 }
 /* ============================================================
    §4 / §7 — tekst + telefon

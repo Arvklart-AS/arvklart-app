@@ -48,13 +48,3 @@ export function DeskShot({ src, w, h, alt, kilde, caption, className = 'shotfig'
     </figure>
   )
 }
-
-// Ramme rundt et telefonutsnitt, med bildetekst under
-export function PhoneShot({ src, w, h, alt, kilde, caption, className = 'shotfig', frameStyle }) {
-  return (
-    <figure className={className}>
-      <div className="phoneframe" style={frameStyle}><Img src={src} w={w} h={h} alt={alt} /></div>
-      <Cap kilde={kilde}>{caption}</Cap>
-    </figure>
-  )
-}
