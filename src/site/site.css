@@ -1640,16 +1640,32 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 .ak .phero--slik{
   border-bottom:1px solid rgba(242,238,230,.1)
 }
-/* ---- filmen øverst ---- */
-.ak .vid{
-  margin:0 auto;max-width:1100px
+/* ---- filmen i sidetoppen ----
+   Sidetoppen får to kolonner: teksten til venstre, filmen til høyre. Teksten står først i
+   markeringen, så under bruddpunktet legges de under hverandre med overskriften øverst.
+   `minmax(0,1fr)` i stedet for `1fr`, ellers kan videoen presse kolonnen bredere enn halve
+   bredden (rutenettsspor har `min-width:auto` som standard).
+   Bruddpunktet er 1024 px, ikke lavere: en kolonne er halve bredden, så et for tidlig bytte
+   gjør filmen mindre enn den var stablet (målt: 809 px stablet mot 390 px i to kolonner ved
+   900 px). Stablet får den en øvre bredde, så den ikke blir urimelig stor på mellomstore
+   skjermer. */
+.ak .phero__med{
+  display:grid;gap:clamp(28px,3.4vw,56px);align-items:center
+}
+.ak .phero__med .vid{
+  margin-inline:auto;max-width:760px
+}
+@media (min-width:1024px){
+  .ak .phero__med{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)
+  }
+  .ak .phero__med .vid{
+    margin-inline:0;max-width:none
+  }
 }
 .ak .vid__v{
   display:block;width:100%;height:auto;aspect-ratio:16/9;
   border:1px solid var(--rule);border-radius:2px;background:var(--natt)
-}
-.ak .vid .cap{
-  margin-top:clamp(12px,1.4vw,18px)
 }
 /* ---- en hoveddel ---- */
 .ak .del__h{

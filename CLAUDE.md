@@ -61,8 +61,10 @@ Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) 
 
 Toppmenyen i appen tar fargen fra boet (`estates.branding_color`, satt under «Merkevare» på
 `/estate/:id/admin`). Standarden er `#1F221E`, den samme som headeren på markedssidene, så toppen
-av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin,
-og `tc()` i `TopBar.jsx` velger lys eller mørk tekst etter lysheten i fargen.
+av appen og toppen av de offentlige sidene ser like ut. Et bo med egen merkevarefarge beholder sin.
+**Teksten i toppmenyen er alltid lys** (`#F5F2EB`, hardkodet i `TopBar.jsx`), så en lys
+merkevarefarge gir for svak kontrast. `tc()` i samme fil velger lys eller mørk tekst etter lysheten
+i fargen, men brukes bare på avatarfargen — ikke på toppmenyen.
 
 Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
 
@@ -158,7 +160,7 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
 | Rute | Komponent | Beskrivelse |
 |------|-----------|-------------|
 | `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app`. Designet ligger i `src/site/` |
-| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret) |
+| `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret). Produktfilmen står i sidetoppen, i høyre kolonne ved siden av overskriften (`aside` på `PageHero`): uten lyd, uten autostart og uten løkke, og tekstalternativet (WCAG 1.2.1) er de fire delene under |
 | `/om-oss` | AboutPage | Teamet bak Arvklart (forhåndsrendret) |
 | `/kontakt` | ContactPage | Kontakt, e-post med ferdig emne (forhåndsrendret; ingen skjema) |
 | `/app` | EstatesPage | Liste over brukerens bo (inngangen til appen) |
