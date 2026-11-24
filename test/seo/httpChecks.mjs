@@ -5,7 +5,7 @@
 // preview: Vercel legger selv X-Robots-Tag: noindex på forhåndsvisninger (ikke-produksjonsdomener). Der kan
 // fraværet av noindex på offentlige sider ikke bevises; sjekken rapporteres som SKIP og må gjøres mot produksjon.
 import { gzipSync } from 'node:zlib'
-import { PUBLIC_PAGES, SITE_URL, organizationJsonLd, websiteJsonLd } from '../../src/seo/pages.js'
+import { PUBLIC_PAGES, SITE_URL, organizationJsonLd, websiteJsonLd, videoJsonLd } from '../../src/seo/pages.js'
 
 // JavaScript som lastes før en offentlig side er interaktiv (gzip). Før code splitting: 371 kB. Se test/e2e/chunks.mjs.
 export const JS_BUDGET_GZIP = 175 * 1024
@@ -166,7 +166,7 @@ export async function runHttpChecks(base, { headers = {}, preview = false, fetch
     assert(new URL(location, `${base}/home`).pathname === '/', `/home sendes til ${location}`)
   })
 
-  await check('Forsiden «/» uten JavaScript: tekst, lenkene til de offentlige sidene, WebSite og Organization', async () => {
+  await check('Forsiden «/» uten JavaScript: tekst, lenkene til de offentlige sidene, WebSite, Organization og VideoObject', async () => {
     const { body } = await get('/')
     for (const text of [...H1_NO, 'Se tingene og hvem som <em>ønsker</em> dem', 'Teamet bak', 'Kan jeg prøve uten å opprette en konto?', 'Prøv demo'])
       assert(body.includes(text), `mangler «${text}»`)
@@ -176,7 +176,7 @@ export async function runHttpChecks(base, { headers = {}, preview = false, fetch
     assert(/<link rel="stylesheet"[^>]+href="\/assets\/[^"]+\.css"/.test(body), 'stilarket mangler')
     assert(!/&gt;|&#x27;/.test(body.match(/<div id="root"[\s\S]*?<\/style>/)?.[0] || ''), 'CSS-en i <style> er HTML-kodet')
     const ld = [...body.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m => JSON.parse(m[1]))
-    assert(JSON.stringify(ld) === JSON.stringify([websiteJsonLd(), organizationJsonLd()]), `JSON-LD: ${JSON.stringify(ld)}`)
+    assert(JSON.stringify(ld) === JSON.stringify([websiteJsonLd(), organizationJsonLd(), videoJsonLd()]), `JSON-LD: ${JSON.stringify(ld)}`)
   })
 
   await check('De nye undersidene uten JavaScript: overskrift, hovedinnhold og brødsmule', async () => {

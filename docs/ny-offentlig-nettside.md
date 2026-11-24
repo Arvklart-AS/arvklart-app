@@ -573,3 +573,31 @@ mye tekst sprenger budsjettet. Jeg har **ikke** hevet grensen — den er en bevi
 Minste avgrensede løsning når det smeller: flytt den lange teksten ut av JavaScript-filene og inn i
 datablokken i den forhåndsrendrede HTML-en, slik guidene allerede gjør (`src/seo/pageData.js`).
 Da teller teksten ikke mot budsjettet, uansett hvor mange sider eller språk som kommer til.
+
+### 2.14 Produktfilmen erstatter enhetsgruppen på forsiden (23.11.2026)
+
+Enhetsgruppen i signaturen (`#cross`) — nettbrett, PC og telefon tegnet i CSS, med tre skjermbilder
+fra demoen — er byttet ut med en 47-sekunders film uten lyd. Filmen finnes på **begge språk**, så
+`d-galleri.webp`, `d-oversikt.webp`, `d-phone.webp` og `m-hero.webp` er slettet, og CSS-en for
+`.rigg`, `.rigg__mobil`, `.dev*`, `.frame*` og `.cross__cap` er fjernet (ca. 5,8 kB av `site.css`).
+Punkt 2.13 over beskriver bilder som ikke lenger finnes; det står som historikk.
+
+* Åtte filer i `public/nettsted/`: `forsidefilm-{no,en}.mp4` (1920×1080), `-{no,en}-mobil.mp4`
+  (1080×1350), og plakatene som WebP (1280×720 og 720×900). Filmene er kjørt gjennom
+  `-map_metadata -1` og `-movflags +faststart`.
+* **Ingen videobytes før trykk:** `<video>` settes ikke inn i DOM-en før knappen trykkes. Det er
+  sterkere enn `preload="none"`, som fortsatt kan hente metadata. Filen velges ved trykket med
+  `matchMedia('(min-width: 981px)')`, altså samme grense som skilte `.rigg` fra `.rigg__mobil`.
+* **Plakaten er ikke lazy.** Den stikker inn i første visning (12 % på 1440×900, 31 % på 390×844)
+  og er LCP-elementet. Målt på Fast 3G: `loading="lazy"` ga LCP 3 456 ms / 3 352 ms, uten lazy og
+  med `fetchpriority="high"` 1 736 ms / 1 564 ms. Google regner over 2,5 s som «må forbedres».
+* **Rammen:** høydestyrt over 980 px (`--frameH`, 16:9), breddestyrt under (4:5 av tilgjengelig
+  bredde). `max-width:min(1140px, 76svh * 4/5)` hindrer at 4:5 blir høyere enn vinduet på en bred,
+  lav skjerm (980×900 ga ellers 882×1103).
+* **Bildeteksten er fjernet** etter avtale. Plakaten har derfor ingen synlig merking av at
+  innholdet er fra eksempelboet. Tekstalternativet (WCAG 1.2.1) ligger skjult ved filmen
+  (`aria-describedby`), og `src/site/Signature.jsx` er tatt ut av etikett-testen i
+  `test/seo/nettsted.test.js` med en kommentar om hvorfor.
+* **Knappens `aria-label` begynner med den synlige teksten.** axe fanget `label-content-name-mismatch`
+  (WCAG 2.5.3): et tilgjengelig navn som ikke inneholder den synlige teksten, gjør at talestyring
+  ikke treffer knappen.

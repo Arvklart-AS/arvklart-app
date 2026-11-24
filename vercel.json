@@ -24,7 +24,7 @@
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }, { "key": "X-Arvklart-Robots", "value": "noindex" }]
     },
     {
-      "source": "/((?!(?:|[a-z0-9-]+|guider/[a-z0-9-]+|robots\\.txt|sitemap\\.xml)$)(?!assets/)(?!.*\\.(?:js|css|svg|jpg|jpeg|png|webp|gif|ico|woff2?|map)$).*)",
+      "source": "/((?!(?:|[a-z0-9-]+|guider/[a-z0-9-]+|robots\\.txt|sitemap\\.xml)$)(?!assets/)(?!.*\\.(?:js|css|svg|jpg|jpeg|png|webp|gif|ico|mp4|woff2?|map)$).*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }, { "key": "X-Arvklart-Robots", "value": "noindex" }]
     }
   ]

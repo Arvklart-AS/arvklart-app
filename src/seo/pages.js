@@ -39,6 +39,7 @@ export const PUBLIC_PAGES = [
     sitemap: true,
     organization: true,
     website: true,
+    video: true,
   },
   {
     path: '/slik-fungerer-det',
@@ -118,6 +119,32 @@ export const organizationJsonLd = () => ({
   email: CONTACT_EMAIL,
 })
 
+// VideoObject for produktfilmen i signaturen på forsiden. headTags() gjelder den forhåndsrendrede
+// norske versjonen, som er den søkemotorene leser, så det er den norske filmen som beskrives.
+//
+// Beskrivelsen er den samme teksten som ligger skjult ved filmen (aria-describedby i
+// src/site/Signature.jsx). Står de to ulikt, beskriver strukturerte data noe annet enn siden.
+//
+// uploadDate er påkrevd av Google. Den settes til datoen filmen ble lagt inn, og må oppdateres
+// hvis filmen byttes. Dette gir ingen garanti for et videoresultat i Google: filmen er ikke
+// sidens hovedinnhold, og det er et krav Google vekter tungt.
+export const VIDEO = {
+  fil: '/nettsted/forsidefilm-no.mp4',
+  plakat: '/nettsted/forsidefilm-no-plakat.webp',
+  lastetOpp: '2026-11-23',
+  sekunder: 47,
+}
+export const videoJsonLd = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: 'Slik fordeler dere innbo med Arvklart',
+  description: 'Filmen viser eksempelboet i Arvklart: en gjenstand legges inn med bilde, navn og kategori; familien får én felles oversikt over gjenstandene med verdianslag og hvem som ønsker hva; hver arving kan skrive hvorfor en gjenstand betyr noe; og til slutt velger administratoren hvem som skal ha den. Filmen er uten lyd.',
+  thumbnailUrl: `${SITE_URL}${VIDEO.plakat}`,
+  uploadDate: VIDEO.lastetOpp,
+  duration: `PT${VIDEO.sekunder}S`,
+  contentUrl: `${SITE_URL}${VIDEO.fil}`,
+})
+
 // <head>-tagger for skallet (index.html), som serveres på alle stier: ingen canonical og ingen og:url.
 export function defaultHeadTags() {
   return [
@@ -167,6 +194,7 @@ export function headTags(page) {
   const ld = (data) => dataBlock('application/ld+json', data)
   if (page.website) tags.push(ld(websiteJsonLd()))
   if (page.organization) tags.push(ld(organizationJsonLd()))
+  if (page.video) tags.push(ld(videoJsonLd()))
   if (page.kind === 'guide') {
     tags.push(`<meta property="article:published_time" content="${esc(page.published)}" />`)
     if (page.updated) tags.push(`<meta property="article:modified_time" content="${esc(page.updated)}" />`)
