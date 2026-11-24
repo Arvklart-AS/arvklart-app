@@ -9,6 +9,7 @@ import { AiConsent } from './AiDialogs'
 import { appraiseText, formatRange, preciousMetal, suggestText, valueAdvice } from '../lib/valueAdvice'
 import { withCorrections } from '../lib/aiCorrections'
 import MetalQuestion from './MetalQuestion'
+import MetalValueNote from './MetalValueNote'
 
 const small = { fontSize: '0.8125rem', color: '#F2EEE6', lineHeight: 1.6, margin: 0 }
 const btn = { padding: '10px 14px', minHeight: '44px', borderRadius: '999px', fontSize: '0.8125rem', fontFamily: 'Karla, sans-serif', cursor: 'pointer', background: 'none', border: '1px solid rgba(242, 238, 230, 0.14)', color: '#F2EEE6' }
@@ -149,6 +150,7 @@ export default function MarketCompare({ item, userId, canEdit, onChanged, onToas
         )}
 
         {canEdit && metal && !metal.answered && <MetalQuestion metal={metal} idPrefix="market-metal" onAnswer={answerMetal} disabled={busy} />}
+        {metal?.answered && <MetalValueNote record={item.ai_analysis} idPrefix="market-metal-value" />}
         {canEdit && !adding && !estimate && (
           <p style={small}>{L('AI-anslaget blir sikrere når materiale, stempel, merke og modell er lagt inn under «Rett opplysningene».', 'The AI estimate is more reliable when material, hallmark, brand and model have been added under «Correct the details».')}</p>
         )}
