@@ -7,6 +7,7 @@
 //   METALCHARTS_API_KEY=mc_live_... node scripts/metal-price.mjs --dry-run # viser bare prisene
 //
 // Nøkkelen leses bare fra miljøet og skrives aldri til disk. Legg den aldri i repoet eller i frontend.
+// Bak en HTTPS-proxy (f.eks. i en Claude Code-økt) trengs NODE_USE_ENV_PROXY=1, ellers går ikke fetch via proxyen.
 // Vilkår (metalcharts.org/api-terms): kommersiell bruk er tillatt på gratisnivået mot en synlig lenke til
 // metalcharts.org ved tallet (MetalValueNote). Ikke kopier priser fra nettsiden: det tillater ikke vilkårene.
 import { writeFileSync } from 'node:fs'
