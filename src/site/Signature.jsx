@@ -149,6 +149,7 @@ export default function Signature() {
       <div className="rules" aria-hidden="true" />
       <figure className="cross__fig">
         <div className="film">
+          <div className="film__vindu">
           {spiller ? (
             <video
               ref={video}
@@ -184,6 +185,13 @@ export default function Signature() {
                   alt={altTekst}
                 />
               </picture>
+              {/* Lysgrensen inne i rammen følger den ute på siden. Ligger bare over plakaten:
+                  når filmen spiller, er <video> det eneste som står her. */}
+              <div className="film__slor" aria-hidden="true" />
+            </>
+          )}
+          </div>
+          {!spiller && (
               <button
                 type="button"
                 className="film__btn"
@@ -202,7 +210,6 @@ export default function Signature() {
                 </span>
                 <span>{L('Se video · 0:47', 'Watch video · 0:47')}</span>
               </button>
-            </>
           )}
         </div>
       </figure>

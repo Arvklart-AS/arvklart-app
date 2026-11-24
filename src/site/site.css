@@ -145,6 +145,12 @@
 .ak .rules{
   position:absolute;inset:0;z-index:0;pointer-events:none
 }
+/* Rutenettstrekene står bare i lyset. På de mørke flatene (g-natt, g-jord) og i overgangen
+   (.cross) ble de stående som grå striper gjennom hele seksjonen. Dette skjuler bare
+   hjelpestrekene – hårstreker og kanter bruker også --rule og er urørt. */
+.ak .g-natt .rules,.ak .g-jord .rules,.ak .cross .rules{
+  display:none
+}
 .ak .rules::before,.ak .rules::after{
   content:'';position:absolute;top:0;bottom:0;width:1px;background:var(--rule)
 }
@@ -928,23 +934,62 @@ mot lyset oppfører seg uendret.
 ------------------------------------------------------------------ */
 .ak .film{
   /* max-width er taket på høyden, uttrykt i bredde: 4:5 av full bredde ville blitt 1103 px høyt
-     på en 980x900-skjerm, altså høyere enn vinduet. 76svh * 4/5 holder den innenfor. */
+     på en 980x900-skjerm, altså høyere enn vinduet. 76svh * 4/5 holder den innenfor.
+     Kant og luft ligger innenfor målene (box-sizing: border-box), så aspect-ratio og --frameH
+     stemmer selv om rammen har ramme. */
   position:relative;width:100%;max-width:min(1140px,calc(76svh * 4 / 5));aspect-ratio:4/5;
   translate:0 calc((1 - var(--lift)) * 2.4svh);
-  border-radius:4px;overflow:hidden;background:var(--natt)
+  border:1px solid var(--strek);border-radius:4px;padding:var(--fpad);
+  background:var(--kalk);
+  box-shadow:0 26px 56px -44px rgba(31,35,38,.5)
+}
+/* Rammen krysser lyset sammen med siden: mørk så lenge --lift < 1, lys når overgangen er ferdig.
+   Fallback uten color-mix trengs ikke – dette er en opacity, ikke en fargeblanding. */
+.ak .film::before{
+  content:'';position:absolute;inset:-1px;z-index:0;border-radius:inherit;
+  background:var(--natt);border:1px solid rgba(242,238,230,.24);
+  opacity:calc(1 - var(--lift));pointer-events:none
+}
+.ak .film__vindu{
+  position:relative;z-index:1;width:100%;height:100%;overflow:hidden;
+  border-radius:2px;background:var(--papir)
 }
 .ak .film__media{
   display:block;width:100%;height:100%;object-fit:cover
+}
+/* SLØRET. Uten dette skjærer lysgrensen tvers over plakaten. Med det treffer grensen inne i
+   rammen nøyaktig samme linje som ute på siden – det er hele grunnen til at --winTop finnes
+   (se kommentaren i .cross). Samme uttrykk som enhetsgruppen hadde før filmen overtok. */
+.ak .film__slor{
+  position:absolute;left:0;right:0;top:0;height:300svh;background:var(--natt);opacity:.8;
+  transform:translateY(calc(var(--edgeY) - var(--winTop) - 300svh));
+  will-change:transform;pointer-events:none
+}
+.ak .film__slor::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:rgba(157,170,140,.6)
 }
 @media (min-width:981px){
   .ak .film{
     aspect-ratio:16/9;height:var(--frameH);width:auto;max-width:min(100%,1140px)
   }
 }
+/* Under bruddpunktet er rammen tykkere og hjørnene rundere, som enhetsrammen var. Kanten er
+   2 px her, og --winTop i .cross regner med nettopp 2px + --fpad under 980 px. */
+@media (max-width:980px){
+  .ak .film{
+    border-width:2px;border-radius:16px
+  }
+  .ak .film__vindu{
+    border-radius:11px
+  }
+}
 /* Avspillingsknappen: en ekte knapp oppå plakaten, midt i rammen. Lys pille med mørkt,
    rundt spillikon, som i designet. Fokusringen er tydelig mot den lyse pillen. */
 .ak .film__btn{
-  position:absolute;left:50%;top:50%;translate:-50% -50%;
+  /* z-index 2: .film__vindu har 1 og lager en stablingskontekst, så knappen ville ellers bli
+     malt under vinduet og være usynlig. */
+  position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:2;
   display:inline-flex;align-items:center;gap:clamp(10px,1vw,14px);
   padding:clamp(9px,.9vw,13px) clamp(20px,1.8vw,28px) clamp(9px,.9vw,13px) clamp(9px,.8vw,12px);
   border:0;border-radius:999px;cursor:pointer;
