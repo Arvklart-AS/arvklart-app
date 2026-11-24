@@ -41,3 +41,7 @@ Thumbs.db
 # Supabase CLI (lokal kobling til prosjektet)
 supabase/.temp/
 supabase/.branches/
+
+# Kalibrering: data og resultater (bilder og annonsedata legges aldri i repoet)
+eval/data/
+eval/**/resultat-*.json
