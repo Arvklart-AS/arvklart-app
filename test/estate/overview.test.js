@@ -126,6 +126,10 @@ describe('overviewGroups (nedtrekksgruppene)', () => {
     assert.deepEqual(overview({ items }).groups.map(g => g.key), ['gjenstander', 'fordeling', 'arvinger', 'praktisk'])
   })
 
+  test('bare «Praktisk» står ved siden av stegene (uten nummer)', () => {
+    assert.deepEqual(overview({ items }).groups.filter(g => g.aside).map(g => g.key), ['praktisk'])
+  })
+
   test('administrator i et vanlig bo ser alle valgene', () => {
     assert.deepEqual(linkKeys(overview({ items }).groups), [
       'swipe', 'add-many', 'add-one', 'items', 'mine',

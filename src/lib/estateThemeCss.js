@@ -67,6 +67,11 @@ export const darkCss = `
 .bo-pluss::before, .bo-pluss::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: ${C.mose}; }
 .bo-pluss::after { transform: rotate(90deg); transition: transform 0.24s ${EASE}; }
 .bo-gruppe[open] .bo-pluss::after { transform: rotate(90deg) scaleX(0); }
+/* «Praktisk»: står for seg under stegene, uten nummer og litt mindre, så den ikke leses som et fjerde steg */
+.bo-ekstra { margin-top: 2.25rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.bo-ekstra-tekst { font-size: 0.875rem; color: ${C.linDempet}; }
+.bo-gruppe.ekstra > summary { padding: 1.1rem 0; }
+.bo-gruppe.ekstra .tittel { font-size: clamp(1.15rem, 0.98rem + 0.6vw, 1.4rem); }
 .bo-valg { list-style: none; margin: 0; padding: 0 0 1.25rem 3rem; }
 .bo-valg a { display: grid; grid-template-columns: minmax(0, 1fr) auto 1.125rem; align-items: center; gap: 0.875rem; padding: 0.95rem 0.75rem; border-top: 1px solid rgba(242, 238, 230, 0.09); color: ${C.lin}; text-decoration: none; }
 .bo-valg li:first-child a { border-top-color: transparent; }

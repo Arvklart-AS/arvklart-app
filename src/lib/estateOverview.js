@@ -192,6 +192,8 @@ export function overviewGroups({ estateId, counts, steps, isAdmin, isDemo }) {
     },
     {
       key: 'praktisk',
+      // Ikke et steg i fordelingen: vises for seg under de nummererte stegene, uten nummer
+      aside: true,
       title: L('Praktisk', 'Practical'),
       desc: isDemo
         ? L('Sjekkliste og veiviser', 'Checklist and guide')

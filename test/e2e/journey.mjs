@@ -245,6 +245,11 @@ await check('Slett konto: feil gir en fast melding, ikke råtekst fra serveren',
 
 await check('Oversikten: «Praktisk» leder til dokumentarkivet og sjekklisten', async page => {
   await page.goto(`${BASE}/estate/${EST}`)
+  // Stegene er nummerert 01–03; «Praktisk» står for seg under, uten nummer
+  const nrs = await page.locator('.bo-nr').evaluateAll(els => els.map(e => e.textContent))
+  assert(JSON.stringify(nrs) === JSON.stringify(['01', '02', '03', '']), `numrene er ${JSON.stringify(nrs)}`)
+  await page.locator('.bo-ekstra').getByText('Praktisk', { exact: true }).waitFor()
+  await page.getByText('Ikke et steg dere må gjennom', { exact: false }).waitFor()
   await page.getByText('Praktisk', { exact: true }).click()
   await page.getByRole('link', { name: /^Dokumenter/ }).click()
   await page.waitForURL(`**/estate/${EST}/documents`)
