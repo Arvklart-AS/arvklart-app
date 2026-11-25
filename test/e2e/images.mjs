@@ -1,5 +1,6 @@
 // Akseptansetester for private bilder (S1): gjenstandsbilder vises med tidsbegrensede (signerte) URL-er,
 // ikke med den offentlige URL-en som ligger lagret. Simulert Supabase. Kjøres av test/e2e/run.sh.
+import { readFileSync } from 'node:fs'
 import { BASE, EST, ITEM, FIXTURES, launch, checker, assert } from './fixtures.mjs'
 
 const browser = await launch()
@@ -36,6 +37,23 @@ await check('Gjenstandslisten: bildet på kortet vises med signert URL, ikke den
   assert(!all.some(s => s.includes('/object/public/item-images/')), 'en offentlig bilde-URL vises fortsatt')
   assert(asked.includes(`${EST}/stol.jpg`), 'stien ble ikke signert')
 }, withImages)
+
+// Et stående bilde (600×800, som et mobilbilde) skal vises helt i 4:3-boksen på kortet, ikke kuttes nederst
+const PORTRAIT = readFileSync(new URL('../../supabase/seed/demo-images/face0001_gyngestol.jpg', import.meta.url))
+for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 900 }]) {
+  await check(`Gjenstandslisten (${viewport.width} px): et stående bilde vises helt, ikke kuttet nederst`, async page => {
+    await signing(page)
+    await page.route('https://test.supabase.co/storage/v1/object/sign/item-images/**', route => route.fulfill({ status: 200, contentType: 'image/jpeg', body: PORTRAIT }))
+    await page.goto(`${BASE}/estate/${EST}/gjenstander`)
+    const img = page.locator('.bo-kort .bo-bilde img').first()
+    await img.waitFor()
+    await page.waitForFunction(() => { const i = document.querySelector('.bo-kort .bo-bilde img'); return i && i.complete && i.naturalWidth > 0 })
+    const m = await img.evaluate(i => { const b = i.parentElement.getBoundingClientRect(), r = i.getBoundingClientRect(); return { bw: b.width, bh: b.height, it: r.top - b.top, ib: r.bottom - b.bottom, ih: r.height, fit: getComputedStyle(i).objectFit } })
+    assert(Math.abs(m.bw / m.bh - 4 / 3) < 0.02, `boksen er ikke 4:3: ${m.bw}×${m.bh}`)
+    assert(Math.abs(m.it) < 1 && Math.abs(m.ib) < 1, `bildet går utenfor boksen (topp ${m.it}, bunn ${m.ib}, høyde ${m.ih} mot ${m.bh})`)
+    assert(m.fit === 'contain', `object-fit er ${m.fit}`)
+  }, { ...withImages, viewport })
+}
 
 await check('Gjenstandssiden: alle bildene i karusellen signeres', async page => {
   const asked = await signing(page)

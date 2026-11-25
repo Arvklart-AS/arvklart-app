@@ -101,7 +101,9 @@ export const darkCss = `
 .bo-kort > a { display: flex; flex-direction: column; flex: 1; color: inherit; text-decoration: none; }
 .bo-kort > a:hover .navn { text-decoration: underline; text-underline-offset: 4px; }
 .bo-bilde { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: ${C.flateHoy}; display: grid; place-items: center; overflow: hidden; }
-.bo-bilde img { width: 100%; height: 100%; object-fit: contain; }
+/* Bildet legges oppå boksen (absolute), så høyden følger 4:3-boksen og ikke bildet. Uten dette ble stående bilder
+   like høye som de er brede, og bunnen ble kuttet; nå vises hele gjenstanden */
+.bo-bilde img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .bo-plassholder { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; color: ${C.linDempet}; font-size: 0.8125rem; padding: 0 0.5rem; text-align: center; }
 .bo-plassholder .emoji { font-size: 2.5rem; line-height: 1; }
 .bo-merke { position: absolute; left: 0.5rem; top: 0.5rem; font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.625rem; border-radius: 999px; }
