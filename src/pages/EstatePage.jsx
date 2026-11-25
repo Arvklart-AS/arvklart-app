@@ -10,8 +10,9 @@ import { APP_HOME } from '../lib/routes'
 // Oversikten i et bo. Den svarer bare på «hva vil du gjøre?»:
 //  1. Hvor langt boet har kommet (én linje).
 //  2. «Anbefalt nå»: det viktigste for denne brukeren akkurat nå, med én knapp.
-//  3. Fire nummererte nedtrekksgrupper (Gjenstander, Fordeling, Arvinger, Praktisk) med lenker videre til egne
-//     sider, i samme stil som «Før dere begynner» på arvklart.no.
+//  3. Tre nummererte nedtrekksgrupper (Gjenstander, Fordeling, Arvinger) med lenker videre til egne sider, i samme
+//     stil som «Før dere begynner» på arvklart.no. «Praktisk» (aside) står for seg under, uten nummer, så den ikke
+//     leses som et fjerde steg i fordelingen.
 // Gjenstandene med bilder, søk, filter og analyse ligger på /estate/:id/gjenstander (EstateItemsPage).
 // Hva som vises for administrator, arving og demo, bestemmes i src/lib/estateOverview.js.
 export default function EstatePage({ session, isDemo }) {
@@ -80,38 +81,55 @@ export default function EstatePage({ session, isDemo }) {
           <p className="bo-overlinje">{L('Alt i boet', 'Everything in the estate')}</p>
           <h2 id="valg-tittel" className="bo-stor">{L('Hva vil du gjøre?', 'What do you want to do?')}</h2>
           <div className="bo-grupper">
-            {groups.map((group, n) => (
-              <details key={group.key} className="bo-gruppe" open={!!openGroups[group.key]}
-                onToggle={e => setOpenGroups(group.key, e.currentTarget.open)}>
-                <summary>
-                  <span className="bo-nr" aria-hidden="true">{String(n + 1).padStart(2, '0')}</span>
-                  <span>
-                    <span className="tittel">{group.title}</span>
-                    <span className="beskrivelse">{group.desc}</span>
-                  </span>
-                  <span className="bo-hint">{group.hint}</span>
-                  <span className="bo-pluss" aria-hidden="true" />
-                </summary>
-                <ul className="bo-valg">
-                  {group.links.map(link => (
-                    <li key={link.key}>
-                      <Link to={link.path}>
-                        <span>
-                          <span className="navn">{link.title}</span>
-                          <span className="forklaring">{link.desc}</span>
-                        </span>
-                        <Count link={link} />
-                        <span className="til" aria-hidden="true">→</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </details>
+            {groups.filter(g => !g.aside).map((group, n) => (
+              <Group key={group.key} group={group} nr={String(n + 1).padStart(2, '0')} openGroups={openGroups} setOpenGroups={setOpenGroups} />
             ))}
           </div>
+          {groups.some(g => g.aside) && (
+            <div className="bo-ekstra">
+              <p className="bo-ekstra-tekst">{L('Ved siden av fordelingen, når det passer. Ikke et steg dere må gjennom.', 'Alongside the distribution, whenever it suits you. Not a step you have to go through.')}</p>
+              <div className="bo-grupper">
+                {groups.filter(g => g.aside).map(group => (
+                  <Group key={group.key} group={group} aside openGroups={openGroups} setOpenGroups={setOpenGroups} />
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </div>
+  )
+}
+
+// Én nedtrekksgruppe. Stegene har nummer; en gruppe ved siden av (aside) har ikke det, og er litt mindre.
+function Group({ group, nr, aside = false, openGroups, setOpenGroups }) {
+  return (
+    <details className={aside ? 'bo-gruppe ekstra' : 'bo-gruppe'} open={!!openGroups[group.key]}
+      onToggle={e => setOpenGroups(group.key, e.currentTarget.open)}>
+      <summary>
+        <span className="bo-nr" aria-hidden="true">{aside ? '' : nr}</span>
+        <span>
+          <span className="tittel">{group.title}</span>
+          <span className="beskrivelse">{group.desc}</span>
+        </span>
+        <span className="bo-hint">{group.hint}</span>
+        <span className="bo-pluss" aria-hidden="true" />
+      </summary>
+      <ul className="bo-valg">
+        {group.links.map(link => (
+          <li key={link.key}>
+            <Link to={link.path}>
+              <span>
+                <span className="navn">{link.title}</span>
+                <span className="forklaring">{link.desc}</span>
+              </span>
+              <Count link={link} />
+              <span className="til" aria-hidden="true">→</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </details>
   )
 }
 
