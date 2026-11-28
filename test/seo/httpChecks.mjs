@@ -13,7 +13,7 @@ export const JS_BUDGET_GZIP = 175 * 1024
 // Forsidens overskrift. Uttrykket i båndet skifter (src/site/Rotator.jsx), så selve teksten står i
 // deler i HTML-en; H1_NAME er det tilgjengelige navnet, som alltid er den samme hele setningen.
 export const H1_NAME = 'Fordel arvegjenstandene med én felles oversikt'
-export const H1_NO = ['Fordel', 'arvegjenstandene', 'med <em>én felles</em> oversikt']
+export const H1_NO = ['Fordel', 'arvegjenstandene', 'med én felles oversikt']
 const PRIVATE = ['/app', '/logg-inn', '/nytt-passord', '/join/ABC123', '/estate/22222222-0000-0000-0000-000000000001',
   '/estate/22222222-0000-0000-0000-000000000001/fordeling', '/konto', '/founder', '/setup',
   '/kontakt.html', '/index.html', '/shell.html']
@@ -168,7 +168,7 @@ export async function runHttpChecks(base, { headers = {}, preview = false, fetch
 
   await check('Forsiden «/» uten JavaScript: tekst, lenkene til de offentlige sidene, WebSite, Organization og VideoObject', async () => {
     const { body } = await get('/')
-    for (const text of [...H1_NO, 'Se tingene og hvem som <em>ønsker</em> dem', 'Teamet bak', 'Kan jeg prøve uten å opprette en konto?', 'Prøv demo'])
+    for (const text of [...H1_NO, 'Slik fordeler dere innboet', 'Teamet bak', 'Kan jeg prøve uten å opprette en konto?', 'Prøv demo'])
       assert(body.includes(text), `mangler «${text}»`)
     for (const href of ['/slik-fungerer-det', '/om-oss', '/veiviser', '/kontakt', '/personvern', '/logg-inn'])
       assert(body.includes(`href="${href}"`), `lenken til ${href} mangler`)
@@ -181,9 +181,9 @@ export async function runHttpChecks(base, { headers = {}, preview = false, fetch
 
   await check('De nye undersidene uten JavaScript: overskrift, hovedinnhold og brødsmule', async () => {
     for (const [path, h1, tekst] of [
-      ['/slik-fungerer-det', 'Slik fordeler dere innbo med <em>Arvklart</em>', 'Finn en <em>fordeling</em>'],
-      ['/om-oss', 'Teamet bak <em>Arvklart</em>', 'Slik begynte det.'],
-      ['/kontakt', 'Hva kan vi hjelpe deg <em>med</em>?', 'admin@arvklart.no'],
+      ['/slik-fungerer-det', 'Slik fordeler dere innbo med Arvklart', 'Finn en fordeling'],
+      ['/om-oss', 'Teamet bak Arvklart', 'Slik begynte det.'],
+      ['/kontakt', 'Hva kan vi hjelpe deg med?', 'admin@arvklart.no'],
     ]) {
       const r = await get(path)
       assert(r.status === 200, `${path}: status ${r.status}`)

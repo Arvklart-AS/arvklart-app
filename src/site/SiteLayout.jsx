@@ -108,7 +108,6 @@ function Footer({ current }) {
   const links = FOOT().filter(l => !(current === HOME && l.href === HOME))
   return (
     <footer className="ground g-natt foot">
-      <div className="rules" aria-hidden="true" />
       <div className="wrap">
         <div className="foot__in">
           <p className="foot__t">{L(

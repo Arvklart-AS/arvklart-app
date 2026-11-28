@@ -19,7 +19,7 @@ async function audit(page, path, ready) {
 
 const PAGES = [
   { path: '/logg-inn', ready: /Logg inn/, loggedIn: false },
-  { path: '/', ready: /Se tingene og hvem som/, loggedIn: false }, // forsiden
+  { path: '/', ready: /Slik fordeler dere innboet/, loggedIn: false }, // forsiden
   { path: '/slik-fungerer-det', ready: /Finn en fordeling/, loggedIn: false },
   { path: '/om-oss', ready: /Fire personer, fire/, loggedIn: false },
   { path: '/', ready: 'Testbo' },

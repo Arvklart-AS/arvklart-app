@@ -24,7 +24,7 @@ export default function AboutPage({ loggedIn = false }) {
   return (
     <SiteLayout current="/om-oss" demo={demo} loggedIn={loggedIn}>
       <PageHero className="phero--om" crumb={L('Om oss', 'About us')} overline={L('Om oss', 'About us')}
-        h1={L(<>Teamet bak <em>Arvklart</em></>, <>The team behind <em>Arvklart</em></>)}
+        h1={L(<>Teamet bak Arvklart</>, <>The team behind Arvklart</>)}
         lead={L(
           'Vi er fire som bygger et verktøy for familier som skal få oversikt over og fordele innbo og løsøre.',
           'We are four people building a tool for families who need an overview of a home’s contents, and a way to share them out.',
@@ -32,7 +32,6 @@ export default function AboutPage({ loggedIn = false }) {
 
       {/* ============ §1 OPPHAVET ============ */}
       <section className="ground g-papir sec" aria-labelledby="h2-1">
-        <div className="rules" aria-hidden="true" />
         <div className="wrap">
           <p className="overline">{L('Hvor det begynte', 'Where it started')}</p>
           <div className="opphav">
@@ -56,12 +55,11 @@ export default function AboutPage({ loggedIn = false }) {
       </section>
 
       {/* ============ §2 TEAMET ============ */}
-      <section className="ground g-papir sec sec--tight" aria-labelledby="h2-2">
-        <div className="rules" aria-hidden="true" />
+      <section className="ground g-lin sec" aria-labelledby="h2-2">
         <div className="wrap">
           <p className="overline">{L('De fire', 'The four of us')}</p>
-          <h2 id="h2-2" style={{ margin: 'clamp(14px,1.6vw,22px) 0 clamp(16px,2vw,26px)', maxWidth: '17ch' }}>
-            {L(<>Fire personer, fire <em>ansvarsområder</em></>, <>Four people, four <em>areas of responsibility</em></>)}</h2>
+          <h2 id="h2-2" className="h2-sek">
+            {L(<>Fire personer, fire ansvarsområder</>, <>Four people, four areas of responsibility</>)}</h2>
           <p className="body">{L(
             'Vi deler arbeidet mellom oss. Har du spørsmål om løsningen, er det én innboks å skrive til, uansett hvem av oss som svarer.',
             'We share the work between us. If you have a question about the tool, there is one inbox to write to, whichever of us answers.',
@@ -81,15 +79,14 @@ export default function AboutPage({ loggedIn = false }) {
       </section>
 
       {/* ============ §3 HVORFOR ============ */}
-      <section className="ground g-natt sec" aria-labelledby="h2-3">
-        <div className="rules" aria-hidden="true"><i /></div>
+      <section className="ground g-natt sec kurve-begge" aria-labelledby="h2-3">
         <div className="wrap">
           <p className="overline">{L('Hvorfor vi holder på', 'Why we keep at it')}</p>
           <div className="hvorfor">
             <div className="hvorfor__txt">
               <h2 id="h2-3">{L(
-                <>Vi bygger for den <em>praktiske</em> delen</>,
-                <>We build for the <em>practical</em> part</>,
+                <>Vi bygger for den praktiske delen</>,
+                <>We build for the practical part</>,
               )}</h2>
               <p className="body">{L(
                 'Et arveoppgjør har mange sider. Arvklart tar for seg én av dem: å få oversikt over gjenstandene, samle hva hver enkelt ønsker seg, og holde orden på hva dere blir enige om.',
@@ -124,13 +121,12 @@ export default function AboutPage({ loggedIn = false }) {
 
       {/* ============ §4 AVSLUTNING ============ */}
       <section className="ground g-papir sec" aria-labelledby="h2-4">
-        <div className="rules" aria-hidden="true" />
         <div className="wrap">
           <div className="end">
             <p className="overline overline--c">{L('Ta kontakt', 'Get in touch')}</p>
             <h2 id="h2-4">{L(
-              <>Vi vil gjerne høre fra familier som står i <em>dette</em> nå</>,
-              <>We would like to hear from families going through <em>this</em> right now</>,
+              <>Vi vil gjerne høre fra familier som står i dette nå</>,
+              <>We would like to hear from families going through this right now</>,
             )}</h2>
             <p className="body">{L(
               'Skriv til oss hvis dere vil prøve Arvklart, eller se først hvordan løsningen ser ut.',

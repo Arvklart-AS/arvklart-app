@@ -23,8 +23,7 @@ export default function PageHero({ className = '', crumb, overline, h1, lead, as
     </div>
   )
   return (
-    <section className={`ground g-natt phero ${className}`.trim()}>
-      <div className="rules" aria-hidden="true"><i /></div>
+    <section className={`ground g-natt phero kurve-ned ${className}`.trim()}>
       <div className="wrap">
         {aside
           // Teksten står først i markeringen, så overskriften blir stående øverst på mobil,

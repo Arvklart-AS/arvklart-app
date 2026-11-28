@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { L, isEn } from '../lib/lang'
 
-// SIGNATUREN — overgangen fra mørke til lys
+// PRODUKTFILMEN UNDER HEROEN (seksjonen heter fortsatt #cross, som lenker og tester bruker)
 //
-// Alt kjører på én variabel, --lift, som skrives på .cross av én rAF-løkke. Alt annet leser den.
-// Uten dette skriptet står --lift på 1, som er sluttilstanden: produktet lyst, skarpt og lesbart.
-// Løkka går bare mens heroen eller overgangen er på skjermen, og stopper helt når den er i ro.
+// Fra designdemo v4: filmen står stille i lyset, i en smaragdramme som de andre produktbildene.
+// Den scrolldrevne overgangen fra mørke til lys (--lift, én rAF-løkke) er tatt bort. Den fulgte
+// rullingen og var i praksis en parallakseeffekt, og v4 klarer seg uten.
 //
 // I rammen står produktfilmen (47 sekunder, uten lyd), på norsk eller engelsk etter språkvalget.
 //
-// INGEN VIDEOBYTES FØR NOEN TRYKKER. Først vises bare plakaten — 16:9 over 980 px, 4:5 under,
-// samme grense som skilte PC-riggen fra mobilbildet før. <video> settes ikke inn i det hele tatt
-// før knappen trykkes, så hverken filmen eller en <source> kan lastes i forkant.
+// INGEN VIDEOBYTES FØR NOEN TRYKKER. Først vises bare plakaten — 16:9 over 980 px, 4:5 under.
+// <video> settes ikke inn i det hele tatt før knappen trykkes, så hverken filmen eller en <source>
+// kan lastes i forkant.
 //
 // Tekstalternativet (WCAG 1.2.1, film uten lyd): plakaten har ekte alt-tekst, og filmen peker med
 // aria-describedby på en visuelt skjult beskrivelse. <video> har ingen alt-attributt, så dette er
@@ -38,7 +38,6 @@ const FILM = {
 }
 
 export default function Signature() {
-  const cross = useRef(null)
   const video = useRef(null)
   const [spiller, setSpiller] = useState(false)
   const fil = isEn() ? FILM.en : FILM.no
@@ -55,99 +54,16 @@ export default function Signature() {
     el.play().catch(() => {}) // nekter nettleseren, står kontrollene der og brukeren kan trykke selv
   }, [spiller, fil])
 
-  useEffect(() => {
-    const el = cross.current
-    if (!el) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const hero = document.getElementById('top')
-    let lift = 1, written = -1, raf = 0, awake = true, inView = true
-
-    const clamp = v => (v < 0 ? 0 : v > 1 ? 1 : v)
-
-    const read = () => {
-      const r = el.getBoundingClientRect()
-      const vh = window.innerHeight || 1
-      // 0 når båndet akkurat har kommet inn nedenfra, 1 når det er løftet forbi
-      const span = r.height * 0.78
-      return clamp((vh * 0.78 - r.top) / (span || 1))
-    }
-
-    const frame = () => {
-      raf = 0
-      if (!awake || !inView) return
-      const target = read()
-      lift += (target - lift) * 0.16            // mykt etterslep
-      if (Math.abs(target - lift) < 0.0015) lift = target
-      if (Math.abs(lift - written) > 0.0012) {
-        // skrives på .cross, ikke på <html>, så bare dette treet regnes om
-        written = lift
-        el.style.setProperty('--lift', lift.toFixed(4))
-      } else if (lift === target) {
-        return                                  // i ro: løkka stopper, og starter på neste rulling
-      }
-      raf = requestAnimationFrame(frame)
-    }
-
-    const tick = () => { if (!raf && awake && inView && !reduce.matches) raf = requestAnimationFrame(frame) }
-
-    const start = () => {
-      if (reduce.matches) {
-        el.style.setProperty('--lift', '1')
-        if (raf) { cancelAnimationFrame(raf); raf = 0 }
-        return
-      }
-      lift = read(); written = -1
-      tick()
-    }
-
-    let io
-    if ('IntersectionObserver' in window) {
-      const seen = new Set()
-      io = new IntersectionObserver(entries => {
-        entries.forEach(e => { e.isIntersecting ? seen.add(e.target) : seen.delete(e.target) })
-        inView = seen.size !== 0
-        if (inView) start()
-        else if (raf) { cancelAnimationFrame(raf); raf = 0 }
-      }, { rootMargin: '120px' })
-      ;[hero, el].forEach(t => { if (t) { seen.add(t); io.observe(t) } })
-    }
-
-    const onVis = () => {
-      awake = !document.hidden
-      if (awake) start()
-      else if (raf) { cancelAnimationFrame(raf); raf = 0 }
-    }
-    document.addEventListener('visibilitychange', onVis)
-    reduce.addEventListener('change', start)
-    window.addEventListener('resize', start, { passive: true })
-    // vekker bare løkka; all utregning skjer i requestAnimationFrame
-    window.addEventListener('scroll', tick, { passive: true })
-    start()
-
-    return () => {
-      if (raf) cancelAnimationFrame(raf)
-      document.removeEventListener('visibilitychange', onVis)
-      reduce.removeEventListener('change', start)
-      window.removeEventListener('resize', start)
-      window.removeEventListener('scroll', tick)
-      io?.disconnect()
-      el.style.removeProperty('--lift')
-    }
-  }, [])
-
   const altTekst = L(
     'Skjermbilde fra Arvklart-demoen: gjenstandsoversikten med middagsservise, oljemaleri og vase, og visningen der administratoren velger hvem som skal ha serviset.',
     'Screenshot from the Arvklart demo: the item overview with a dinner service, an oil painting and a vase, and the view where the administrator chooses who should have the service.',
   )
 
   return (
-    <div className="cross" id="cross" ref={cross}>
-      <div className="cross__bg" aria-hidden="true">
-        <div className="cross__dark" />
-        <div className="cross__line" />
-      </div>
-      <div className="rules" aria-hidden="true" />
-      <figure className="cross__fig">
+    <section className="ground g-papir filmsone" id="cross"
+      aria-label={L('Film om eksempelboet', 'Film about the example estate')}>
+      <div className="wrap">
+      <figure className="filmsone__fig">
         <div className="film">
           <div className="film__vindu">
           {spiller ? (
@@ -185,9 +101,6 @@ export default function Signature() {
                   alt={altTekst}
                 />
               </picture>
-              {/* Lysgrensen inne i rammen følger den ute på siden. Ligger bare over plakaten:
-                  når filmen spiller, er <video> det eneste som står her. */}
-              <div className="film__slor" aria-hidden="true" />
             </>
           )}
           </div>
@@ -219,6 +132,7 @@ export default function Signature() {
         'Filmen viser eksempelboet i Arvklart: en gjenstand legges inn med bilde, navn og kategori; familien får én felles oversikt over gjenstandene med verdianslag og hvem som ønsker hva; hver arving kan skrive hvorfor en gjenstand betyr noe; og til slutt velger administratoren hvem som skal ha den. Filmen er uten lyd.',
         'The film shows the example estate in Arvklart: an item is added with a photo, a name and a category; the family gets one shared overview of the items with estimated values and who wants what; each heir can write why an item matters to them; and finally the administrator chooses who should have it. The film has no sound.',
       )}</p>
-    </div>
+      </div>
+    </section>
   )
 }

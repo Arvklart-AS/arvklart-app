@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Konseptskisse – fremdrift i «Ditt bo» (ikke implementert)</title>
+<style>
+  /* Konseptskisse. Ikke en del av appen, ikke publisert. Fargene er appens mørke palett (CLAUDE.md). */
+  :root{--natt:#1F221E;--flate:#272A25;--hoy:#30342D;--lin:#F2EEE6;--dempet:#B9B4A8;--strek:rgba(242,238,230,.14);--felt:rgba(242,238,230,.4);
+    --mose:#9DAA8C;--messing:#C79A6B;--ord:#D7BA9A;--granskog:#2F4A43;--rust:#E08A7A;
+    --serif:'Bodoni Moda','Times New Roman',serif;--sans:Karla,Arial,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#ECF0E2;color:#2A1D14;font:17px/1.6 var(--sans)}
+  .doc{max-width:1180px;margin:0 auto;padding:48px 24px 80px}
+  .doc h1{font:400 clamp(2rem,1.4rem + 2vw,2.8rem)/1.1 var(--serif);margin-bottom:12px}
+  .doc h2{font:400 1.6rem/1.2 var(--serif);margin:48px 0 12px}
+  .doc p,.doc li{max-width:72ch;color:#4F463A}
+  .doc ul{margin:10px 0 0 1.2em}
+  .merke{display:inline-block;font:600 .8rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#654527;margin-bottom:14px}
+  .advarsel{border-left:3px solid #9A3B2E;padding:10px 16px;background:#F7F1EA;margin:18px 0;color:#2A1D14}
+  .rad{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.9fr);gap:28px;align-items:start;margin-top:20px}
+  @media (max-width:900px){.rad{grid-template-columns:1fr}}
+  .etikett{font:600 .78rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#654527;margin-bottom:8px}
+
+  /* --- skjermen (appens mørke uttrykk) --- */
+  .skjerm{background:var(--natt);color:var(--lin);border-radius:14px;padding:28px;box-shadow:0 30px 60px -40px rgba(16,37,26,.6)}
+  .skjerm.mobil{max-width:390px;padding:20px 16px;margin:0 auto}
+  .over{font:600 .72rem var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--messing);display:flex;align-items:center;gap:10px}
+  .over::before{content:'';width:28px;height:1px;background:currentColor}
+  .skjerm h3{font:400 2rem/1.1 var(--serif);margin:10px 0 18px}
+  .mobil h3{font-size:1.6rem}
+
+  /* Fasene: ikke en trappestige, men fire tellere. Ingen hake før det faktisk er ferdig. */
+  .faser{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--strek);border:1px solid var(--strek);border-radius:10px;overflow:hidden}
+  .mobil .faser{grid-template-columns:1fr 1fr}
+  .fase{background:var(--flate);padding:14px 14px 16px;display:grid;gap:6px;align-content:start;text-decoration:none;color:inherit}
+  .fase:hover{background:var(--hoy)}
+  .fase__t{font:600 .95rem var(--sans);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 8px}
+  .doc .skjerm li{color:var(--lin)}
+  .doc .skjerm .over{color:var(--messing)}
+  .doc .skjerm .merknad,.doc .skjerm .din{color:var(--dempet)}
+  .fase__tall{font:400 1.5rem/1.1 var(--serif);color:var(--ord)}
+  .fase__d{font-size:.875rem;color:var(--dempet);line-height:1.45}
+  .spor{height:4px;border-radius:2px;background:rgba(242,238,230,.12);overflow:hidden}
+  .spor span{display:block;height:100%;background:var(--mose)}
+  .status{font:600 .7rem var(--sans);letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+  .s-pagar{color:var(--ord)} .s-ferdig{color:var(--mose)} .s-ikke{color:var(--dempet)} .s-venter{color:var(--rust)}
+  .fase.aktiv{box-shadow:inset 0 2px 0 var(--ord)}
+
+  .anbefalt{margin-top:18px;background:var(--granskog);border-radius:10px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .anbefalt b{display:block;font:400 1.2rem/1.25 var(--serif)}
+  .anbefalt small{color:#DCE3D2;font-size:.9rem}
+  .knapp{background:var(--lin);color:var(--natt);border-radius:999px;padding:12px 20px;font-weight:600;text-decoration:none;white-space:nowrap}
+  .din{margin-top:14px;border:1px solid var(--strek);border-radius:10px;padding:12px 14px;font-size:.9rem;color:var(--dempet)}
+  .din b{color:var(--lin)}
+  .merknad{margin-top:12px;font-size:.82rem;color:var(--dempet)}
+  table{border-collapse:collapse;width:100%;margin-top:12px;font-size:.95rem}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid rgba(42,29,20,.16);vertical-align:top}
+  th{font-weight:600;color:#2A1D14}
+  td{color:#4F463A}
+  code{font-size:.88em;background:rgba(42,29,20,.07);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="doc">
+  <span class="merke">Konseptskisse · ikke implementert · 28.11.2026</span>
+  <h1>Fremdrift i «Ditt bo»</h1>
+  <p>Andreas forslag: en oversikt på bo-siden som viser hvor langt familien har kommet, hva som gjenstår og hva som er neste naturlige handling. Dette er et forslag teamet kan vurdere. Ingen kode, database eller produktlogikk er endret.</p>
+
+  <div class="advarsel"><b>Viktig før vi bygger noe:</b> mye av dette finnes allerede. Bo-oversikten (<code>/estate/:id</code>) har i dag én fremdriftslinje («4 av 10 gjenstander fordelt»), boksen «Anbefalt nå» og siden «Se hva som gjenstår» (<code>/status</code>). PR #87 (åpen) jobber med stegene i samme oversikt. Forslaget er derfor å <b>utvide den eksisterende linjen</b>, ikke å lage en ny komponent ved siden av, og å koordinere med #87.</div>
+
+  <h2>Forslaget: fire tellere i stedet for én linje</h2>
+  <p>Linjen «4 av 10 gjenstander fordelt» sier bare noe om det siste steget. En familie som har lagt inn 40 gjenstander og ventet på svar i to uker, ser 0 % og tror ingenting har skjedd. Fire fasefelt viser at arbeidet har kommet et stykke, uten å late som rekkefølgen er fast.</p>
+
+  <div class="rad">
+    <div>
+      <p class="etikett">Administrator · PC</p>
+      <div class="skjerm">
+        <p class="over">Ditt bo</p>
+        <h3>Fam. Hansen sitt bo</h3>
+        <ol class="faser" aria-label="Hvor dere står">
+          <li><a class="fase" href="#"><span class="fase__t">Gjenstander <span class="status s-pagar">Åpen</span></span><span class="fase__tall">10</span><span class="fase__d">lagt inn. Dere kan legge til flere når som helst.</span></a></li>
+          <li><a class="fase aktiv" href="#"><span class="fase__t">Ønsker <span class="status s-pagar">Pågår</span></span><span class="fase__tall">2 av 3</span><span class="fase__d">har svart på alt. Mona mangler 4.</span><span class="spor"><span style="width:67%"></span></span></a></li>
+          <li><a class="fase" href="#"><span class="fase__t">Fordeling <span class="status s-pagar">Pågår</span></span><span class="fase__tall">4 av 10</span><span class="fase__d">tildelt · 2 ønskes av flere · 1 vil ingen ha</span><span class="spor"><span style="width:40%"></span></span></a></li>
+          <li><a class="fase" href="#"><span class="fase__t">Godkjenning <span class="status s-ikke">Ikke startet</span></span><span class="fase__tall">–</span><span class="fase__d">Forslag kan legges frem når alt er avklart.</span></a></li>
+        </ol>
+        <div class="anbefalt">
+          <div><small>Anbefalt nå</small><b>Du har 4 gjenstander du ikke har tatt stilling til</b></div>
+          <a class="knapp" href="#">Gå gjennom nå →</a>
+        </div>
+        <p class="merknad">Hver fase er en lenke til siden som finnes i dag: gjenstandslisten, «Ta stilling», «Fordelingen» og godkjenningen på «Fordelingen».</p>
+      </div>
+    </div>
+    <div>
+      <p class="etikett">Arving · mobil</p>
+      <div class="skjerm mobil">
+        <p class="over">Ditt bo</p>
+        <h3>Fam. Hansen sitt bo</h3>
+        <ol class="faser" aria-label="Hvor dere står">
+          <li><a class="fase" href="#"><span class="fase__t">Gjenstander</span><span class="fase__tall">10</span><span class="fase__d">lagt inn</span></a></li>
+          <li><a class="fase aktiv" href="#"><span class="fase__t">Ønsker</span><span class="fase__tall">2 av 3</span><span class="fase__d">har svart på alt</span></a></li>
+          <li><a class="fase" href="#"><span class="fase__t">Fordeling</span><span class="fase__tall">4 av 10</span><span class="fase__d">tildelt</span></a></li>
+          <li><a class="fase" href="#"><span class="fase__t">Godkjenning</span><span class="fase__tall">–</span><span class="fase__d">ikke startet</span></a></li>
+        </ol>
+        <p class="din"><b>Din del:</b> du har svart på alle 10. 2 av ønskene dine ønskes også av andre.</p>
+        <div class="anbefalt">
+          <div><small>Anbefalt nå</small><b>Les hvorfor de andre ønsker det samme</b></div>
+          <a class="knapp" href="#">Se gjenstandene →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Prinsipper</h2>
+  <ul>
+    <li><b>Tellere, ikke en trappestige.</b> Prosessen er ikke lineær: gjenstander kan legges til etter at fordelingen har startet, og tildeling skjer i flere runder. Ingen fase får hake før den faktisk er ferdig, og «Gjenstander» er aldri «ferdig» så lenge boet er åpent.</li>
+    <li><b>Én neste handling.</b> «Anbefalt nå» er allerede den ene knappen (<code>recommendation()</code> i <code>estateOverview.js</code>). Fasefeltene skal ikke få egne knapper som konkurrerer med den.</li>
+    <li><b>Administrator og arving ser ulikt.</b> Administrator ser hele familien («Mona mangler 4»). Arvingen ser fasene for boet, men handlingen og «Din del» handler om dem selv — det er administrator som fordeler.</li>
+    <li><b>Et manglende svar er ikke et nei.</b> «2 av 3 har svart på alt» sier hvem som mangler, aldri «avslått». Samme regel som <code>pendingMembersFor</code>.</li>
+    <li><b>«Godkjent» betyr registrert i Arvklart.</b> Ikke BankID, ikke bindende. Fasen sier «Godkjent av alle», aldri «signert».</li>
+  </ul>
+
+  <h2>Hva tallene kan bygge på (uten ny logikk eller nye tabeller)</h2>
+  <table>
+    <tr><th>Fase</th><th>Tall</th><th>Finnes i dag</th></tr>
+    <tr><td>Gjenstander</td><td>antall lagt inn</td><td><code>overviewCounts().total</code></td></tr>
+    <tr><td>Ønsker</td><td>hvor mange som har svart på alt; egne ubesvarte</td><td><code>undecidedMembers</code>, <code>members</code>, <code>myUndecided</code> (fra <code>getUndecided</code>)</td></tr>
+    <tr><td>Fordeling</td><td>tildelt, ønskes av flere, vil ingen ha</td><td><code>assigned</code>, <code>contested</code>, <code>unwanted</code></td></tr>
+    <tr><td>Godkjenning</td><td>ikke lagt frem / venter på N / godkjent / utdatert</td><td><b>Delvis.</b> Bo-siden vet bare om et forslag venter på <i>meg</i> (<code>proposal.needsMyResponse</code>). Status for alle hentes i dag bare på «Fordelingen». Dette er den eneste delen som trenger mer data på bo-siden (lesing, ikke ny logikk).</td></tr>
+  </table>
+
+  <h2>Åpne spørsmål til teamet</h2>
+  <ul>
+    <li>Skal fasefeltene erstatte linjen, eller stå under den? (Forslaget: erstatte, ellers to fremdriftsvisninger.)</li>
+    <li>Hvordan skal «Ingen vil ha» telle — som en del av fordelingen (disponert) eller for seg?</li>
+    <li>Demoen: Mona er administrator. Skal demoen vise administratorvisningen, som i dag?</li>
+    <li>Brukertest: forstår eldre brukere «2 av 3 har svart på alt» uten forklaring? Bør testes med 3–5 personer før vi bygger.</li>
+  </ul>
+  <p style="margin-top:28px;font-size:.9rem">Tallene i skissen er illustrasjoner i stil med eksempelboet, ikke hentet fra databasen.</p>
+</div>
+</body>
+</html>

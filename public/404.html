@@ -6,23 +6,29 @@
   <meta name="robots" content="noindex" />
   <title>Fant ikke siden — Arvklart</title>
   <link rel="icon" type="image/svg+xml" href="/Arvklart Favicon.svg" />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Karla:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600&display=swap" rel="stylesheet" />
   <!-- Ukjente adresser (og guider som ikke er publisert) gir HTTP 404 med denne siden fra Vercel. Ingen skript:
-       siden virker uten appen. Se vercel.json og test/e2e/seo.mjs. -->
+       siden virker uten appen. Se vercel.json og test/e2e/seo.mjs. Uttrykket følger de offentlige sidene
+       (src/site/site.css): smaragd header, lys silke, Bodoni Moda (selvhostet) og pilleknapper. -->
   <style>
+    @font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 400 700; font-display: swap; src: url('/fonter/bodoni-moda-400-latin.woff2') format('woff2'); }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #FBF9F5; color: #3A2F26; font-family: 'Karla', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
-    header { background: #2A211A; padding: 20px 24px; }
-    header img { height: 26px; display: block; }
-    main { flex: 1; max-width: 640px; margin: 0 auto; padding: 72px 24px; width: 100%; }
-    h1 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 2rem; line-height: 1.25; margin-bottom: 14px; }
-    p { color: #5C4530; line-height: 1.65; margin-bottom: 24px; }
+    body { background: #ECF0E2; color: #2A1D14; font-family: 'Karla', Arial, sans-serif; font-size: 1.0625rem; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: linear-gradient(160deg, #22402F, #1B3527 55%, #152C20); padding: 18px 24px; }
+    header a { display: inline-flex; min-height: 44px; align-items: center; }
+    header img { height: 28px; display: block; }
+    main { flex: 1; max-width: 680px; margin: 0 auto; padding: 80px 24px; width: 100%; }
+    h1 { font-family: 'Bodoni Moda', 'Times New Roman', serif; font-optical-sizing: none; font-weight: 400; font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.2rem); line-height: 1.1; letter-spacing: -.02em; margin-bottom: 18px; }
+    p { color: #4F463A; line-height: 1.65; margin-bottom: 28px; }
     ul { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; }
-    a.btn { display: inline-block; padding: 12px 20px; border-radius: 8px; background: #3A2F26; color: #FBF9F5; text-decoration: none; font-weight: 500; }
-    a.btn.alt { background: #E8DFD0; color: #3A2F26; }
-    a:focus-visible { outline: 3px solid #5F6E52; outline-offset: 2px; }
-    .en { margin-top: 40px; font-size: 0.875rem; color: #75604B; }
-    .en a { color: #5F6E52; }
+    a.btn { display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 999px; background: #24392A; color: #F4F2EB; text-decoration: none; font-weight: 600; }
+    a.btn:hover { background: #2F573E; }
+    a.btn.alt { background: transparent; color: #2A1D14; border: 1px solid rgba(42,29,20,.3); }
+    a.btn.alt:hover { border-color: #2F573E; }
+    a:focus-visible { outline: 2px solid #2F573E; outline-offset: 3px; }
+    header a:focus-visible { outline-color: #EDE4C9; }
+    .en { margin-top: 44px; font-size: 1rem; color: #4F463A; }
+    .en a { color: #654527; }
   </style>
 </head>
 <body>

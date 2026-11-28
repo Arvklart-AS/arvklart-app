@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase, signIn, signUp } from '../lib/supabase'
 import { L } from '../lib/lang'
+import { HOME } from '../lib/routes'
 import TextSizeControl from '../components/TextSizeControl'
 
 const hasPendingInvite = () => { try { return Boolean(localStorage.getItem('pendingJoinCode')) } catch { return false } }
@@ -65,21 +66,26 @@ export default function LoginPage({ onToast }) {
     : email.trim() && password.trim() && (mode === 'login' || name.trim())
 
   return (
-    <div style={{ minHeight:'100vh', background:'#F5F2EB', display:'flex', fontFamily:'Karla, sans-serif' }}>
+    <div style={{ minHeight:'100vh', background:'#ECF0E2', display:'flex', fontFamily:'Karla, sans-serif' }}>
       <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 20px' }}>
         <div style={{ maxWidth:'400px', width:'100%' }}>
-          <div style={{ textAlign:'center', marginBottom:'40px' }}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1F2326" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom:'16px' }}>
-              <path d="M12 3v18M7 21h10M5 7h4M15 7h4M5 7L2.5 12a2.5 2.5 0 0 0 5 0L5 7zM19 7l-2.5 5a2.5 2.5 0 0 0 5 0L19 7z"/>
-            </svg>
-            <h1 style={{ fontFamily:'Fraunces, serif', fontSize:'1.875rem', fontWeight:'400', color:'#1F2326', marginBottom:'10px' }}>Arvklart</h1>
-            <p style={{ color:'#575B5E', fontSize:'0.9375rem', lineHeight:'1.6' }}>{L('Registrer, ønsk og fordel innbo og løsøre – samlet og dokumentert', 'Register, wish for and divide household contents – in one place, documented')}</p>
+          {/* Siden har ingen header, så veien tilbake står her (samme uttrykk som de offentlige sidene) */}
+          <a href={HOME} style={{ display:'inline-flex', alignItems:'center', minHeight:'44px', marginBottom:'12px', color:'#4F463A', fontSize:'0.9375rem', textDecoration:'underline', textUnderlineOffset:'4px' }}>
+            {L('← Til forsiden', '← To the home page')}
+          </a>
+          <div style={{ textAlign:'center', marginBottom:'36px' }}>
+            {/* Logoen fra nettsiden (samme maske som headeren). Navnet står som tekst for skjermlesere. */}
+            <h1 style={{ margin:'0 0 12px' }}>
+              <span aria-hidden="true" style={{ display:'block', width:'168px', aspectRatio:'460/122', margin:'0 auto', background:'#24392A', WebkitMask:'url(/nettsted/logo-maske.png) no-repeat center/contain', mask:'url(/nettsted/logo-maske.png) no-repeat center/contain' }} />
+              <span style={{ position:'absolute', width:'1px', height:'1px', overflow:'hidden', clipPath:'inset(50%)', whiteSpace:'nowrap' }}>Arvklart</span>
+            </h1>
+            <p style={{ color:'#4F463A', fontSize:'1rem', lineHeight:'1.6' }}>{L('Registrer, ønsk og fordel innbo og løsøre – samlet og dokumentert', 'Register, wish for and divide household contents – in one place, documented')}</p>
           </div>
 
           <div style={{ background:'#fff', border:'1px solid #CFC8BA', borderRadius:'14px', padding:'36px', boxShadow:'0 4px 32px rgba(0,0,0,0.06)' }}>
             {mode==='forgot' ? (
               <div style={{ marginBottom:'24px' }}>
-                <h2 style={{ fontFamily:'Fraunces, serif', fontSize:'1.375rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Glemt passord', 'Forgot password')}</h2>
+                <h2 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontOpticalSizing:'none', fontSize:'1.5rem', fontWeight:'400', color:'#1F2326', marginBottom:'8px' }}>{L('Glemt passord', 'Forgot password')}</h2>
                 <p style={{ color:'#575B5E', fontSize:'0.875rem', lineHeight:'1.6', margin:0 }}>{L('Skriv inn e-postadressen din, så sender vi deg en lenke for å velge nytt passord.', 'Enter your email address and we will send you a link to choose a new password.')}</p>
               </div>
             ) : (
@@ -139,7 +145,7 @@ export default function LoginPage({ onToast }) {
             </div>
 
             <button onClick={handleSubmit} disabled={loading||!canSubmit} style={{
-              width:'100%', padding:'13px', background:canSubmit?'#2F4A43':'#CFC8BA',
+              width:'100%', padding:'13px', background:canSubmit?'#24392A':'#CFC8BA',
               color:'#F5F2EB', border:'none', borderRadius:'8px',
               cursor:canSubmit?'pointer':'not-allowed', fontSize:'0.9375rem', fontFamily:'Karla, sans-serif',
             }}>{loading?L('Vent litt…','Please wait…'):mode==='login'?L('Logg inn','Log in'):mode==='forgot'?L('Send lenke','Send link'):L('Opprett konto','Create account')}</button>
