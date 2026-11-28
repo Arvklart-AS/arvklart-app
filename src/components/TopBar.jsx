@@ -36,7 +36,7 @@ export default function TopBar({ profile, session, estate }) {
   // Samme farge som headeren på de offentlige sidene (--natt i src/site/site.css),
   // så toppen av appen og markedssidene ser like ut. Et bo med egen merkevarefarge
   // beholder sin (AdminPage → Merkevare).
-  const brandColor = estate?.branding_color || '#1F221E'
+  const brandColor = estate?.branding_color || '#1B3527' // smaragd, som headeren på nettsiden
   const brandName = estate?.name ? `Arvklart · ${estate.name}` : 'Arvklart'
 
   const isDemo = isDemoSession(session)
@@ -68,17 +68,17 @@ export default function TopBar({ profile, session, estate }) {
       background: brandColor, color: '#F5F2EB', height: '56px',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '0 20px', position: 'sticky', top: 0, zIndex: 100,
-      fontFamily: 'Karla, sans-serif', boxShadow: '0 1px 12px rgba(0,0,0,0.18)',
+      fontFamily: 'Karla, sans-serif', boxShadow: '0 1px 12px rgba(16, 37, 26, 0.063)',
     }}>
       <style>{`
         .tb-logo { background: none; border: 1px solid transparent; border-radius: 8px; padding: 4px 8px; margin-left: -8px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #F5F2EB; transition: background 0.15s, border-color 0.15s; }
         .tb-logo:hover, .tb-logo[aria-expanded="true"] { background: rgba(251,249,245,0.14); border-color: rgba(251,249,245,0.3); }
-        .tb-item { display: block; width: 100%; padding: 11px 16px; background: none; border: none; text-align: left; cursor: pointer; font-size: 0.875rem; color: #F2EEE6; font-family: Karla, sans-serif; transition: background 0.12s; }
-        .tb-item:hover, .tb-item:focus-visible { background: rgba(242, 238, 230, 0.07); }
-        .tb-item:focus-visible { outline: 3px solid #9DAA8C; outline-offset: -3px; }
+        .tb-item { display: block; width: 100%; padding: 11px 16px; background: none; border: none; text-align: left; cursor: pointer; font-size: 0.875rem; color: #2A1D14; font-family: Karla, sans-serif; transition: background 0.12s; }
+        .tb-item:hover, .tb-item:focus-visible { background: rgba(42, 29, 20, 0.056); }
+        .tb-item:focus-visible { outline: 3px solid #2F573E; outline-offset: -3px; }
         .tb-logo:focus-visible, .tb-nav a:focus-visible, .tb-avatar:focus-visible { outline: 3px solid #F5F2EB; outline-offset: 2px; }
-        .tb-item.danger { color: #E08A7A; }
-        .tb-item + .tb-item { border-top: 1px solid rgba(242, 238, 230, 0.14); }
+        .tb-item.danger { color: #9A3B2E; }
+        .tb-item + .tb-item { border-top: 1px solid rgba(42, 29, 20, 0.14); }
         .tb-nav { flex: 1; min-width: 0; display: flex; justify-content: flex-end; gap: 4px; margin: 0 12px; overflow-x: auto; scrollbar-width: none; }
         .tb-nav::-webkit-scrollbar { display: none; }
         .tb-nav a { flex-shrink: 0; padding: 7px 13px; border-radius: 999px; border: 1px solid transparent; font-size: 0.875rem; font-weight: 500; color: #F5F2EB; text-decoration: none; white-space: nowrap; transition: background 0.15s, border-color 0.15s; }
@@ -98,9 +98,9 @@ export default function TopBar({ profile, session, estate }) {
 
         {logoMenuOpen && (
           <div role="menu" style={{
-            position: 'absolute', top: '46px', left: '-8px', background: '#30342D',
-            border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', minWidth: '220px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.14)', overflow: 'hidden',
+            position: 'absolute', top: '46px', left: '-8px', background: '#FCFCF9',
+            border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '12px', minWidth: '220px',
+            boxShadow: '0 14px 36px -8px rgba(16, 37, 26, 0.28)', overflow: 'hidden',
           }}>
             <button role="menuitem" className="tb-item" onClick={() => { navigate(APP_HOME); setLogoMenuOpen(false) }}>{L('Mine bo', 'My estates')}</button>
             <button role="menuitem" className="tb-item" onClick={goHome}>
@@ -131,17 +131,17 @@ export default function TopBar({ profile, session, estate }) {
 
         {menuOpen && (
           <div style={{
-            position: 'absolute', top: '44px', right: 0, background: '#30342D',
-            border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', minWidth: '200px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.14)', overflow: 'hidden', zIndex: 200,
+            position: 'absolute', top: '44px', right: 0, background: '#FCFCF9',
+            border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '12px', minWidth: '200px',
+            boxShadow: '0 14px 36px -8px rgba(16, 37, 26, 0.28)', overflow: 'hidden', zIndex: 200,
           }}>
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(242, 238, 230, 0.14)' }}>
-              <div style={{ fontSize: '0.875rem', color: '#F2EEE6', fontWeight: '500' }}>{profile?.display_name}</div>
-              <div style={{ fontSize: '0.75rem', color: '#B9B4A8', marginTop: '2px' }}>{session?.user?.email}</div>
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(42, 29, 20, 0.14)' }}>
+              <div style={{ fontSize: '0.875rem', color: '#2A1D14', fontWeight: '500' }}>{profile?.display_name}</div>
+              <div style={{ fontSize: '0.75rem', color: '#4F463A', marginTop: '2px' }}>{session?.user?.email}</div>
             </div>
 
-            <div style={{ borderBottom: '1px solid rgba(242, 238, 230, 0.14)' }}><TextSizeControl compact /></div>
-            <button className="tb-item" lang={lang === 'en' ? 'no' : 'en'} onClick={toggleLang} style={{ borderBottom: '1px solid rgba(242, 238, 230, 0.14)' }}>
+            <div style={{ borderBottom: '1px solid rgba(42, 29, 20, 0.14)' }}><TextSizeControl compact /></div>
+            <button className="tb-item" lang={lang === 'en' ? 'no' : 'en'} onClick={toggleLang} style={{ borderBottom: '1px solid rgba(42, 29, 20, 0.14)' }}>
               {lang === 'en' ? '🇳🇴 Bytt til Norsk' : '🇬🇧 Switch to English'}
             </button>
 

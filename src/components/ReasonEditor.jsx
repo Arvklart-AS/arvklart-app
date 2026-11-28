@@ -4,7 +4,7 @@ import { readReasonDraft, writeReasonDraft, clearReasonDraft } from '../lib/reas
 import { L } from '../lib/lang'
 
 // Fargene i det mørke uttrykket som alle sidene i boet har (se src/lib/estateTheme.js)
-const t = { text: '#B9B4A8', strong: '#F2EEE6', muted: '#B9B4A8', link: '#9DAA8C', danger: '#E08A7A', field: '#1F221E', fieldBorder: 'rgba(242, 238, 230, 0.4)', primaryBg: '#F2EEE6', primaryText: '#1F221E', secondaryBg: 'transparent' }
+const t = { text: '#4F463A', strong: '#2A1D14', muted: '#4F463A', link: '#2F573E', danger: '#9A3B2E', field: '#F1F3EA', fieldBorder: 'rgba(42, 29, 20, 0.5)', primaryBg: '#24392A', primaryText: '#F4F2EB', secondaryBg: 'transparent' }
 
 // Valgfri begrunnelse på eget ønske: legges til, endres eller fjernes på stedet, uten dialog.
 // Det som skrives speiles som utkast i fanen (reasonDraft), så teksten ikke går tapt hvis feltet lukkes,

@@ -81,6 +81,10 @@ Før ble 620–680 px store skjermbilder skalert opp til 900 px — uskarpt og h
 
 ## 3. Julies tilbakemelding: demobildene
 
+> **Oppdatert:** etter at appen fikk lyse arbeidsflater (`docs/app-lys.md`) er skjermbildene tatt på nytt fra
+> demospeilet, og rammen er gjort om til et lite «appvindu» med en smal smaragdlist øverst. Smaragdrammen beskrevet
+> under gjelder nå bare produktfilmen.
+
 * Alle produktbilder (forsiden, «Slik fungerer det», filmplakaten) står i samme smaragdramme med
   myk skygge og 14 px hjørner; telefonrammen i veiviserseksjonen er den samme i mørk variant.
 * Bildene er ekte utsnitt fra demoen og ikke endret. Ingen nye bilder er laget, og ingen funksjoner

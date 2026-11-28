@@ -38,10 +38,10 @@ export const sessionFor = (email, meta = {}) => {
 // Brukes som setup-valg ({ ...DEMO }) eller med sessionFor(DEMO.email, DEMO.meta).
 export const DEMO = { email: 'mona.demo@arvklart.no', meta: { app_metadata: { provider: 'email', arvklart_demo: 'mona' } } }
 
-export async function setup(browser, { loggedIn = true, viewport = { width: 390, height: 844 }, textSize = null, fixtures = {}, rpc = {}, email = null, meta = null, consent = 'denied', resetLang = true } = {}) {
+export async function setup(browser, { loggedIn = true, viewport = { width: 390, height: 844 }, deviceScaleFactor = 1, textSize = null, fixtures = {}, rpc = {}, email = null, meta = null, consent = 'denied', resetLang = true } = {}) {
   const data = { ...FIXTURES, ...fixtures }
   const s0 = email || meta ? sessionFor(email || session.user.email, meta || {}) : session
-  const ctx = await browser.newContext({ viewport })
+  const ctx = await browser.newContext({ viewport, deviceScaleFactor })
   const page = await ctx.newPage()
   const calls = [] // { method, table } for alle kall mot databasen, så testene kan sjekke hva som ble gjort
   await page.route('https://test.supabase.co/**', async route => {

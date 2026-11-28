@@ -39,12 +39,12 @@ const newDraft = () => ({
 })
 
 // Sekundærtekst og feltkanter med nok kontrast (WCAG 1.4.3 / 1.4.11)
-const MUTED = '#B9B4A8'
-const FIELD_BORDER = 'rgba(242, 238, 230, 0.4)'
+const MUTED = '#4F463A'
+const FIELD_BORDER = 'rgba(42, 29, 20, 0.5)'
 
 const inputStyle = {
   width: '100%', minHeight: '44px', padding: '10px 12px', border: `1px solid ${FIELD_BORDER}`, borderRadius: '8px',
-  fontSize: '1rem', background: '#1F221E', color: '#F2EEE6',
+  fontSize: '1rem', background: '#F1F3EA', color: '#2A1D14',
   fontFamily: 'Karla, sans-serif', boxSizing: 'border-box',
 }
 const bigBtn = {
@@ -53,7 +53,7 @@ const bigBtn = {
 }
 const smallBtn = {
   minHeight: '44px', padding: '8px 12px', background: 'none', border: `1px solid ${FIELD_BORDER}`, borderRadius: '8px',
-  cursor: 'pointer', fontSize: '0.875rem', color: '#F2EEE6', fontFamily: 'Karla, sans-serif',
+  cursor: 'pointer', fontSize: '0.875rem', color: '#2A1D14', fontFamily: 'Karla, sans-serif',
 }
 
 // Flytter fokus til navnefeltet på et kort (fra oppsummeringen og bunnlinjen)
@@ -600,7 +600,7 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
 
       <Overline>{L('Gjenstander', 'Items')}</Overline>
 
-      <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight: '400', color: '#F2EEE6', marginBottom: '6px' }}>
+      <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight: '400', color: '#2A1D14', marginBottom: '6px' }}>
         {L('Legg til flere gjenstander', 'Add several items')}
       </h1>
       <p style={{ color: MUTED, fontSize: '0.875rem', lineHeight: 1.5, marginBottom: '18px' }}>
@@ -609,32 +609,32 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
       </p>
 
       {isDemo && (
-        <div style={{ background: '#30342D', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '10px', padding: '12px 14px', fontSize: '0.8125rem', color: '#9DAA8C', lineHeight: 1.5, marginBottom: '18px' }}>
+        <div style={{ background: '#EEF1E6', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '10px', padding: '12px 14px', fontSize: '0.8125rem', color: '#2F573E', lineHeight: 1.5, marginBottom: '18px' }}>
           <strong>{L(`${demoRemaining} av 5 AI-forsøk igjen.`, `${demoRemaining} of 5 AI attempts left.`)}</strong>{' '}
           {L('Hver gjenstand bruker ett forsøk. Gjenstandene lagres ikke.', 'Each item uses one attempt. The items are not saved.')}
         </div>
       )}
 
       {done && (
-        <div role="status" style={{ background: '#30342D', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '18px', marginBottom: '18px' }}>
-          <div style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.25rem', color: '#F2EEE6', marginBottom: '6px' }}>
+        <div role="status" style={{ background: '#EEF1E6', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '12px', padding: '18px', marginBottom: '18px' }}>
+          <div style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.25rem', color: '#2A1D14', marginBottom: '6px' }}>
             {L(`✓ ${done.saved} ${done.saved === 1 ? 'gjenstand' : 'gjenstander'} lagt til i boet`, `✓ ${done.saved} ${done.saved === 1 ? 'item' : 'items'} added to the estate`)}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#9DAA8C', lineHeight: 1.5, marginBottom: '14px' }}>
+          <p style={{ fontSize: '0.875rem', color: '#2F573E', lineHeight: 1.5, marginBottom: '14px' }}>
             {myRole === 'admin'
               ? L('Neste steg: inviter arvingene, så de kan se gjenstandene og vise interesse.', 'Next step: invite the heirs so they can see the items and show interest.')
               : L('Gjenstandene er nå synlige for alle i boet.', 'The items are now visible to everyone in the estate.')}
           </p>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {myRole === 'admin' && !isDemo && (
-              <button onClick={() => navigate(`/estate/${id}/admin`)} style={{ ...bigBtn, background: '#F2EEE6', color: '#1F221E', border: 'none' }}>
+              <button onClick={() => navigate(`/estate/${id}/admin`)} style={{ ...bigBtn, background: '#24392A', color: '#F4F2EB', border: 'none' }}>
                 {L('Inviter arvingene', 'Invite the heirs')}
               </button>
             )}
-            <button onClick={() => navigate(`/estate/${id}/gjenstander`)} style={{ ...bigBtn, background: myRole === 'admin' ? '#272A25' : '#F2EEE6', color: myRole === 'admin' ? '#F2EEE6' : '#1F221E', border: myRole === 'admin' ? `1px solid ${FIELD_BORDER}` : 'none' }}>
+            <button onClick={() => navigate(`/estate/${id}/gjenstander`)} style={{ ...bigBtn, background: myRole === 'admin' ? '#FCFCF9' : '#24392A', color: myRole === 'admin' ? '#2A1D14' : '#F4F2EB', border: myRole === 'admin' ? `1px solid ${FIELD_BORDER}` : 'none' }}>
               {L('Se gjenstandene', 'See the items')}
             </button>
-            <button onClick={() => { setDone(null); openCamera() }} style={{ ...bigBtn, background: '#272A25', color: '#F2EEE6', border: `1px solid ${FIELD_BORDER}` }}>
+            <button onClick={() => { setDone(null); openCamera() }} style={{ ...bigBtn, background: '#FCFCF9', color: '#2A1D14', border: `1px solid ${FIELD_BORDER}` }}>
               {L('Legg til flere', 'Add more')}
             </button>
           </div>
@@ -650,21 +650,21 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
       </div>
       <input ref={pickRef} type="file" accept="image/*" multiple onChange={onPick} style={{ display: 'none' }} />
       <input ref={addInputRef} type="file" accept="image/*" multiple onChange={onAddTo} style={{ display: 'none' }} />
-      <button onClick={addEmpty} disabled={full || !!busy || merging} style={{ background: 'none', border: 'none', color: '#C79A6B', cursor: 'pointer', fontSize: '0.8125rem', padding: '4px 0 18px', fontFamily: 'Karla, sans-serif', textDecoration: 'underline' }}>
+      <button onClick={addEmpty} disabled={full || !!busy || merging} style={{ background: 'none', border: 'none', color: '#6E4A2A', cursor: 'pointer', fontSize: '0.8125rem', padding: '4px 0 18px', fontFamily: 'Karla, sans-serif', textDecoration: 'underline' }}>
         {L('+ Legg til gjenstand uten bilde', '+ Add an item without a photo')}
       </button>
 
       {/* Hver for seg eller samme gjenstand? */}
       {pendingFiles && (
-        <div style={{ background: '#272A25', border: '2px solid #9DAA8C', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
-          <div style={{ fontSize: '0.9375rem', color: '#F2EEE6', fontWeight: '500', marginBottom: '12px' }}>
+        <div style={{ background: '#FCFCF9', border: '2px solid #2F573E', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+          <div style={{ fontSize: '0.9375rem', color: '#2A1D14', fontWeight: '500', marginBottom: '12px' }}>
             {L(`Du valgte ${pendingFiles.length} bilder. Hva viser de?`, `You chose ${pendingFiles.length} photos. What do they show?`)}
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button onClick={() => addAsSeparate(pendingFiles)} style={{ flex: '1 1 180px', padding: '12px', background: '#F2EEE6', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+            <button onClick={() => addAsSeparate(pendingFiles)} style={{ flex: '1 1 180px', padding: '12px', background: '#24392A', color: '#F4F2EB', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
               {L(`${pendingFiles.length} ulike gjenstander`, `${pendingFiles.length} different items`)}
             </button>
-            <button onClick={() => addAsOne(pendingFiles)} style={{ flex: '1 1 180px', padding: '12px', background: '#1F221E', color: '#F2EEE6', border: `1px solid ${FIELD_BORDER}`, borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
+            <button onClick={() => addAsOne(pendingFiles)} style={{ flex: '1 1 180px', padding: '12px', background: '#F1F3EA', color: '#2A1D14', border: `1px solid ${FIELD_BORDER}`, borderRadius: '8px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>
               {L('Samme gjenstand', 'The same item')}{pendingFiles.length > MAX_PHOTOS ? L(' (de 5 første)', ' (first 5)') : ''}
             </button>
             <button onClick={() => setPendingFiles(null)} style={{ ...smallBtn, border: 'none' }}>{L('Avbryt', 'Cancel')}</button>
@@ -678,8 +678,8 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
       {preparing && <p style={{ fontSize: '0.8125rem', color: MUTED, marginBottom: '12px' }}>{L('Klargjør bilder…', 'Preparing photos…')}</p>}
 
       {dragOver && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(95,110,82,0.18)', border: '4px dashed #9DAA8C', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-          <div style={{ background: '#272A25', padding: '16px 24px', borderRadius: '12px', fontSize: '1rem', color: '#F2EEE6' }}>{L('Slipp bildene her', 'Drop the photos here')}</div>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(95,110,82,0.18)', border: '4px dashed #2F573E', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div style={{ background: '#FCFCF9', padding: '16px 24px', borderRadius: '12px', fontSize: '1rem', color: '#2A1D14' }}>{L('Slipp bildene her', 'Drop the photos here')}</div>
         </div>
       )}
 
@@ -690,7 +690,7 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
             {L(`${drafts.length} av maks ${MAX_ITEMS} gjenstander`, `${drafts.length} of max ${MAX_ITEMS} items`)}
           </span>
           {!merging && mergeable.length >= 2 && (
-            <button onClick={startMerge} disabled={!!busy} style={{ ...smallBtn, padding: '8px 12px', fontSize: '0.8125rem', color: '#F2EEE6', background: '#272A25', opacity: busy ? 0.5 : 1 }}>
+            <button onClick={startMerge} disabled={!!busy} style={{ ...smallBtn, padding: '8px 12px', fontSize: '0.8125rem', color: '#2A1D14', background: '#FCFCF9', opacity: busy ? 0.5 : 1 }}>
               {L('Slå sammen gjenstander', 'Merge items')}
             </button>
           )}
@@ -706,13 +706,13 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
         const n = drafts.filter(d => canEstimate(d) && !d.estimate && !d.estimateMissing && !d.appraise).length
         if (merging || busy || !n || !drafts.some(d => d.status === 'analyzed')) return null
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px', fontSize: '0.9375rem', color: '#F2EEE6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', background: '#FCFCF9', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px', fontSize: '0.9375rem', color: '#2A1D14' }}>
             <span style={{ flex: '1 1 220px', lineHeight: 1.5 }}>
               {L('Vil du ha et grovt verdianslag? Verdien er valgfri og bare veiledende.', 'Would you like a rough value estimate? The value is optional and for guidance only.')}
               <span style={{ display: 'block', fontSize: '0.8125rem', color: MUTED }}>{L('Anslaget blir sikrere når materiale, stempel, merke og modell er lagt inn (Rett opplysningene på kortet).', 'The estimate is more reliable when material, hallmark, brand and model have been added (Correct the details on the card).')}</span>
               <span style={{ display: 'block', fontSize: '0.8125rem', color: MUTED }}>{L(`Bruker ${n} AI-forsøk.`, `Uses ${n} AI attempts.`)}</span>
             </span>
-            <button onClick={() => estimateValues()} style={{ ...smallBtn, background: '#272A25', color: '#F2EEE6', fontWeight: '600' }}>
+            <button onClick={() => estimateValues()} style={{ ...smallBtn, background: '#FCFCF9', color: '#2A1D14', fontWeight: '600' }}>
               {L(`Anslå verdi for alle (${n})`, `Estimate value for all (${n})`)}
             </button>
           </div>
@@ -720,12 +720,12 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
       })()}
 
       {estimateReport && !busy && (
-        <div role="status" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: '#30342D', border: '1px solid #C79A6B', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px', fontSize: '0.9375rem', color: '#F2EEE6', lineHeight: 1.5 }}>
+        <div role="status" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: '#EEF1E6', border: '1px solid #8A5A34', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px', fontSize: '0.9375rem', color: '#2A1D14', lineHeight: 1.5 }}>
           <span style={{ flex: 1 }}>
             {estimateReport.stoppedCode ? `${aiErrorMessage(estimateReport.stoppedCode)} ` : ''}
             {L(`Verdien ble ikke anslått for ${estimateReport.failed} ${estimateReport.failed === 1 ? 'gjenstand' : 'gjenstander'}. Du kan prøve igjen på kortet, eller la feltet stå tomt.`, `The value was not estimated for ${estimateReport.failed} ${estimateReport.failed === 1 ? 'item' : 'items'}. You can try again on the card, or leave the field empty.`)}
           </span>
-          <button onClick={() => setEstimateReport(null)} aria-label={L('Lukk meldingen', 'Close the message')} style={{ minWidth: '44px', minHeight: '44px', background: 'none', border: 'none', fontSize: '1.25rem', color: '#F2EEE6', cursor: 'pointer', marginTop: '-10px', marginRight: '-10px' }}>×</button>
+          <button onClick={() => setEstimateReport(null)} aria-label={L('Lukk meldingen', 'Close the message')} style={{ minWidth: '44px', minHeight: '44px', background: 'none', border: 'none', fontSize: '1.25rem', color: '#2A1D14', cursor: 'pointer', marginTop: '-10px', marginRight: '-10px' }}>×</button>
         </div>
       )}
 
@@ -748,14 +748,14 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
       </div>}
 
       {drafts.length === 0 && !pendingFiles && !done && (
-        <div style={{ textAlign: 'center', padding: '40px 16px', color: MUTED, fontSize: '0.875rem', border: '2px dashed rgba(242, 238, 230, 0.14)', borderRadius: '12px' }}>
+        <div style={{ textAlign: 'center', padding: '40px 16px', color: MUTED, fontSize: '0.875rem', border: '2px dashed rgba(42, 29, 20, 0.14)', borderRadius: '12px' }}>
           {L('Ingen gjenstander ennå. Start med å ta eller velge bilder.', 'No items yet. Start by taking or choosing photos.')}
         </div>
       )}
 
       {/* Handlinger nederst: alltid synlige, også med 20 kort */}
       {(drafts.length > 0 || undo) && (
-        <div ref={bottomBarRef} className="bottom-bar" role="region" aria-label={L('Lagre gjenstandene', 'Save the items')} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px max(16px, env(safe-area-inset-bottom))', background: '#272A25', borderTop: '1px solid rgba(242, 238, 230, 0.14)', boxShadow: '0 -4px 20px rgba(0,0,0,0.08)', zIndex: 100 }}>
+        <div ref={bottomBarRef} className="bottom-bar" role="region" aria-label={L('Lagre gjenstandene', 'Save the items')} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 16px max(16px, env(safe-area-inset-bottom))', background: '#FCFCF9', borderTop: '1px solid rgba(42, 29, 20, 0.14)', boxShadow: '0 -4px 20px rgba(16, 37, 26, 0.028)', zIndex: 100 }}>
           <div style={{ maxWidth: '720px', margin: '0 auto' }}>
             {askConsent && (
               <div style={{ marginBottom: '10px' }}>
@@ -768,17 +768,17 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
             )}
             {aiProgress && !merging && (
               <div style={{ marginBottom: '10px' }}>
-                <div role="status" style={{ fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '6px' }}>
+                <div role="status" style={{ fontSize: '0.875rem', color: '#2A1D14', marginBottom: '6px' }}>
                   {L(`AI analyserer… ${aiProgress.done} av ${aiProgress.total} ferdig. Du kan fortsette imens.`, `AI is analysing… ${aiProgress.done} of ${aiProgress.total} done. You can carry on meanwhile.`)}
                 </div>
-                <div style={{ height: '6px', background: '#30342D', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${aiProgress.total ? (aiProgress.done / aiProgress.total) * 100 : 0}%`, background: '#F2EEE6', transition: 'width 0.3s' }} />
+                <div style={{ height: '6px', background: '#EEF1E6', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${aiProgress.total ? (aiProgress.done / aiProgress.total) * 100 : 0}%`, background: '#24392A', transition: 'width 0.3s' }} />
                 </div>
               </div>
             )}
             {merging ? (
               <div>
-                <div style={{ fontSize: '0.8125rem', color: mergeSel.length > MAX_PHOTOS ? '#C79A6B' : '#F2EEE6', marginBottom: '10px' }}>
+                <div style={{ fontSize: '0.8125rem', color: mergeSel.length > MAX_PHOTOS ? '#6E4A2A' : '#2A1D14', marginBottom: '10px' }}>
                   {mergeSel.length > MAX_PHOTOS
                     ? L('Maks 5 bilder per gjenstand — fjern noen av de markerte', 'Max 5 photos per item — unmark some')
                     : mergeSel.length < 2
@@ -786,7 +786,7 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
                       : L(`${mergeSel.length} bilder blir én gjenstand`, `${mergeSel.length} photos become one item`)}
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={cancelMerge} style={{ flex: 1, padding: '14px 10px', background: '#272A25', color: '#F2EEE6', border: `1px solid ${FIELD_BORDER}`, borderRadius: '10px', cursor: 'pointer', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif' }}>
+                  <button onClick={cancelMerge} style={{ flex: 1, padding: '14px 10px', background: '#FCFCF9', color: '#2A1D14', border: `1px solid ${FIELD_BORDER}`, borderRadius: '10px', cursor: 'pointer', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif' }}>
                     {L('Avbryt', 'Cancel')}
                   </button>
                   {(() => {
@@ -794,7 +794,7 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
                     return (
                       <button onClick={approveMerge} disabled={!ok} style={{
                         flex: 2, padding: '14px 10px', border: 'none', borderRadius: '999px', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif', fontWeight: '500',
-                        background: ok ? '#F2EEE6' : '#30342D', color: ok ? '#1F221E' : '#F2EEE6', cursor: ok ? 'pointer' : 'not-allowed',
+                        background: ok ? '#24392A' : '#EEF1E6', color: ok ? '#F4F2EB' : '#2A1D14', cursor: ok ? 'pointer' : 'not-allowed',
                       }}>
                         {L('Godkjenn sammenslåing', 'Approve merge')}{mergeSel.length ? ` (${mergeSel.length})` : ''}
                       </button>
@@ -804,19 +804,19 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
               </div>
             ) : busy ? (
               <div>
-                <div role="status" style={{ fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '8px' }}>
+                <div role="status" style={{ fontSize: '0.875rem', color: '#2A1D14', marginBottom: '8px' }}>
                   {busy === 'estimating' ? L(`Anslår verdi… ${progress.done} av ${progress.total}`, `Estimating value… ${progress.done} of ${progress.total}`) : L(`Lagrer… ${progress.done} av ${progress.total}`, `Saving… ${progress.done} of ${progress.total}`)}
                 </div>
-                <div style={{ height: '8px', background: '#30342D', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${progress.total ? (progress.done / progress.total) * 100 : 0}%`, background: '#F2EEE6', transition: 'width 0.3s' }} />
+                <div style={{ height: '8px', background: '#EEF1E6', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${progress.total ? (progress.done / progress.total) * 100 : 0}%`, background: '#24392A', transition: 'width 0.3s' }} />
                 </div>
               </div>
             ) : !askConsent && (
               <>
                 {undo && !cameraDraft && (
-                  <div role="status" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9375rem', color: '#F2EEE6', marginBottom: '10px' }}>
+                  <div role="status" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9375rem', color: '#2A1D14', marginBottom: '10px' }}>
                     <span style={{ flex: 1 }}>{undo.text}</span>
-                    <button onClick={undoRemove} style={{ ...smallBtn, fontSize: '0.9375rem', color: '#F2EEE6', fontWeight: '600', background: '#272A25' }}>{L('Angre', 'Undo')}</button>
+                    <button onClick={undoRemove} style={{ ...smallBtn, fontSize: '0.9375rem', color: '#2A1D14', fontWeight: '600', background: '#FCFCF9' }}>{L('Angre', 'Undo')}</button>
                     <button onClick={dismissUndo} aria-label={L('Lukk meldingen', 'Close the message')} style={{ ...smallBtn, minWidth: '44px', border: 'none', fontSize: '1.125rem' }}>×</button>
                   </div>
                 )}
@@ -825,11 +825,11 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
                   const missing = drafts.filter(d => d.status !== 'saved' && d.status !== 'analyzing' && !d.title.trim() && !aiTargets.includes(d))
                   if (!toSave && !missing.length) return null
                   return (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.875rem', color: '#2A1D14', marginBottom: '8px' }}>
                       <span>{L(`${toSave} klare til lagring`, `${toSave} ready to save`)}</span>
                       {missing.length > 0 && <>
-                        <span style={{ color: '#C79A6B' }}>· {L(`${missing.length} mangler navn og lagres ikke`, `${missing.length} without a name will not be saved`)}</span>
-                        <button onClick={() => focusDraft(missing[0].key)} style={{ ...smallBtn, color: '#F2EEE6' }}>
+                        <span style={{ color: '#6E4A2A' }}>· {L(`${missing.length} mangler navn og lagres ikke`, `${missing.length} without a name will not be saved`)}</span>
+                        <button onClick={() => focusDraft(missing[0].key)} style={{ ...smallBtn, color: '#2A1D14' }}>
                           {L('Vis', 'Show')}
                         </button>
                       </>}
@@ -838,13 +838,13 @@ export default function AddItemsPage({ session, profile, onToast, isDemo }) {
                 })()}
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {aiTargets.length > 0 && (
-                    <button onClick={() => analyzeAll()} style={{ ...bigBtn, flex: '3 1 180px', background: '#F2EEE6', color: '#1F221E', border: 'none' }}>
+                    <button onClick={() => analyzeAll()} style={{ ...bigBtn, flex: '3 1 180px', background: '#24392A', color: '#F4F2EB', border: 'none' }}>
                       {L(`Analyser med AI (${aiTargets.length})`, `Analyse with AI (${aiTargets.length})`)}
                     </button>
                   )}
                   <button onClick={saveAll} disabled={!toSave} style={{
                     ...bigBtn, flex: '2 1 180px', border: 'none',
-                    background: toSave ? '#F2EEE6' : '#30342D', color: toSave ? '#1F221E' : '#F2EEE6', cursor: toSave ? 'pointer' : 'not-allowed',
+                    background: toSave ? '#24392A' : '#EEF1E6', color: toSave ? '#F4F2EB' : '#2A1D14', cursor: toSave ? 'pointer' : 'not-allowed',
                   }}>
                     {toSave ? L(`Godkjenn og lagre alle (${toSave})`, `Approve and save all (${toSave})`) : L('Godkjenn og lagre alle', 'Approve and save all')}
                   </button>
@@ -890,11 +890,11 @@ function SourceButton({ onClick, disabled, title, hint, primary, cameraReturn })
   return (
     <button onClick={onClick} disabled={disabled} data-camera-return={cameraReturn || undefined} style={{
       display: 'block', textAlign: 'left', padding: '16px', minHeight: '64px',
-      background: primary ? '#F2EEE6' : '#272A25', border: primary ? 'none' : `1px solid ${FIELD_BORDER}`, borderRadius: '12px',
+      background: primary ? '#24392A' : '#FCFCF9', border: primary ? 'none' : `1px solid ${FIELD_BORDER}`, borderRadius: '12px',
       cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, fontFamily: 'Karla, sans-serif',
     }}>
-      <span style={{ display: 'block', fontSize: '1rem', color: primary ? '#1F221E' : '#F2EEE6', fontWeight: '500' }}>{title}</span>
-      <span style={{ display: 'block', fontSize: '0.8125rem', color: primary ? '#30342D' : MUTED, lineHeight: 1.4, marginTop: '2px' }}>{hint}</span>
+      <span style={{ display: 'block', fontSize: '1rem', color: primary ? '#F4F2EB' : '#2A1D14', fontWeight: '500' }}>{title}</span>
+      <span style={{ display: 'block', fontSize: '0.8125rem', color: primary ? '#F4F2EB' : MUTED, lineHeight: 1.4, marginTop: '2px' }}>{hint}</span>
     </button>
   )
 }
@@ -905,7 +905,7 @@ function MergeGrid({ drafts, items, selected, onToggle }) {
   const photos = items.flatMap(d => d.photos.map(p => ({ ...p, itemNo: drafts.indexOf(d) + 1 })))
   return (
     <div>
-      <p style={{ fontSize: '0.875rem', color: '#F2EEE6', lineHeight: 1.5, marginBottom: '14px' }}>
+      <p style={{ fontSize: '0.875rem', color: '#2A1D14', lineHeight: 1.5, marginBottom: '14px' }}>
         {L('Trykk på bildene som viser samme gjenstand, og godkjenn nederst. Bildet du markerer først blir hovedbildet.',
            'Tap the photos that show the same item, then approve below. The first photo you mark becomes the main photo.')}
       </p>
@@ -915,14 +915,14 @@ function MergeGrid({ drafts, items, selected, onToggle }) {
           return (
             <button key={p.url} onClick={() => onToggle(p.url)} aria-pressed={order > 0} style={{
               position: 'relative', aspectRatio: '1', padding: 0, borderRadius: '10px', overflow: 'hidden', cursor: 'pointer',
-              border: order ? '3px solid #9DAA8C' : '1px solid rgba(242, 238, 230, 0.14)', background: '#30342D',
+              border: order ? '3px solid #2F573E' : '1px solid rgba(42, 29, 20, 0.14)', background: '#EEF1E6',
             }}>
               <img src={p.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               <span style={{
                 position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8125rem', fontWeight: '600',
-                fontFamily: 'Karla, sans-serif', background: order ? '#F2EEE6' : 'rgba(255,255,255,0.85)',
-                color: '#1F221E', border: order ? 'none' : '2px solid rgba(242, 238, 230, 0.14)', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                fontFamily: 'Karla, sans-serif', background: order ? '#24392A' : 'rgba(255,255,255,0.85)',
+                color: '#F4F2EB', border: order ? 'none' : '2px solid rgba(42, 29, 20, 0.14)', boxShadow: '0 1px 3px rgba(16, 37, 26, 0.105)',
               }}>{order || ''}</span>
               <span style={{
                 position: 'absolute', left: '6px', bottom: '6px', padding: '2px 7px', borderRadius: '10px',
@@ -944,7 +944,7 @@ function AiSummary({ report, drafts, onClose }) {
     .filter(({ d }) => report.failedKeys.includes(d.key) && d.status === 'failed' && !d.title.trim())
   if (!needs.length && !report.stoppedCode) return null
   return (
-    <div role="status" style={{ background: '#30342D', border: '1px solid #C79A6B', borderRadius: '12px', padding: '14px 16px', marginBottom: '14px', color: '#F2EEE6', fontSize: '0.9375rem', lineHeight: 1.5 }}>
+    <div role="status" style={{ background: '#EEF1E6', border: '1px solid #8A5A34', borderRadius: '12px', padding: '14px 16px', marginBottom: '14px', color: '#2A1D14', fontSize: '0.9375rem', lineHeight: 1.5 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
         <div style={{ flex: 1 }}>
           {report.stoppedCode && (
@@ -960,12 +960,12 @@ function AiSummary({ report, drafts, onClose }) {
             </p>
           )}
         </div>
-        <button onClick={onClose} aria-label={L('Lukk oppsummeringen', 'Close the summary')} style={{ minWidth: '44px', minHeight: '44px', background: 'none', border: 'none', fontSize: '1.25rem', color: '#F2EEE6', cursor: 'pointer', marginTop: '-10px', marginRight: '-10px' }}>×</button>
+        <button onClick={onClose} aria-label={L('Lukk oppsummeringen', 'Close the summary')} style={{ minWidth: '44px', minHeight: '44px', background: 'none', border: 'none', fontSize: '1.25rem', color: '#2A1D14', cursor: 'pointer', marginTop: '-10px', marginRight: '-10px' }}>×</button>
       </div>
       {needs.length > 0 && (
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
           {needs.map(({ d, no }) => (
-            <button key={d.key} onClick={() => focusDraft(d.key)} style={{ ...smallBtn, background: '#272A25', color: '#F2EEE6' }}>
+            <button key={d.key} onClick={() => focusDraft(d.key)} style={{ ...smallBtn, background: '#FCFCF9', color: '#2A1D14' }}>
               {L(`Gå til gjenstand ${no}`, `Go to item ${no}`)}
             </button>
           ))}
@@ -976,12 +976,12 @@ function AiSummary({ report, drafts, onClose }) {
 }
 
 const STATUS = {
-  analyzing: () => ({ text: L('AI analyserer…', 'AI is analysing…'), color: '#9DAA8C', bg: '#30342D' }),
-  analyzed: () => ({ text: L('✓ Fylt inn av AI – se over', '✓ Filled in by AI – review'), color: '#9DAA8C', bg: '#30342D' }),
-  failed: () => ({ text: L('AI klarte ikke denne', 'AI could not do this one'), color: '#C79A6B', bg: '#30342D' }),
-  saveFailed: () => ({ text: L('Kunne ikke lagres — prøv igjen', 'Could not be saved — try again'), color: '#C79A6B', bg: '#30342D' }),
-  saving: () => ({ text: L('Lagrer…', 'Saving…'), color: '#F2EEE6', bg: '#30342D' }),
-  saved: () => ({ text: L('✓ Lagret', '✓ Saved'), color: '#9DAA8C', bg: '#30342D' }),
+  analyzing: () => ({ text: L('AI analyserer…', 'AI is analysing…'), color: '#2F573E', bg: '#EEF1E6' }),
+  analyzed: () => ({ text: L('✓ Fylt inn av AI – se over', '✓ Filled in by AI – review'), color: '#2F573E', bg: '#EEF1E6' }),
+  failed: () => ({ text: L('AI klarte ikke denne', 'AI could not do this one'), color: '#6E4A2A', bg: '#EEF1E6' }),
+  saveFailed: () => ({ text: L('Kunne ikke lagres — prøv igjen', 'Could not be saved — try again'), color: '#6E4A2A', bg: '#EEF1E6' }),
+  saving: () => ({ text: L('Lagrer…', 'Saving…'), color: '#2A1D14', bg: '#EEF1E6' }),
+  saved: () => ({ text: L('✓ Lagret', '✓ Saved'), color: '#2F573E', bg: '#EEF1E6' }),
 }
 
 function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRemove, onRemovePhoto, onMergeUp, onSplit, onRetry, onEstimate, onAddPhotos, onCamera }) {
@@ -1008,14 +1008,14 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
   const photoTip = !disabled && d.photos.length < MAX_PHOTOS ? ai?.photo_suggestions?.[0]?.reason : null
   const valueField = (
     <div style={{ marginTop: showValueInMore ? 0 : '8px' }}>
-      {!showValueInMore && <label htmlFor={`value-${d.key}`} style={{ display: 'block', fontSize: '0.875rem', color: '#F2EEE6', marginBottom: '4px' }}>{L('Verdi i kroner (valgfri)', 'Value in NOK (optional)')}</label>}
+      {!showValueInMore && <label htmlFor={`value-${d.key}`} style={{ display: 'block', fontSize: '0.875rem', color: '#2A1D14', marginBottom: '4px' }}>{L('Verdi i kroner (valgfri)', 'Value in NOK (optional)')}</label>}
       <input id={`value-${d.key}`} value={d.value} onChange={e => onChange({ value: e.target.value })} disabled={disabled || d.estimating} inputMode="numeric"
         aria-label={showValueInMore ? L('Verdi i NOK (valgfri)', 'Value in NOK (optional)') : undefined} aria-describedby={aiValue ? `est-${d.key}` : undefined}
         placeholder={d.estimating ? L('Anslår verdi…', 'Estimating value…') : L('Verdi i NOK (valgfri)', 'Value in NOK (optional)')} style={inputStyle} />
       {aiValue && (
-        <div id={`est-${d.key}`} style={{ fontSize: '0.8125rem', color: '#F2EEE6', marginTop: '4px', lineHeight: 1.5 }}>
+        <div id={`est-${d.key}`} style={{ fontSize: '0.8125rem', color: '#2A1D14', marginTop: '4px', lineHeight: 1.5 }}>
           {L('Veiledende AI-anslag, ikke en dokumentert markedsverdi', 'Indicative AI estimate, not a documented market value')}
-          {d.estimate.low && d.estimate.high ? <>{'. '}<strong style={{ color: '#F2EEE6' }}>{L('Sannsynlig spenn', 'Likely range')}: {formatRange(d.estimate.low, d.estimate.high)}</strong></> : ''}
+          {d.estimate.low && d.estimate.high ? <>{'. '}<strong style={{ color: '#2A1D14' }}>{L('Sannsynlig spenn', 'Likely range')}: {formatRange(d.estimate.low, d.estimate.high)}</strong></> : ''}
           {'. '}{L('Du kan endre eller tømme feltet.', 'You can change or clear the field.')}
           {d.estimate.advice === 'suggest' && <> {suggestText(d.estimate.valuation, d.analysis)}</>}
         </div>
@@ -1023,26 +1023,26 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
     </div>
   )
   return (
-    <div id={`draft-${d.key}`} style={{ background: '#272A25', border: `1px solid ${d.status === 'failed' || d.status === 'saveFailed' ? '#C79A6B' : 'rgba(242, 238, 230, 0.14)'}`, borderRadius: '12px', padding: '14px', opacity: d.status === 'saved' ? 0.6 : 1 }}>
+    <div id={`draft-${d.key}`} style={{ background: '#FCFCF9', border: `1px solid ${d.status === 'failed' || d.status === 'saveFailed' ? '#8A5A34' : 'rgba(42, 29, 20, 0.14)'}`, borderRadius: '12px', padding: '14px', opacity: d.status === 'saved' ? 0.6 : 1 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '0.8125rem', color: MUTED }}>{L(`Gjenstand ${index + 1}`, `Item ${index + 1}`)}{d.photos.length > 1 ? L(` · ${d.photos.length} bilder`, ` · ${d.photos.length} photos`) : ''}</span>
         {status && <span style={{ fontSize: '0.8125rem', color: status.color, background: status.bg, padding: '3px 9px', borderRadius: '12px' }}>{status.text}</span>}
       </div>
       {d.status === 'failed' && !locked && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px', fontSize: '0.8125rem', color: '#C79A6B' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px', fontSize: '0.8125rem', color: '#6E4A2A' }}>
           <span>{L('Fyll inn selv, eller', 'Fill it in yourself, or')}</span>
-          <button onClick={onRetry} style={{ ...smallBtn, minHeight: '40px', fontSize: '0.8125rem', color: '#F2EEE6' }}>{L('Prøv AI igjen', 'Try AI again')}</button>
+          <button onClick={onRetry} style={{ ...smallBtn, minHeight: '40px', fontSize: '0.8125rem', color: '#2A1D14' }}>{L('Prøv AI igjen', 'Try AI again')}</button>
         </div>
       )}
 
       {/* Bilder */}
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
         {d.photos.map((p, i) => (
-          <div key={p.url} style={{ position: 'relative', width: '84px', height: '84px', borderRadius: '8px', overflow: 'hidden', background: '#30342D' }}>
+          <div key={p.url} style={{ position: 'relative', width: '84px', height: '84px', borderRadius: '8px', overflow: 'hidden', background: '#EEF1E6' }}>
             <img src={p.url} alt={L(`Gjenstand ${index + 1}, bilde ${i + 1}`, `Item ${index + 1}, photo ${i + 1}`)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             {!disabled && (
               <button onClick={() => onRemovePhoto(i)} aria-label={L(`Slett bilde ${i + 1}`, `Delete photo ${i + 1}`)} style={{
-                position: 'absolute', top: '2px', right: '2px', background: 'rgba(0,0,0,0.65)', color: '#fff', border: 'none',
+                position: 'absolute', top: '2px', right: '2px', background: 'rgba(20, 30, 24, 0.52)', color: '#fff', border: 'none',
                 borderRadius: '50%', width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.125rem', lineHeight: '1', padding: 0,
               }}>×</button>
             )}
@@ -1075,26 +1075,26 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
         </p>
       )}
       {multiple && (
-        <p style={{ fontSize: '0.8125rem', color: '#C79A6B', background: '#30342D', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '0.8125rem', color: '#6E4A2A', background: '#EEF1E6', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
           {multiple}{d.photos.length > 1 ? ` ${L('Du kan også dele opp kortet nedenfor.', 'You can also split the card below.')}` : ''}
         </p>
       )}
       {metal && !metal.answered && !disabled && <MetalQuestion metal={metal} idPrefix={`metal-${d.key}`} onAnswer={text => saveFix({ material: text })} />}
       {(d.estimate || d.estimating) && valueField}
       {d.appraise && !d.estimate && !d.estimating && (
-        <div role="status" style={{ fontSize: '0.8125rem', color: '#F2EEE6', background: '#30342D', border: '2px solid #C79A6B', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
-          <strong style={{ color: '#F2EEE6' }}>{d.appraise.title}.</strong> {d.appraise.body}{' '}
+        <div role="status" style={{ fontSize: '0.8125rem', color: '#2A1D14', background: '#EEF1E6', border: '2px solid #8A5A34', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
+          <strong style={{ color: '#2A1D14' }}>{d.appraise.title}.</strong> {d.appraise.body}{' '}
           {L('Verdien står tom (ukjent) når du lagrer.', 'The value is left empty (unknown) when you save.')}
         </div>
       )}
       {d.estimateMissing && !d.estimate && !d.estimating && (
-        <p style={{ fontSize: '0.8125rem', color: '#F2EEE6', background: '#1F221E', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '0.8125rem', color: '#2A1D14', background: '#F1F3EA', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '8px', padding: '8px 10px', margin: '8px 0 0', lineHeight: 1.5 }}>
           {L('For lite informasjon til å anslå verdi.', 'Too little information to estimate a value.')}
           {d.estimateMissing.length > 0 && <> {L('Dette kan hjelpe', 'This could help')}: {d.estimateMissing.join('; ')}.</>}
         </p>
       )}
       <details style={{ marginTop: '8px' }}>
-        <summary style={{ cursor: 'pointer', fontSize: '0.875rem', color: '#F2EEE6', padding: '10px 0', minHeight: '44px', boxSizing: 'border-box' }}>
+        <summary style={{ cursor: 'pointer', fontSize: '0.875rem', color: '#2A1D14', padding: '10px 0', minHeight: '44px', boxSizing: 'border-box' }}>
           {showValueInMore
             ? <>{L('Mer', 'More')}{d.description.trim() || d.value ? ` · ${[d.description.trim() && L('beskrivelse', 'description'), d.value && formatNOK(d.value)].filter(Boolean).join(' · ')}` : ` · ${L('beskrivelse og verdi (valgfritt)', 'description and value (optional)')}`}</>
             : <>{L('Mer', 'More')} · {d.description.trim() ? L('beskrivelse', 'description') : L('beskrivelse (valgfritt)', 'description (optional)')}</>}
@@ -1105,7 +1105,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
             style={{ ...inputStyle, resize: 'vertical', fontSize: '0.9375rem' }} />
           {showValueInMore && valueField}
           {ai && (
-            <div style={{ borderTop: '1px solid rgba(242, 238, 230, 0.14)', paddingTop: '8px' }}>
+            <div style={{ borderTop: '1px solid rgba(42, 29, 20, 0.14)', paddingTop: '8px' }}>
               {fixing && !disabled ? (
                 <AiCorrectionsForm record={d.analysis} idPrefix={`fix-${d.key}`} onSave={saveFix} onCancel={() => setFixing(false)} />
               ) : (
@@ -1124,7 +1124,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
           {d.title.trim() && !d.estimate && !d.estimating && !d.appraise && <button onClick={onEstimate} style={smallBtn}>{L('Anslå verdi (AI)', 'Estimate value (AI)')}</button>}
           {d.photos.length > 1 && <button onClick={onSplit} style={smallBtn}>{L('Del opp: ett bilde per gjenstand', 'Split: one photo per item')}</button>}
           {onMergeUp && <button onClick={onMergeUp} style={smallBtn}>{L('↑ Samme gjenstand som over', '↑ Same item as above')}</button>}
-          <button onClick={onRemove} style={{ ...smallBtn, color: '#C79A6B' }}>{L('Fjern', 'Remove')}</button>
+          <button onClick={onRemove} style={{ ...smallBtn, color: '#6E4A2A' }}>{L('Fjern', 'Remove')}</button>
         </div>
       )}
     </div>
@@ -1132,7 +1132,7 @@ function DraftCard({ draft: d, index, categories, locked, userId, onChange, onRe
 }
 
 const tileStyle = {
-  width: '84px', height: '84px', borderRadius: '8px', border: `2px dashed ${FIELD_BORDER}`, background: '#1F221E',
-  cursor: 'pointer', fontSize: '0.8125rem', color: '#F2EEE6', fontFamily: 'Karla, sans-serif', lineHeight: 1.3,
+  width: '84px', height: '84px', borderRadius: '8px', border: `2px dashed ${FIELD_BORDER}`, background: '#F1F3EA',
+  cursor: 'pointer', fontSize: '0.8125rem', color: '#2A1D14', fontFamily: 'Karla, sans-serif', lineHeight: 1.3,
   padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
 }

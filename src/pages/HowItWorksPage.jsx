@@ -39,7 +39,7 @@ const TRINN = () => [
       'Svaret registreres på deg. Du kan skrive hvorfor gjenstanden betyr noe for deg, men du må ikke.',
       'The answer is registered to you. You can write why the item matters to you, but you do not have to.',
     ),
-    bilde: { src: 'j-svar.webp', w: 900, h: 141, zoom: 1.5 },
+    bilde: { src: 'j-svar.webp', w: 900, h: 97, zoom: 1.5, bg: '#FCFCF9' },
     alt: L(
       'Skjermbilde fra demoen: knappene «Registrer interesse» og «Ikke interessert» på oljemaleriets side.',
       'Screenshot from the demo (Norwegian interface): the «Registrer interesse» and «Ikke interessert» buttons on the painting’s page.',
@@ -54,10 +54,10 @@ const TRINN = () => [
       'Gjenstanden merkes «2 vil ha» i galleriet, med navnene på dem som har svart. Filteret «Ettertraktede» samler alle slike gjenstander.',
       'The item is marked «2 vil ha» (2 want it) in the gallery, with the names of those who answered. The «Ettertraktede» (contested) filter gathers every item like it.',
     ),
-    bilde: { src: 'f-flere.webp', w: 640, h: 360, zoom: 1.4 },
+    bilde: { src: 'f-flere.webp', w: 640, h: 464, zoom: 1.4, bg: '#F1F3EA' },
     alt: L(
-      'Skjermbilde fra demoen: to gjenstandskort merket «2 vil ha» — oljemaleriet og familiealbumet — med navnene Lars Hansen og Kari Hansen under.',
-      'Screenshot from the demo (Norwegian interface): two item cards marked «2 vil ha» (2 want it) — the oil painting and the family album — with the names Lars Hansen and Kari Hansen below.',
+      'Skjermbilde fra demoen: to gjenstandskort merket «2 vil ha» — Bestemors gyngestol og oljemaleriet — med navnene Lars Hansen og Kari Hansen under.',
+      'Screenshot from the demo (Norwegian interface): two item cards marked «2 vil ha» (2 want it) — grandmother’s rocking chair and the oil painting — with the names Lars Hansen and Kari Hansen below.',
     ),
     cap: L('Merket står på kortet, sammen med hvem som har svart.', 'The mark sits on the card, together with who has answered.'),
   },
@@ -69,7 +69,7 @@ const TRINN = () => [
       'Arvklart ber dere snakke sammen først, og viser begrunnelsene ved siden av hverandre i stedet for i hver sin samtale. Hver av dere kan trekke sitt eget ønske.',
       'Arvklart asks you to talk it over first, and shows the explanations next to each other instead of in separate conversations. Each of you can withdraw your own wish.',
     ),
-    bilde: { src: 'j-onsker.webp', w: 1060, h: 454, zoom: 2.1 },
+    bilde: { src: 'j-onsker.webp', w: 1060, h: 434, zoom: 2.1, bg: '#FCFCF9' },
     alt: L(
       'Skjermbilde fra demoen: «Flere ønsker denne (2)» med teksten «Snakk sammen først» og begrunnelsene fra Lars Hansen og Kari Hansen.',
       'Screenshot from the demo (Norwegian interface): «Flere ønsker denne (2)» (Several want this) with the text «Snakk sammen først» (Talk it over first) and the explanations from Lars Hansen and Kari Hansen.',
@@ -84,7 +84,7 @@ const TRINN = () => [
       'Ingen metode starter av seg selv. Administrator gjennomfører den valgte metoden, og resultatet er et forslag dere kan justere før det registreres.',
       'No method starts on its own. The administrator carries out the chosen method, and the result is a proposal you can adjust before it is registered.',
     ),
-    bilde: { src: 'p-metoder.webp', w: 680, h: 469, zoom: 1.4 },
+    bilde: { src: 'p-metoder.webp', w: 680, h: 467, zoom: 1.4, bg: '#F1F3EA' },
     alt: L(
       'Skjermbilde fra demoen: valget mellom Loddtrekning, Vekslende runder og Jevn verdifordeling.',
       'Screenshot from the demo (Norwegian interface): the choice between Loddtrekning (lottery), Vekslende runder (alternating rounds) and Jevn verdifordeling (even value split).',
@@ -192,7 +192,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
         )}>
         <figure className="shotfig del__shot">
           <div className="deskframe" style={{ '--zoom': 1.5 }}>
-            <Img lazy src="i-legg-til.webp" w={640} h={344}
+            <Img lazy src="i-legg-til.webp" w={640} h={364}
               alt={L('Skjermbilde fra demoen: skjemaet «Legg til gjenstand» med «Bilder (valgfri, maks 5)», knappene «Ta bilder» og «Velg bilder», og feltet «Navn på gjenstand».',
                 'Screenshot from the demo (Norwegian interface): the «Legg til gjenstand» (Add item) form with «Bilder (valgfri, maks 5)» (photos, optional, max 5), the «Ta bilder» (Take photos) and «Velg bilder» (Choose photos) buttons, and the «Navn på gjenstand» (Item name) field.')} />
           </div>
@@ -230,7 +230,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
           </div>
           <figure className="shotfig utdyp__shot">
             <div className="deskframe" style={{ '--zoom': 2.0 }}>
-              <Img lazy src="j-verdi.webp" w={900} h={440}
+              <Img lazy src="j-verdi.webp" w={900} h={450}
                 alt={L('Skjermbilde fra demoen: oljemaleriets side med «Fordelingsverdi (foreslått) 4 000 kr — fra AI-anslaget» og forklaringen under.',
                   'Screenshot from the demo (Norwegian interface): the painting’s page with «Fordelingsverdi (foreslått) 4 000 kr» (proposed distribution value, from the AI estimate) and the explanation below.')} />
             </div>
@@ -248,7 +248,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
         )}>
         <figure className="shotfig del__shot del__shot--bred">
           <div className="deskframe" style={{ '--zoom': 1.7 }}>
-            <Img lazy src="f-filtre.webp" w={1320} h={84}
+            <Img lazy src="f-filtre.webp" w={1320} h={70}
               alt={L('Skjermbilde fra demoen: verktøylinjen over galleriet med søkefeltet, valget «Alle gjenstander (10)», «Alle kategorier» og byttet mellom Bilder og Analyse.',
                 'Screenshot from the demo (Norwegian interface): the toolbar above the gallery with the search field, the «Alle gjenstander (10)» (all items) choice, «Alle kategorier» (all categories) and the switch between Bilder (pictures) and Analyse (analysis).')} />
           </div>
@@ -316,7 +316,8 @@ export default function HowItWorksPage({ loggedIn = false }) {
             {trinn.map((t, i) => (
               <div className={`trinn__steg s${i + 1}`} key={t.id}>
                 <figure className="shotfig">
-                  <div className="deskframe" style={{ '--zoom': t.bilde.zoom }}>
+                  {/* bg: flaten bildet er tatt fra (kort eller side), så det glir inn i den faste rammehøyden */}
+                  <div className="deskframe" style={{ '--zoom': t.bilde.zoom, background: t.bilde.bg }}>
                     <Img lazy src={t.bilde.src} w={t.bilde.w} h={t.bilde.h} alt={t.alt} />
                   </div>
                   <Cap>{t.cap}</Cap>
@@ -366,7 +367,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
         )}>
         <figure className="shotfig del__shot del__shot--smal">
           <div className="deskframe" style={{ '--zoom': 1.6 }}>
-            <Img lazy src="m-fordeling.webp" w={620} h={525}
+            <Img lazy src="m-fordeling.webp" w={620} h={575}
               alt={L('Skjermbilde fra demoen: siden «Fordelingen» med teksten om at alt er foreløpig til alle har godkjent, og knappen «Last ned utkast (PDF)».',
                 'Screenshot from the demo (Norwegian interface): the «Fordelingen» (The distribution) page with the text saying everything is provisional until everyone has approved, and the «Last ned utkast (PDF)» button.')} />
           </div>
@@ -412,7 +413,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
           </div>
           <figure className="shotfig utdyp__shot">
             <div className="deskframe" style={{ '--zoom': 1.6 }}>
-              <Img lazy src="m-godkjenning.webp" w={620} h={405}
+              <Img lazy src="m-godkjenning.webp" w={620} h={432}
                 alt={L('Skjermbilde fra demoen: avsnittet «Godkjenning», som sier at godkjenningen registreres med innloggingen din og at Arvklart ikke verifiserer identitet med BankID.',
                   'Screenshot from the demo (Norwegian interface): the «Godkjenning» (Approval) section, stating that the approval is registered with your login and that Arvklart does not verify identity with BankID.')} />
             </div>

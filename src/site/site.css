@@ -578,15 +578,14 @@ må holde kontrastkravet. */
   margin:0;display:grid;gap:14px;align-content:start;justify-items:start
 }
 /* ---- rammene rundt produktbildene (Julies tilbakemelding) ----
-   Appen er mørk (Natt, grønnsort), og skjermbildene er ekte og urørte. I stedet for en beige
-   passepartout, som gjorde dem til tunge, brune blokker på lys silke, står de i en ramme av
-   samme smaragd som heroen og veiviseren. Da hører bildet og siden til samme materiale.
-   Ingen filter, blandingsmodus eller fargetone på selve bildene. */
+   Rammen er et lite «appvindu»: en smal smaragdlist øverst, som topplinjen i appen, og ellers en tynn kant og en
+   myk skygge. Appen har lyse arbeidsflater under en smaragd topplinje (docs/app-lys.md), så rammen speiler
+   produktet i stedet for å pynte på det. Bildene er ekte utsnitt fra demoen og ikke redigert. */
 .ak{
   --ramme:
     radial-gradient(120% 90% at 0% 0%,rgba(54,100,74,.55),rgba(54,100,74,0) 60%),
     linear-gradient(160deg,#22402F,#1B3527 60%,#152C20);
-  --ramme-skygge:0 1px 0 rgba(255,255,255,.08) inset,0 30px 60px -38px rgba(16,37,26,.55),0 8px 18px -12px rgba(16,37,26,.35);
+  --ramme-skygge:0 30px 60px -38px rgba(16,37,26,.45),0 8px 18px -12px rgba(16,37,26,.25);
 }
 .ak .phoneframe{
   border:1px solid rgba(244,242,235,.22);border-radius:26px;padding:7px;
@@ -601,11 +600,12 @@ må holde kontrastkravet. */
   background:rgba(0,0,0,.18);box-shadow:none
 }
 .ak .deskframe,.ak .sh__f{
-  border:1px solid rgba(21,44,32,.5);border-radius:14px;padding:clamp(7px,.8vw,11px);
-  background:var(--ramme);box-shadow:var(--ramme-skygge)
+  position:relative;overflow:hidden;padding:0;
+  border:1px solid rgba(42,29,20,.14);border-top:clamp(8px,.7vw,11px) solid #1B3527;border-radius:12px;
+  background:#F1F3EA;box-shadow:var(--ramme-skygge)
 }
 .ak .deskframe img,.ak .sh__f img{
-  border-radius:7px;width:100%
+  border-radius:0;width:100%
 }
 .ak .g-natt .deskframe,.ak .g-jord .deskframe{
   border-color:rgba(244,242,235,.22);background:rgba(0,0,0,.18);box-shadow:none
@@ -1260,10 +1260,10 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
   margin:4px 0 6px
 }
 .ak .prosess__bilde .sh__f{
-  padding:6px;border-radius:12px
+  border-radius:10px
 }
 .ak .prosess__bilde img{
-  aspect-ratio:16/9;object-fit:cover;object-position:left top;border-radius:6px
+  aspect-ratio:16/9;object-fit:cover;object-position:left top
 }
 .ak .prosess + .cap{
   display:block;max-width:none;margin-top:clamp(14px,1.6vw,20px)

@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { L } from '../lib/lang'
 import { getTextSize, setTextSize } from '../lib/textSize'
 
-// Fargene i den mørke appen, og på de lyse sidene for utloggede (innloggingen)
+// app: appens lyse arbeidsflater og kontomenyen. light: de lyse sidene for utloggede (innloggingen)
 const TONES = {
-  dark: { label: '#B9B4A8', on: '#F2EEE6', onText: '#1F221E', onBorder: '#9DAA8C', off: '#272A25', offText: '#F2EEE6', offBorder: 'rgba(242, 238, 230, 0.4)' },
-  light: { label: '#575B5E', on: '#2F4A43', onText: '#F5F2EB', onBorder: '#2F4A43', off: '#fff', offText: '#1F2326', offBorder: '#575B5E' },
+  app: { label: '#4F463A', on: '#24392A', onText: '#F4F2EB', onBorder: '#2F573E', off: '#FCFCF9', offText: '#2A1D14', offBorder: 'rgba(42, 29, 20, 0.5)' },
+  light: { label: '#4F463A', on: '#24392A', onText: '#F4F2EB', onBorder: '#24392A', off: '#fff', offText: '#2A1D14', offBorder: '#4F463A' },
 }
 
 // Valg av tekststørrelse (Normal / Stor / Ekstra stor). Samme design for alle, bare større tekst.
 // light: lyse farger, på sidene for utloggede (innloggingen)
 export default function TextSizeControl({ compact = false, light = false }) {
-  const t = light ? TONES.light : TONES.dark
+  const t = light ? TONES.light : TONES.app
   const [size, setSize] = useState(getTextSize)
   const choose = (key) => { setTextSize(key); setSize(key) }
   const options = [
