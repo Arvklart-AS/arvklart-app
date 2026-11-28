@@ -63,14 +63,14 @@ Ingressen sier at rekkefølgen ikke er fast («Dere kan legge til gjenstander un
 flere omganger»), fordi produktet fungerer slik. KI-hjelpen er én linje under stegene i stedet for et
 eget bånd. Detaljene står på «Slik fungerer det».
 
-Målt med seksjonen øverst under headeren (bunnen av de fire stegene):
+Målt i Chromium med seksjonen rullet til toppen, rett under headeren (px fra toppen av vinduet):
 
-| Skjerm | Stegene slutter ved | Får plass |
-|---|---|---|
-| 1920×1080 | ~830 px | ja, med fotlinjen |
-| 1440×900 | ~830 px | ja, med fotlinjen |
-| 1366×768 | ~690 px | alle fire steg; fotlinjen under |
-| 1280×720 | ~660 px | alle fire steg; fotlinjen under |
+| Skjerm | De fire stegene slutter | Fotlinjen (KI + lenke) slutter | Alle fire steg synlige |
+|---|---|---|---|
+| 1920×1080 | 702 | 857 | ja, med fotlinjen |
+| 1440×900 | 698 | 854 | ja, med fotlinjen |
+| 1366×768 | 683 | 839 | ja; fotlinjen under |
+| 1280×720 | 666 | 820 | ja; fotlinjen under |
 
 Mobil: én kolonne, nummer til venstre, lite bilde under teksten.
 
