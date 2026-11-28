@@ -10,7 +10,7 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 
 ## Teknisk stack
 - **Frontend**: React 18 + Vite, inline JSX-styles (ingen CSS-filer i appen)
-- **Design**: Appens komponenter bruker inline `style`-props med palette-tokens (se nedenfor). **Unntak: de offentlige markedssidene** (`/`, `/slik-fungerer-det`, `/om-oss`, `/kontakt`) har sitt eget designsystem i `src/site/` med all CSS i `src/site/site.css`, avgrenset til rotklassen `.ak`. Egen fil fordi ~1 000 linjer CSS i en JavaScript-streng ville sprengt budsjettet for offentlige sider; som stilark teller den ikke med. **Avgrensningen går én vei:** ingen regel i `site.css` treffer utenfor `.ak`, men appens globale reset i `index.html` (`* { margin:0; padding:0 }`, `:focus-visible`, skriftstørrelse) gjelder også inne i `.ak`. Derfor settes marger på `dl`, `dd`, `figure` m.fl. uttrykkelig i `site.css` i stedet for å bygge på nettleserens standardverdier. Se `docs/ny-offentlig-nettside.md`
+- **Design**: Appens komponenter bruker inline `style`-props med palette-tokens (se nedenfor). **Unntak: de offentlige markedssidene** (`/`, `/slik-fungerer-det`, `/om-oss`, `/kontakt`) har sitt eget designsystem i `src/site/` med all CSS i `src/site/site.css`, avgrenset til rotklassen `.ak`. Egen fil fordi ~1 000 linjer CSS i en JavaScript-streng ville sprengt budsjettet for offentlige sider; som stilark teller den ikke med. **Avgrensningen går én vei:** ingen regel i `site.css` treffer utenfor `.ak`, men appens globale reset i `index.html` (`* { margin:0; padding:0 }`, `:focus-visible`, skriftstørrelse) gjelder også inne i `.ak`. Derfor settes marger på `dl`, `dd`, `figure` m.fl. uttrykkelig i `site.css` i stedet for å bygge på nettleserens standardverdier. Se `docs/ny-offentlig-nettside.md`, og `docs/nettside-v4.md` for det visuelle uttrykket (smaragd og silke fra designdemo v4: palett med målt kontrast, typografisk skala `--fs-*`, flatene `g-natt`/`g-papir`/`g-lin`/`g-jord`, kurvene `kurve-ned`/`kurve-begge`, smaragdrammen rundt skjermbildene). Ingen bevegelse utover ordskiftet i heroen (med pauseknapp); ingen scrolldrevne effekter
 - **Fonter**: Karla og Fraunces fra Google Fonts (`index.html`) for appen **og for markedssidene** — de offentlige sidene gjør altså fortsatt to eksterne kall (`fonts.googleapis.com`, `fonts.gstatic.com`), uavhengig av samtykke; **Bodoni Moda** selvhostes fra `public/fonter/` og brukes bare på markedssidene, til overskrifter. Ikke lag en lokal `@font-face` med familienavnet `Karla` — den ville overstyrt appens vekter 300/500/600 med den ene 400-fila
 - **Database**: Supabase (PostgreSQL) — se `supabase/README.md` for struktur, rekkefølge og deploy
 - **Auth**: Supabase Auth (e-post/passord, glemt passord). Navnet ved registrering lagres i `user_metadata.display_name`, og profilen opprettes fra det ved første innlogging (`App.jsx`)
@@ -41,28 +41,32 @@ ArvKlart er en norsk SaaS-tjeneste for arveoppgjør. React 18 + Vite SPA, Supaba
 - `scripts/smoke-browser.mjs` (`.github/workflows/smoke.yml`) er en røyktest i ekte nettleser mot forhåndsvisningen og produksjonen: forsiden, `/home`, `/app` uten innlogging, innlogging med feil passord, nytt passord, invitasjon, veiviseren (i siden, uten iframe; `/veiviser.html` gir 308), personvern og demoen med navigering i demo-boet. Ingen ekte kontoer; den rapporterer bare
 
 ## Fargepalett — bruk alltid disse
-Fargene er fra «Fargepalett.pdf» (designsystemet «Arvklart» → Farger). **Den innloggede appen er mørk**, i samme uttrykk som arvklart.no (`src/site/site.css`):
+Appen har **lyse, rolige arbeidsflater under en smaragdgrønn topplinje**, i samme familie som den offentlige nettsiden (designdemo v4, `docs/nettside-v4.md`). Omleggingen fra den mørke appen er beskrevet i `docs/app-lys.md`, med kontrasttall. Ingen bakgrunnseffekter i arbeidsflatene.
 ```
-#1F221E  natt (bakgrunn og toppmenyen)
-#272A25  flate (kort; Natt løftet litt)
-#30342D  flate høy (bokser, dialoger, menyer, bildebakgrunn)
-#F2EEE6  lin (tekst, og fylte knapper med Natt-tekst)
-#B9B4A8  lin dempet (sekundærtekst; 8,5:1 mot Natt)
-rgba(242,238,230,.14)  hårstreker   rgba(242,238,230,.4)  feltkanter (3:1)
-#9DAA8C  mose (aksent, «ferdig», fokusring)
-#C79A6B  messing lys (overlinjene)    #D7BA9A  ordfarge (fremhevet ord i store overskrifter)
-#E08A7A  rust lys (feil og sletting)  #2F4A43  granskog (mørk grønn flate, f.eks. demobanneret)
+#F1F3EA  side (bakgrunnen i appen, lys silke)      #1B3527  topp (topplinjen, som headeren på nettsiden)
+#FCFCF9  flate (kort, paneler, menyer, dialoger)   #EEF1E6  flate høy (bokser i kort, bildebakgrunn)
+#2A1D14  blekk (tekst; 15,9:1 mot flate)           #4F463A  dempet (sekundærtekst; 9,0:1)
+#24392A  smaragd (primærknapp, valgt tilstand, med lin tekst #F4F2EB; 11,1:1)   #2F573E  hover og jade
+#2F573E  jade (aksent, «ferdig», fokusring, fremdrift; 7,3:1)
+#6E4A2A  messing (overlinjene)    #7A5230  ordfarge (fremhevet ord i store overskrifter)
+#9A3B2E  rust (feil og sletting)  #EFE4D3  varm lin (merket «N vil ha», demobanneret)
+#5E6A61  deaktivert knapp (lin tekst 5,1:1 – en deaktivert knapp skal fortsatt kunne leses)
+rgba(42,29,20,.12–.14)  hårstreker   rgba(42,29,20,.5)  feltkanter og konturknapper (3:1)
 ```
-Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som også bestemmer hvilke sider som er lyse (`isLightAppPath`) og har den globale CSS-en (`appDarkCss`: Bodoni Moda fra `/fonter`, fokusring, mørke skjemafelt, lyset øverst). Oversikten i boet og gjenstandslisten bruker klassene i `src/lib/estateThemeCss.js` (prefiks `bo-`); de andre sidene har fargene i inline style.
+Fargene står i `src/lib/estateTheme.js` (`C`, liten, brukes av `App.jsx`), som også bestemmer hvilke sider som har eget oppsett (`isLightAppPath`) og har den globale CSS-en (`appCss`, klassen `app-flate`: Bodoni Moda fra `/fonter`, fokusring, plassholdertekst). Oversikten i boet og gjenstandslisten bruker klassene i `src/lib/estateThemeCss.js` (`boCss`, rotklasse `bo-flate`, prefiks `bo-`); de andre sidene har fargene i inline style. «Anbefalt nå» på oversikten er den ene smaragdflaten i arbeidsflaten.
 
-**Lyse sider:** sidene som også vises for utloggede (innlogging, nytt passord, invitasjon, personvern, kontakt, veiviseren, guidene, forsiden) og PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) bruker produktpaletten (lys): papir `#F5F2EB`, kalk `#EAE5DA`, blekk `#1F2326`, skifer `#575B5E`, granskog `#2F4A43`, messing `#8A5A34`, strek `#CFC8BA`, rust `#9A3B2E`.
+**Knapper:** primær = fylt smaragd med lin tekst; sekundær = kontur (`rgba(42,29,20,.5)` eller smaragd) på lys flate; deaktivert = `#5E6A61` med lin tekst. Ingen løft ved hover, bare fargeskifte. «Vil ha» og «Nei takk» er like store og like sterke (Arvklart skal ikke dytte mot det ene), med farget kant og tekst — aldri farge alene.
+
+**Sidene for utloggede** (innlogging, nytt passord, invitasjon, personvern) bruker samme lyse palett. Veiviseren, guidene og founder-sidene har fortsatt sitt eget oppsett, og PDF-ene (`distributionPdf.js`, `dataExportPdf.js`) sin egen produktpalett (papir `#F5F2EB`, blekk `#1F2326`, granskog `#2F4A43` …).
+
+**Skjermbildene på nettsiden** (`public/nettsted/`) tas fra demospeilet: `scripts/nettsidebilder.mjs` (den ekte appen med demoens innhold og bilder fra `supabase/seed/`, mot simulert Supabase – aldri produksjonen) og `scripts/til-webp.py`. Endres appen, tas bildene på nytt med de to skriptene. Produktfilmene og plakatene deres viser fortsatt det mørke grensesnittet.
 
 Avatarfargene (`AVATAR_COLORS`, `COLORS` i `ProfileSetupPage`, `FORDEL_COLORS`) og fargene på mappene i dokumentarkivet er identitetsfarger og følger ikke paletten. All tekst skal ha minst 4,5:1 mot bakgrunnen den står på.
 
-**Toppmenyen er alltid `#1F221E`, uansett bo.** `TopBar.jsx` har riktignok
-`estate?.branding_color || '#1F221E'`, men `App.jsx` sender aldri `estate` til komponenten
+**Toppmenyen er alltid `#1B3527` (smaragd), uansett bo.** `TopBar.jsx` har riktignok
+`estate?.branding_color || '#1B3527'`, men `App.jsx` sender aldri `estate` til komponenten
 (`<TopBar profile session onToast />`, det eneste stedet den brukes), så uttrykket faller alltid
-tilbake på standarden. Det har aldri vært sendt — ikke før den mørke appen heller. Teksten er
+tilbake på standarden. Det har aldri vært sendt. (Standardverdien for nye bo, `branding_color: '#1F221E'` i `EstatesPage.jsx`/`AdminPage.jsx`, er en dataverdi som lagres og er ikke endret.) Teksten er
 hardkodet lys (`#F5F2EB`); `tc()` i samme fil velger lys eller mørk tekst etter lysheten i fargen,
 men brukes bare på avatarfargen.
 
@@ -73,7 +77,7 @@ Migreringen `20261120170000_header_farge` (ikke kjørt) ville bare endret den li
 Skal «Merkevare» virke på toppmenyen, må `estate` sendes til `TopBar` **og** tekstfargen velges
 med `tc()`, ellers blir lys tekst på lys flate.
 
-Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (granskog på lyse sider, mose i den mørke appen).
+Tilgjengelighet (WCAG 2.2 AA): ikke bruk `outline:'none'`; fokus vises med `:focus-visible` (jade `#2F573E` i appen, lin på smaragd).
 
 **Uttrykket (som arvklart.no):** overskrifter i Bodoni Moda (`'Bodoni Moda', 'Times New Roman', serif`, med `font-optical-sizing: none`), en overlinje over sideoverskriften (`<Overline>` i `src/components/UI.jsx`), pilleknapper (`borderRadius: '999px'`), hårstreker og nummererte rader med pluss/minus på oversikten.
 
@@ -166,7 +170,7 @@ Hent verdiene fra Supabase Dashboard → Project Settings → API.
 ## Viktige sider og ruter
 | Rute | Komponent | Beskrivelse |
 |------|-----------|-------------|
-| `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app`. Designet ligger i `src/site/`. Under heroen står produktfilmen (`src/site/Signature.jsx`, seksjonen `#cross`): plakat med en ekte `<button>` oppå, og `<video>` settes først inn i DOM-en ved trykk, så ingen videobytes lastes i forkant. Fire filer per språk i `public/nettsted/` (`forsidefilm-{no,en}[-mobil].mp4` + plakater); 16:9 over 980 px, 4:5 under. Plakaten er **ikke** lazy: den er LCP-elementet, og `lazy` doblet LCP på Fast 3G (3,4 s mot 1,7 s) |
+| `/` | LandingPage | Offentlig forside (forhåndsrendret); innloggede som åpner den direkte, sendes til `/app`. Designet ligger i `src/site/`. Prosessen står som fire synlige steg (`src/site/Prosess.jsx`), ikke faner. Under heroen står produktfilmen (`src/site/Signature.jsx`, seksjonen `#cross`, uten scrolleffekt): plakat med en ekte `<button>` oppå, og `<video>` settes først inn i DOM-en ved trykk, så ingen videobytes lastes i forkant. Fire filer per språk i `public/nettsted/` (`forsidefilm-{no,en}[-mobil].mp4` + plakater); 16:9 over 980 px, 4:5 under. Plakaten er **ikke** lazy: den er LCP-elementet, og `lazy` doblet LCP på Fast 3G (3,4 s mot 1,7 s) |
 | `/slik-fungerer-det` | HowItWorksPage | Fire deler (samle, inviter, fordel, dokumenter), fulgt gjennom én gjenstand. Utdypingene ligger i `<details>` per del, og del 3 har en trinnvis produktvisning med radioknapper og `:has()` — ingen automatikk, virker uten JavaScript (forhåndsrendret). Produktfilmen står i sidetoppen, i høyre kolonne ved siden av overskriften (`aside` på `PageHero`): uten lyd, uten autostart og uten løkke, og tekstalternativet (WCAG 1.2.1) er de fire delene under |
 | `/om-oss` | AboutPage | Teamet bak Arvklart (forhåndsrendret) |
 | `/kontakt` | ContactPage | Kontakt, e-post med ferdig emne (forhåndsrendret; ingen skjema) |

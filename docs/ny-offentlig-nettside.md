@@ -1,5 +1,9 @@
 # Ny offentlig nettside — integrasjon av designpakken av 19.11.2026
 
+> Det visuelle uttrykket er senere lagt om etter designdemo v4 (smaragd og silke), og produktreisen
+> med faner er erstattet av fire synlige steg. Se `docs/nettside-v4.md`. Resten av dette dokumentet
+> (påstander, språk, SEO, samtykke, filmen) gjelder fortsatt.
+
 De fire offentlige sidene (`/`, `/slik-fungerer-det`, `/om-oss`, `/kontakt`) er bygget opp igjen i
 React fra integrasjonspakken. Appen, demoen, Supabase, innloggingen, invitasjonene, veiviseren og
 personvernerklæringens innhold er ikke endret. Ingen migreringer, ingen edge-funksjoner, ingen

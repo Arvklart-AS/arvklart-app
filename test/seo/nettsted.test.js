@@ -176,7 +176,7 @@ test('hvert produktutsnitt er merket som skjermbilde', () => {
   // alt-tekst, og filmen har aria-label og en skjult beskrivelse (aria-describedby), men ingen
   // SYNLIG merking av at innholdet er fra eksempelboet. Det er en bevisst avveining, ikke noe
   // testen har oversett. Regexen under ville dessuten gitt falsk pass på «aria-label».
-  const sider = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/site/Journey.jsx']
+  const sider = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/site/Prosess.jsx']
   for (const p of sider) assert.match(read(p), /Cap|cap--c/, `${p}: mangler etiketter på skjermbildene`)
 })
 
@@ -197,7 +197,7 @@ test('behandlingsansvarlig: personvernerklæringen og bunnteksten oppgir det sam
 // Formuleringer som ikke stemte med produktkoden, og som ikke skal krype inn igjen.
 // Se docs/ny-offentlig-nettside.md for hva koden faktisk gjør.
 const SIDER = ['src/pages/LandingPage.jsx', 'src/pages/HowItWorksPage.jsx', 'src/pages/AboutPage.jsx',
-  'src/pages/ContactPage.jsx', 'src/site/Journey.jsx', 'src/site/Faq.jsx']
+  'src/pages/ContactPage.jsx', 'src/site/Prosess.jsx', 'src/site/Faq.jsx']
 
 test('produktpåstander: ingen av de uriktige formuleringene står igjen', () => {
   const tekst = SIDER.map(read).join('\n')

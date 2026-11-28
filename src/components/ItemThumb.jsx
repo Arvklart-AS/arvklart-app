@@ -17,7 +17,7 @@ export default function ItemThumb({ item, size = 96, still = false, fill = false
   const cat = item.categories || { emoji: '📦', label: 'Annet' }
   const box = {
     width: fill ? '100%' : `${size}px`, maxWidth: fill ? 'none' : '40vw', aspectRatio: '4 / 3', flex: 'none', padding: 0, overflow: 'hidden',
-    display: 'grid', placeItems: 'center', background: '#30342D', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '4px',
+    display: 'grid', placeItems: 'center', background: '#EEF1E6', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '4px',
   }
   const picture = item.image_url
     ? <StoredImage src={item.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -33,18 +33,18 @@ export default function ItemThumb({ item, size = 96, still = false, fill = false
       </button>
       {open && (
         <Modal onClose={() => setOpen(false)} labelledBy={titleId} maxWidth={640}>
-          <div style={{ aspectRatio: '4 / 3', background: '#1F221E', borderRadius: '4px', overflow: 'hidden', display: 'grid', placeItems: 'center', marginBottom: '16px' }}>
+          <div style={{ aspectRatio: '4 / 3', background: '#F1F3EA', borderRadius: '4px', overflow: 'hidden', display: 'grid', placeItems: 'center', marginBottom: '16px' }}>
             {item.image_url
               ? <StoredImage src={item.image_url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               : <span aria-hidden="true" style={{ fontSize: '4rem' }}>{cat.emoji}</span>}
           </div>
-          <h2 id={titleId} style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: 400, fontSize: '1.6rem', lineHeight: 1.15, color: '#F2EEE6', margin: '0 0 4px' }}>{item.title}</h2>
-          <p style={{ fontSize: '0.875rem', color: '#B9B4A8', margin: '0 0 18px' }}>{cat.emoji} {categoryLabel(cat.label)}{value}</p>
+          <h2 id={titleId} style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: 400, fontSize: '1.6rem', lineHeight: 1.15, color: '#2A1D14', margin: '0 0 4px' }}>{item.title}</h2>
+          <p style={{ fontSize: '0.875rem', color: '#4F463A', margin: '0 0 18px' }}>{cat.emoji} {categoryLabel(cat.label)}{value}</p>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <Link to={`/estate/${estateId}/item/${item.id}`} style={{ display: 'inline-flex', alignItems: 'center', minHeight: '48px', padding: '0 1.6em', borderRadius: '999px', background: '#F2EEE6', color: '#1F221E', fontWeight: 600, textDecoration: 'none' }}>
+            <Link to={`/estate/${estateId}/item/${item.id}`} style={{ display: 'inline-flex', alignItems: 'center', minHeight: '48px', padding: '0 1.6em', borderRadius: '999px', background: '#24392A', color: '#F4F2EB', fontWeight: 600, textDecoration: 'none' }}>
               {L('Åpne gjenstanden', 'Open the item')}
             </Link>
-            <button type="button" onClick={() => setOpen(false)} style={{ minHeight: '48px', padding: '0 1.6em', borderRadius: '999px', background: 'none', border: '1px solid rgba(242, 238, 230, 0.32)', color: '#F2EEE6', fontWeight: 600, fontFamily: 'Karla, sans-serif', fontSize: '0.9375rem', cursor: 'pointer' }}>
+            <button type="button" onClick={() => setOpen(false)} style={{ minHeight: '48px', padding: '0 1.6em', borderRadius: '999px', background: 'none', border: '1px solid rgba(42, 29, 20, 0.5)', color: '#2A1D14', fontWeight: 600, fontFamily: 'Karla, sans-serif', fontSize: '0.9375rem', cursor: 'pointer' }}>
               {L('Lukk', 'Close')}
             </button>
           </div>
@@ -62,8 +62,8 @@ export function ItemHead({ item, size = 96, still = false, titleAs: Title = 'spa
     <div style={{ display: 'flex', gap: '14px', alignItems: 'center', minWidth: 0, flex: '1 1 16rem' }}>
       <ItemThumb item={item} size={size} still={still} />
       <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        <Title style={{ display: 'block', margin: 0, fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: 400, fontSize: '1.15rem', lineHeight: 1.25, color: '#F2EEE6', overflowWrap: 'anywhere' }}>{item.title}</Title>
-        <span style={{ fontSize: '0.8125rem', color: '#B9B4A8' }}>{cat.emoji} {categoryLabel(cat.label)}</span>
+        <Title style={{ display: 'block', margin: 0, fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: 400, fontSize: '1.15rem', lineHeight: 1.25, color: '#2A1D14', overflowWrap: 'anywhere' }}>{item.title}</Title>
+        <span style={{ fontSize: '0.8125rem', color: '#4F463A' }}>{cat.emoji} {categoryLabel(cat.label)}</span>
         {children}
       </div>
     </div>

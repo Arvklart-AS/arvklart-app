@@ -48,10 +48,10 @@ const taskText = text => {
 }
 // Kategoriene i sjekklisten skilles på prikken; flatene er like
 const CATEGORY_COLORS = {
-  'Umiddelbart': { bg: '#30342D', border: 'rgba(242, 238, 230, 0.14)', text: '#9DAA8C', dot: '#9DAA8C' },
-  'Uke 1':       { bg: '#30342D', border: 'rgba(242, 238, 230, 0.14)', text: '#F2EEE6', dot: '#C79A6B' },
-  'Måned 1':     { bg: '#30342D', border: 'rgba(242, 238, 230, 0.14)', text: '#F2EEE6', dot: '#B9B4A8' },
-  'Fordeling':   { bg: '#30342D', border: 'rgba(242, 238, 230, 0.14)', text: '#F2EEE6', dot: '#F2EEE6' },
+  'Umiddelbart': { bg: '#EEF1E6', border: 'rgba(42, 29, 20, 0.14)', text: '#2F573E', dot: '#2F573E' },
+  'Uke 1':       { bg: '#EEF1E6', border: 'rgba(42, 29, 20, 0.14)', text: '#2A1D14', dot: '#8A5A34' },
+  'Måned 1':     { bg: '#EEF1E6', border: 'rgba(42, 29, 20, 0.14)', text: '#2A1D14', dot: '#4F463A' },
+  'Fordeling':   { bg: '#EEF1E6', border: 'rgba(42, 29, 20, 0.14)', text: '#2A1D14', dot: '#24392A' },
 }
 
 export default function TasksPage({ session, onToast, isDemo }) {
@@ -139,21 +139,21 @@ export default function TasksPage({ session, onToast, isDemo }) {
 
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '28px 16px', fontFamily: 'Karla, sans-serif' }}>
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ background: 'none', border: 'none', color: '#B9B4A8', cursor: 'pointer', fontSize: '0.8125rem', padding: '0 0 20px', fontFamily: 'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ background: 'none', border: 'none', color: '#4F463A', cursor: 'pointer', fontSize: '0.8125rem', padding: '0 0 20px', fontFamily: 'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <Overline>{L('Praktisk', 'Practical')}</Overline>
-          <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight: '400', color: '#F2EEE6', marginBottom: '4px' }}>{L('Oppgaveliste', 'Task list')}</h1>
-          <p style={{ color: '#B9B4A8', fontSize: '0.875rem' }}>{L('Steg-for-steg-veiledning gjennom arveprosessen', 'Step-by-step guidance through the inheritance process')}</p>
+          <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight: '400', color: '#2A1D14', marginBottom: '4px' }}>{L('Oppgaveliste', 'Task list')}</h1>
+          <p style={{ color: '#4F463A', fontSize: '0.875rem' }}>{L('Steg-for-steg-veiledning gjennom arveprosessen', 'Step-by-step guidance through the inheritance process')}</p>
         </div>
         {!isDemo && <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {tasks.length === 0 && (
-            <button onClick={seedTasks} style={{ padding: '9px 18px', background: '#F2EEE6', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', whiteSpace: 'nowrap' }}>
+            <button onClick={seedTasks} style={{ padding: '9px 18px', background: '#24392A', color: '#F4F2EB', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', whiteSpace: 'nowrap' }}>
               {L('Last standard sjekkliste', 'Load standard checklist')}
             </button>
           )}
-          <button onClick={() => setShowAdd(!showAdd)} style={{ padding: '9px 18px', background: '#F2EEE6', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', whiteSpace: 'nowrap' }}>
+          <button onClick={() => setShowAdd(!showAdd)} style={{ padding: '9px 18px', background: '#24392A', color: '#F4F2EB', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif', whiteSpace: 'nowrap' }}>
             {L('+ Legg til oppgave', '+ Add task')}
           </button>
         </div>}
@@ -161,58 +161,58 @@ export default function TasksPage({ session, onToast, isDemo }) {
 
       {/* Fremdriftslinje */}
       {total > 0 && (
-        <div style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px' }}>
+        <div style={{ background: '#FCFCF9', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontSize: '0.875rem', color: '#F2EEE6', fontWeight: '500' }}>{L('Samlet fremdrift', 'Overall progress')}</span>
-            <span style={{ fontSize: '1.375rem', fontFamily: "'Bodoni Moda', 'Times New Roman', serif", color: progress === 100 ? '#9DAA8C' : '#F2EEE6' }}>{progress}%</span>
+            <span style={{ fontSize: '0.875rem', color: '#2A1D14', fontWeight: '500' }}>{L('Samlet fremdrift', 'Overall progress')}</span>
+            <span style={{ fontSize: '1.375rem', fontFamily: "'Bodoni Moda', 'Times New Roman', serif", color: progress === 100 ? '#2F573E' : '#2A1D14' }}>{progress}%</span>
           </div>
-          <div style={{ height: '8px', background: '#30342D', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${progress}%`, background: progress === 100 ? '#F2EEE6' : '#F2EEE6', borderRadius: '4px', transition: 'width 0.4s ease' }} />
+          <div style={{ height: '8px', background: '#EEF1E6', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${progress}%`, background: progress === 100 ? '#24392A' : '#24392A', borderRadius: '4px', transition: 'width 0.4s ease' }} />
           </div>
-          <div style={{ fontSize: '0.8125rem', color: '#B9B4A8', marginTop: '8px' }}>{L(`${completed} av ${total} oppgaver fullført`, `${completed} of ${total} tasks completed`)}</div>
+          <div style={{ fontSize: '0.8125rem', color: '#4F463A', marginTop: '8px' }}>{L(`${completed} av ${total} oppgaver fullført`, `${completed} of ${total} tasks completed`)}</div>
         </div>
       )}
 
       {/* Legg til oppgave */}
       {showAdd && (
-        <div style={{ background: '#272A25', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '12px', padding: '24px', marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '1rem', color: '#F2EEE6', marginBottom: '16px', fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: '400' }}>{L('Legg til egendefinert oppgave', 'Add a custom task')}</h3>
+        <div style={{ background: '#FCFCF9', border: '1px solid rgba(42, 29, 20, 0.14)', borderRadius: '12px', padding: '24px', marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '1rem', color: '#2A1D14', marginBottom: '16px', fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontWeight: '400' }}>{L('Legg til egendefinert oppgave', 'Add a custom task')}</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <input value={newTask.title} onChange={e => setNewTask(p => ({ ...p, title: e.target.value }))} placeholder={L('Oppgavetittel *', 'Task title *')} maxLength={200}
-              style={{ width: '100%', padding: '11px 14px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontSize: '0.875rem', background: '#1F221E', color: '#F2EEE6', fontFamily: 'Karla, sans-serif', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '11px 14px', border: '1px solid rgba(42, 29, 20, 0.5)', borderRadius: '8px', fontSize: '0.875rem', background: '#F1F3EA', color: '#2A1D14', fontFamily: 'Karla, sans-serif', boxSizing: 'border-box' }} />
             <input value={newTask.description} onChange={e => setNewTask(p => ({ ...p, description: e.target.value }))} placeholder={L('Beskrivelse (valgfri)', 'Description (optional)')} maxLength={1000}
-              style={{ width: '100%', padding: '11px 14px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontSize: '0.875rem', background: '#1F221E', color: '#F2EEE6', fontFamily: 'Karla, sans-serif', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '11px 14px', border: '1px solid rgba(42, 29, 20, 0.5)', borderRadius: '8px', fontSize: '0.875rem', background: '#F1F3EA', color: '#2A1D14', fontFamily: 'Karla, sans-serif', boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <select value={newTask.category} onChange={e => setNewTask(p => ({ ...p, category: e.target.value }))}
-                style={{ flex: 1, padding: '11px 14px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontSize: '0.875rem', background: '#1F221E', color: '#F2EEE6', fontFamily: 'Karla, sans-serif' }}>
+                style={{ flex: 1, padding: '11px 14px', border: '1px solid rgba(42, 29, 20, 0.5)', borderRadius: '8px', fontSize: '0.875rem', background: '#F1F3EA', color: '#2A1D14', fontFamily: 'Karla, sans-serif' }}>
                 {[...CATEGORY_ORDER, 'Annet'].map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
               </select>
               <input type="date" value={newTask.due_date} onChange={e => setNewTask(p => ({ ...p, due_date: e.target.value }))}
-                style={{ flex: 1, padding: '11px 14px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '8px', fontSize: '0.875rem', background: '#1F221E', color: '#F2EEE6', fontFamily: 'Karla, sans-serif' }} />
+                style={{ flex: 1, padding: '11px 14px', border: '1px solid rgba(42, 29, 20, 0.5)', borderRadius: '8px', fontSize: '0.875rem', background: '#F1F3EA', color: '#2A1D14', fontFamily: 'Karla, sans-serif' }} />
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setShowAdd(false)} style={{ flex: 1, padding: '10px', background: 'none', border: '1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor: 'pointer', color: '#F2EEE6', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
-              <button onClick={addTask} disabled={!newTask.title.trim()} style={{ flex: 2, padding: '10px', background: newTask.title.trim() ? '#F2EEE6' : 'rgba(242, 238, 230, 0.14)', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: newTask.title.trim() ? 'pointer' : 'not-allowed', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>{L('Legg til oppgave', 'Add task')}</button>
+              <button onClick={() => setShowAdd(false)} style={{ flex: 1, padding: '10px', background: 'none', border: '1px solid rgba(42, 29, 20, 0.5)', borderRadius: '999px', cursor: 'pointer', color: '#2A1D14', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+              <button onClick={addTask} disabled={!newTask.title.trim()} style={{ flex: 2, padding: '10px', background: newTask.title.trim() ? '#24392A' : '#5E6A61', color: '#F4F2EB', border: 'none', borderRadius: '999px', cursor: newTask.title.trim() ? 'pointer' : 'not-allowed', fontSize: '0.875rem', fontFamily: 'Karla, sans-serif' }}>{L('Legg til oppgave', 'Add task')}</button>
             </div>
           </div>
         </div>
       )}
 
       {tasks.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '80px 20px', color: '#B9B4A8' }}>
+        <div style={{ textAlign: 'center', padding: '80px 20px', color: '#4F463A' }}>
           <p style={{ marginBottom: '20px', fontSize: '0.9375rem' }}>{L('Ingen oppgaver ennå. Last standard sjekkliste for å komme i gang.', 'No tasks yet. Load the standard checklist to get started.')}</p>
-          {!isDemo && <button onClick={seedTasks} style={{ padding: '12px 28px', background: '#F2EEE6', color: '#1F221E', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif' }}>{L('Last standard sjekkliste', 'Load standard checklist')}</button>}
+          {!isDemo && <button onClick={seedTasks} style={{ padding: '12px 28px', background: '#24392A', color: '#F4F2EB', border: 'none', borderRadius: '999px', cursor: 'pointer', fontSize: '0.9375rem', fontFamily: 'Karla, sans-serif' }}>{L('Last standard sjekkliste', 'Load standard checklist')}</button>}
         </div>
       ) : (
         allCats.map(cat => {
           const catTasks = grouped[cat] || []
-          const colors = CATEGORY_COLORS[cat] || { bg: '#1F221E', border: 'rgba(242, 238, 230, 0.14)', text: '#F2EEE6', dot: '#C79A6B' }
+          const colors = CATEGORY_COLORS[cat] || { bg: '#F1F3EA', border: 'rgba(42, 29, 20, 0.14)', text: '#2A1D14', dot: '#8A5A34' }
           const catDone = catTasks.filter(t => t.completed).length
           return (
             <div key={cat} style={{ marginBottom: '28px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: colors.dot, flexShrink: 0 }} />
-                <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#F2EEE6' }}>{catLabel(cat)}</h2>
+                <h2 style={{ fontFamily: "'Bodoni Moda', 'Times New Roman', serif", fontSize: '1.0625rem', fontWeight: '400', color: '#2A1D14' }}>{catLabel(cat)}</h2>
                 <span style={{ fontSize: '0.75rem', color: colors.text, background: colors.bg, border: `1px solid ${colors.border}`, padding: '2px 8px', borderRadius: '20px' }}>{catDone}/{catTasks.length}</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -229,11 +229,11 @@ export default function TasksPage({ session, onToast, isDemo }) {
       )}
       {confirmTask && (
         <Modal onClose={() => setConfirmTask(null)} labelledBy="delete-task-title" maxWidth={400}>
-            <h3 id="delete-task-title" style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.125rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'8px' }}>{L('Slette oppgaven?', 'Delete the task?')}</h3>
-            <p style={{ fontSize:'0.875rem', color:'#F2EEE6' }}>«{taskText(confirmTask.title)}»</p>
+            <h3 id="delete-task-title" style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1.125rem', fontWeight:'400', color:'#2A1D14', marginBottom:'8px' }}>{L('Slette oppgaven?', 'Delete the task?')}</h3>
+            <p style={{ fontSize:'0.875rem', color:'#2A1D14' }}>«{taskText(confirmTask.title)}»</p>
             <div style={{ display:'flex', gap:'10px', marginTop:'20px' }}>
-              <button onClick={() => setConfirmTask(null)} style={{ flex:1, minHeight:'44px', padding:'11px', background:'none', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius: '999px', cursor:'pointer', color:'#F2EEE6', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
-              <button onClick={() => { deleteTask(confirmTask.id); setConfirmTask(null) }} style={{ flex:1, minHeight:'44px', padding:'11px', background:'#E08A7A', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Slett', 'Delete')}</button>
+              <button onClick={() => setConfirmTask(null)} style={{ flex:1, minHeight:'44px', padding:'11px', background:'none', border:'1px solid rgba(42, 29, 20, 0.5)', borderRadius: '999px', cursor:'pointer', color:'#2A1D14', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+              <button onClick={() => { deleteTask(confirmTask.id); setConfirmTask(null) }} style={{ flex:1, minHeight:'44px', padding:'11px', background:'#9A3B2E', color:'#F4F2EB', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Slett', 'Delete')}</button>
             </div>
         </Modal>
       )}
@@ -247,8 +247,8 @@ function TaskRow({ task, members, myRole, readOnly, onToggle, onAssign, onDelete
 
   return (
     <div style={{
-      background: task.completed ? '#30342D' : '#272A25',
-      border: `1px solid ${overdue ? 'rgba(242, 238, 230, 0.14)' : 'rgba(242, 238, 230, 0.14)'}`,
+      background: task.completed ? '#EEF1E6' : '#FCFCF9',
+      border: `1px solid ${overdue ? 'rgba(42, 29, 20, 0.14)' : 'rgba(42, 29, 20, 0.14)'}`,
       borderRadius: '10px', overflow: 'hidden',
       opacity: task.completed ? 0.75 : 1,
       transition: 'opacity 0.2s',
@@ -258,43 +258,43 @@ function TaskRow({ task, members, myRole, readOnly, onToggle, onAssign, onDelete
         <button onClick={e => { e.stopPropagation(); if (!readOnly) onToggle() }} disabled={readOnly} aria-pressed={!!task.completed}
           aria-label={L(`Gjort: ${taskText(task.title)}`, `Done: ${taskText(task.title)}`)} style={{
           width: '22px', height: '22px', borderRadius: '6px', flexShrink: 0,
-          background: task.completed ? '#F2EEE6' : '#272A25',
-          border: `2px solid ${task.completed ? '#F2EEE6' : 'rgba(242, 238, 230, 0.4)'}`,
+          background: task.completed ? '#24392A' : '#FCFCF9',
+          border: `2px solid ${task.completed ? '#24392A' : 'rgba(42, 29, 20, 0.5)'}`,
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '0.75rem', color: '#1F221E',
+          fontSize: '0.75rem', color: '#F4F2EB',
         }}>{task.completed ? '✓' : ''}</button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '0.875rem', color: '#F2EEE6', textDecoration: task.completed ? 'line-through' : 'none', lineHeight: '1.4' }}>{taskText(task.title)}</div>
-          {task.description && !expanded && <div style={{ fontSize: '0.75rem', color: '#B9B4A8', marginTop: '2px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{taskText(task.description)}</div>}
+          <div style={{ fontSize: '0.875rem', color: '#2A1D14', textDecoration: task.completed ? 'line-through' : 'none', lineHeight: '1.4' }}>{taskText(task.title)}</div>
+          {task.description && !expanded && <div style={{ fontSize: '0.75rem', color: '#4F463A', marginTop: '2px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{taskText(task.description)}</div>}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          {overdue && <span style={{ fontSize: '0.6875rem', background: '#30342D', color: '#F2EEE6', padding: '2px 7px', borderRadius: '20px' }}>{L('Forfalt', 'Overdue')}</span>}
-          {task.due_date && !overdue && <span style={{ fontSize: '0.6875rem', color: '#B9B4A8' }}>{formatDateOnly(task.due_date)}</span>}
+          {overdue && <span style={{ fontSize: '0.6875rem', background: '#EEF1E6', color: '#2A1D14', padding: '2px 7px', borderRadius: '20px' }}>{L('Forfalt', 'Overdue')}</span>}
+          {task.due_date && !overdue && <span style={{ fontSize: '0.6875rem', color: '#4F463A' }}>{formatDateOnly(task.due_date)}</span>}
           {task.assigned_to_profile && (
             <div title={task.assigned_to_profile.display_name} style={{ width: '24px', height: '24px', borderRadius: '50%', background: task.assigned_to_profile.avatar_color || '#EAE5DA', border:tc(task.assigned_to_profile.avatar_color||'#EAE5DA')==='#1F2326'?'1px solid #CFC8BA':'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.625rem', color: tc(task.assigned_to_profile.avatar_color || '#EAE5DA'), fontWeight: '500' }}>
               {task.assigned_to_profile.display_name[0].toUpperCase()}
             </div>
           )}
-          <span style={{ fontSize: '0.75rem', color: '#B9B4A8' }} aria-hidden="true">{expanded ? '▲' : '▼'}</span>
+          <span style={{ fontSize: '0.75rem', color: '#4F463A' }} aria-hidden="true">{expanded ? '▲' : '▼'}</span>
         </div>
       </div>
 
       {expanded && (
-        <div style={{ padding: '0 16px 16px', borderTop: '1px solid rgba(242, 238, 230, 0.14)' }}>
-          {task.description && <p style={{ fontSize: '0.8125rem', color: '#F2EEE6', lineHeight: '1.6', margin: '12px 0' }}>{taskText(task.description)}</p>}
+        <div style={{ padding: '0 16px 16px', borderTop: '1px solid rgba(42, 29, 20, 0.14)' }}>
+          {task.description && <p style={{ fontSize: '0.8125rem', color: '#2A1D14', lineHeight: '1.6', margin: '12px 0' }}>{taskText(task.description)}</p>}
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.75rem', color: '#B9B4A8' }}>{L('Tildel til:', 'Assign to:')}</span>
+              <span style={{ fontSize: '0.75rem', color: '#4F463A' }}>{L('Tildel til:', 'Assign to:')}</span>
               <select value={task.assigned_to || ''} onChange={e => onAssign(e.target.value)} disabled={readOnly}
-                style={{ padding: '5px 10px', border: '1px solid rgba(242, 238, 230, 0.4)', borderRadius: '6px', fontSize: '0.8125rem', background: '#1F221E', color: '#F2EEE6', fontFamily: 'Karla, sans-serif' }}>
+                style={{ padding: '5px 10px', border: '1px solid rgba(42, 29, 20, 0.5)', borderRadius: '6px', fontSize: '0.8125rem', background: '#F1F3EA', color: '#2A1D14', fontFamily: 'Karla, sans-serif' }}>
                 <option value="">{L('— ikke tildelt —', '— not assigned —')}</option>
                 {members.map(m => <option key={m.user_id} value={m.user_id}>{m.profiles?.display_name}</option>)}
               </select>
             </div>
             {myRole === 'admin' && !readOnly && (
-              <button onClick={onDelete} style={{ fontSize: '0.75rem', color: '#B9B4A8', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Karla, sans-serif', marginLeft: 'auto' }}>{L('Slett oppgave', 'Delete task')}</button>
+              <button onClick={onDelete} style={{ fontSize: '0.75rem', color: '#4F463A', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Karla, sans-serif', marginLeft: 'auto' }}>{L('Slett oppgave', 'Delete task')}</button>
             )}
           </div>
         </div>
@@ -304,5 +304,5 @@ function TaskRow({ task, members, myRole, readOnly, onToggle, onAssign, onDelete
 }
 
 function Loader() {
-  return <div style={{ padding: '80px', textAlign: 'center', color: '#B9B4A8', fontFamily: 'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
+  return <div style={{ padding: '80px', textAlign: 'center', color: '#4F463A', fontFamily: 'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
 }

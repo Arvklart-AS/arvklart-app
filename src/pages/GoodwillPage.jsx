@@ -87,32 +87,32 @@ export default function GoodwillPage({ session, onToast }) {
     load()
   }
 
-  if (loading) return <div style={{ padding:'80px', textAlign:'center', color:'#B9B4A8', fontFamily:'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
+  if (loading) return <div style={{ padding:'80px', textAlign:'center', color:'#4F463A', fontFamily:'Karla, sans-serif' }}>{L('Laster…', 'Loading…')}</div>
 
   return (
     <div style={{ maxWidth:'820px', margin:'0 auto', padding:'28px 16px', fontFamily:'Karla, sans-serif' }}>
-      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#B9B4A8', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
+      <button onClick={() => navigate(`/estate/${id}`)} style={{ background:'none', border:'none', color:'#4F463A', cursor:'pointer', fontSize:'0.8125rem', padding:'0 0 20px', fontFamily:'Karla, sans-serif' }}>{L('← Tilbake til boet', '← Back to the estate')}</button>
 
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'28px', flexWrap:'wrap', gap:'12px' }}>
         <div>
           <Overline>{L('Praktisk', 'Practical')}</Overline>
-          <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight:'400', color:'#F2EEE6', marginBottom:'4px' }}>{L('Oppgaver og bidrag', 'Tasks and contributions')}</h1>
-          <p style={{ color:'#B9B4A8', fontSize:'0.875rem' }}>{L('Hvem tar hva, og hva som er gjort', 'Who takes what, and what has been done')}</p>
+          <h1 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'clamp(1.9rem, 1.3rem + 2.6vw, 3rem)', lineHeight:1.08, letterSpacing:'-0.02em', fontWeight:'400', color:'#2A1D14', marginBottom:'4px' }}>{L('Oppgaver og bidrag', 'Tasks and contributions')}</h1>
+          <p style={{ color:'#4F463A', fontSize:'0.875rem' }}>{L('Hvem tar hva, og hva som er gjort', 'Who takes what, and what has been done')}</p>
         </div>
-        <button onClick={() => { setShowAddChore(true); setTab('chores') }} style={{ padding:'9px 18px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+        <button onClick={() => { setShowAddChore(true); setTab('chores') }} style={{ padding:'9px 18px', background:'#24392A', color:'#F4F2EB', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
           {L('+ Legg til oppgave', '+ Add task')}
         </button>
       </div>
 
       {/* Faner */}
       <style>{`@media (max-width: 400px) { .gw-tabs > button { padding-left: 10px !important; padding-right: 10px !important; } }`}</style>
-      <div className="gw-tabs" style={{ display:'flex', gap:'4px', borderBottom:'1px solid rgba(242, 238, 230, 0.14)', marginBottom:'24px' }}>
+      <div className="gw-tabs" style={{ display:'flex', gap:'4px', borderBottom:'1px solid rgba(42, 29, 20, 0.14)', marginBottom:'24px' }}>
         {[['chores',L('Oppgaver','Tasks')],['overview',L('Hvem har bidratt','Who has helped')],['log',L('Det som er gjort','What has been done')]].map(([t,l]) => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding:'10px 18px', border:'none', background:'none', cursor:'pointer',
             fontSize:'0.875rem', fontFamily:'Karla, sans-serif',
-            color:tab===t?'#F2EEE6':'#B9B4A8',
-            borderBottom:tab===t?'2px solid #9DAA8C':'2px solid transparent',
+            color:tab===t?'#2A1D14':'#4F463A',
+            borderBottom:tab===t?'2px solid #2F573E':'2px solid transparent',
             marginBottom:'-1px',
           }}>{l}</button>
         ))}
@@ -120,24 +120,24 @@ export default function GoodwillPage({ session, onToast }) {
 
       {/* HVEM HAR BIDRATT */}
       {tab === 'overview' && (
-        <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'24px' }}>
-          <p style={{ fontSize:'0.875rem', color:'#F2EEE6', lineHeight:1.6, marginBottom:'16px' }}>
+        <div style={{ background:'#FCFCF9', border:'1px solid rgba(42, 29, 20, 0.14)', borderRadius:'12px', padding:'24px' }}>
+          <p style={{ fontSize:'0.875rem', color:'#2A1D14', lineHeight:1.6, marginBottom:'16px' }}>
             {L('Her ser dere hva hver enkelt har tatt seg av. Det er ment som oversikt, ikke som en sammenligning.', 'Here you can see what each person has taken care of. It is meant as an overview, not a comparison.')}
           </p>
           {contributors.map((c, i) => (
-            <div key={c.user_id} style={{ display:'flex', alignItems:'flex-start', gap:'10px', padding:'10px 0', borderTop: i ? '1px solid rgba(242, 238, 230, 0.14)' : 'none' }}>
+            <div key={c.user_id} style={{ display:'flex', alignItems:'flex-start', gap:'10px', padding:'10px 0', borderTop: i ? '1px solid rgba(42, 29, 20, 0.14)' : 'none' }}>
               <div style={{ width:'32px', height:'32px', flexShrink:0, borderRadius:'50%', background:c.profiles?.avatar_color||getScoreColor(i), border:tc(c.profiles?.avatar_color||getScoreColor(i))==='#1F2326'?'1px solid #CFC8BA':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.8125rem', color:tc(c.profiles?.avatar_color||getScoreColor(i)), fontWeight:'500' }}>
                 {(c.profiles?.display_name||'?')[0].toUpperCase()}
               </div>
               <div style={{ minWidth:0 }}>
-                <div style={{ fontSize:'0.9375rem', color:'#F2EEE6' }}>
-                  {c.profiles?.display_name}{c.user_id===session.user.id && <span style={{ fontSize:'0.75rem', color:'#B9B4A8', marginLeft:'6px' }}>{L('(deg)', '(you)')}</span>}
+                <div style={{ fontSize:'0.9375rem', color:'#2A1D14' }}>
+                  {c.profiles?.display_name}{c.user_id===session.user.id && <span style={{ fontSize:'0.75rem', color:'#4F463A', marginLeft:'6px' }}>{L('(deg)', '(you)')}</span>}
                 </div>
-                <div style={{ fontSize:'0.8125rem', color:'#B9B4A8' }}>
+                <div style={{ fontSize:'0.8125rem', color:'#4F463A' }}>
                   {c.events.length === 0 ? L('Ingen oppgaver registrert ennå', 'No tasks recorded yet') : L(`${c.events.length} ${c.events.length === 1 ? 'oppgave' : 'oppgaver'} gjort`, `${c.events.length} ${c.events.length === 1 ? 'task' : 'tasks'} done`)}
                 </div>
                 {c.events.slice(0, 2).map(e => (
-                  <div key={e.id} style={{ fontSize:'0.8125rem', color:'#F2EEE6', marginTop:'2px' }}>{logText(e.description)}</div>
+                  <div key={e.id} style={{ fontSize:'0.8125rem', color:'#2A1D14', marginTop:'2px' }}>{logText(e.description)}</div>
                 ))}
               </div>
             </div>
@@ -149,36 +149,36 @@ export default function GoodwillPage({ session, onToast }) {
       {tab === 'chores' && (
         <div>
           {showAddChore && (
-            <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', padding:'24px', marginBottom:'16px' }}>
-              <h3 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1rem', fontWeight:'400', color:'#F2EEE6', marginBottom:'16px' }}>{L('Legg til oppgave', 'Add task')}</h3>
+            <div style={{ background:'#FCFCF9', border:'1px solid rgba(42, 29, 20, 0.14)', borderRadius:'12px', padding:'24px', marginBottom:'16px' }}>
+              <h3 style={{ fontFamily:"'Bodoni Moda', 'Times New Roman', serif", fontSize:'1rem', fontWeight:'400', color:'#2A1D14', marginBottom:'16px' }}>{L('Legg til oppgave', 'Add task')}</h3>
               <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
                 <input value={newChore.title} onChange={e => setNewChore(p => ({ ...p, title: e.target.value }))} placeholder={L('Oppgavetittel, f.eks. Rydde garasjen', 'Task title, e.g. Clear out the garage')} maxLength={200}
-                  style={{ width:'100%', padding:'11px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.875rem', background:'#1F221E', color:'#F2EEE6', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
+                  style={{ width:'100%', padding:'11px 14px', border:'1px solid rgba(42, 29, 20, 0.5)', borderRadius:'8px', fontSize:'0.875rem', background:'#F1F3EA', color:'#2A1D14', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
                 <input value={newChore.description} onChange={e => setNewChore(p => ({ ...p, description: e.target.value }))} placeholder={L('Beskrivelse (valgfri)', 'Description (optional)')} maxLength={500}
-                  style={{ width:'100%', padding:'11px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.875rem', background:'#1F221E', color:'#F2EEE6', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
+                  style={{ width:'100%', padding:'11px 14px', border:'1px solid rgba(42, 29, 20, 0.5)', borderRadius:'8px', fontSize:'0.875rem', background:'#F1F3EA', color:'#2A1D14', fontFamily:'Karla, sans-serif', boxSizing:'border-box' }} />
                 <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
                   {CHORE_SIZES.map(s => (
                     <button key={s.id} onClick={() => setNewChore(p => ({ ...p, size: s.id }))} style={{
-                      padding:'9px 14px', border:`2px solid ${newChore.size===s.id?'#9DAA8C':'rgba(242, 238, 230, 0.14)'}`,
+                      padding:'9px 14px', border:`2px solid ${newChore.size===s.id?'#2F573E':'rgba(42, 29, 20, 0.14)'}`,
                       borderRadius:'8px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif',
-                      background:newChore.size===s.id?'#F2EEE6':'#272A25',
-                      color:newChore.size===s.id?'#1F221E':'#F2EEE6',
+                      background:newChore.size===s.id?'#24392A':'#FCFCF9',
+                      color:newChore.size===s.id?'#F4F2EB':'#2A1D14',
                     }}>
                       {s.label} <span style={{ fontSize:'0.75rem', opacity:0.85 }}>({s.desc.toLowerCase()})</span>
                     </button>
                   ))}
                 </div>
                 <div>
-                  <label htmlFor="goodwill-f1" style={{ display:'block', fontSize:'0.8125rem', color:'#B9B4A8', marginBottom:'6px' }}>{L('Tildel til (valgfri)', 'Assign to (optional)')}</label>
+                  <label htmlFor="goodwill-f1" style={{ display:'block', fontSize:'0.8125rem', color:'#4F463A', marginBottom:'6px' }}>{L('Tildel til (valgfri)', 'Assign to (optional)')}</label>
                   <select id="goodwill-f1" value={newChore.assigned_to} onChange={e => setNewChore(p => ({ ...p, assigned_to: e.target.value }))}
-                    style={{ width:'100%', padding:'11px 14px', border:'1px solid rgba(242, 238, 230, 0.4)', borderRadius:'8px', fontSize:'0.875rem', background:'#1F221E', color:'#F2EEE6', fontFamily:'Karla, sans-serif' }}>
+                    style={{ width:'100%', padding:'11px 14px', border:'1px solid rgba(42, 29, 20, 0.5)', borderRadius:'8px', fontSize:'0.875rem', background:'#F1F3EA', color:'#2A1D14', fontFamily:'Karla, sans-serif' }}>
                     <option value="">{L('— Hvem som helst kan ta den —', '— Anyone can take it —')}</option>
                     {members.map(m => <option key={m.user_id} value={m.user_id}>{m.profiles?.display_name}</option>)}
                   </select>
                 </div>
                 <div style={{ display:'flex', gap:'10px' }}>
-                  <button onClick={() => setShowAddChore(false)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', color:'#F2EEE6', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
-                  <button onClick={addChore} disabled={!newChore.title.trim()} style={{ flex:2, padding:'11px', background:newChore.title.trim()?'#F2EEE6':'rgba(242, 238, 230, 0.14)', color:'#1F221E', border:'none', borderRadius: '999px', cursor:newChore.title.trim()?'pointer':'not-allowed', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
+                  <button onClick={() => setShowAddChore(false)} style={{ flex:1, padding:'11px', background:'none', border:'1px solid rgba(42, 29, 20, 0.5)', borderRadius: '999px', cursor:'pointer', color:'#2A1D14', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Avbryt', 'Cancel')}</button>
+                  <button onClick={addChore} disabled={!newChore.title.trim()} style={{ flex:2, padding:'11px', background:newChore.title.trim()?'#24392A':'#5E6A61', color:'#F4F2EB', border:'none', borderRadius: '999px', cursor:newChore.title.trim()?'pointer':'not-allowed', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>
                     {L('Legg til oppgave', 'Add task')}
                   </button>
                 </div>
@@ -187,15 +187,15 @@ export default function GoodwillPage({ session, onToast }) {
           )}
 
           {chores.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'80px 20px', color:'#B9B4A8' }}>
+            <div style={{ textAlign:'center', padding:'80px 20px', color:'#4F463A' }}>
               <p style={{ marginBottom:'20px' }}>{L('Ingen oppgaver ennå. Legg til ting som må gjøres — garasje, søppelkjøring, pakking.', 'No tasks yet. Add things that need doing — garage, dump runs, packing.')}</p>
-              <button onClick={() => setShowAddChore(true)} style={{ padding:'11px 24px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Legg til første oppgave', 'Add the first task')}</button>
+              <button onClick={() => setShowAddChore(true)} style={{ padding:'11px 24px', background:'#24392A', color:'#F4F2EB', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.875rem', fontFamily:'Karla, sans-serif' }}>{L('Legg til første oppgave', 'Add the first task')}</button>
             </div>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
               {chores.filter(c => !c.completed).length > 0 && (
                 <>
-                  <div style={{ fontSize:'0.8125rem', color:'#B9B4A8', fontWeight:'500', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'4px' }}>{L('Åpne oppgaver', 'Open tasks')}</div>
+                  <div style={{ fontSize:'0.8125rem', color:'#4F463A', fontWeight:'500', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:'4px' }}>{L('Åpne oppgaver', 'Open tasks')}</div>
                   {chores.filter(c => !c.completed).map(chore => (
                     <ChoreCard key={chore.id} chore={chore} session={session} members={members}
                       onClaim={() => claimChore(chore.id)}
@@ -205,7 +205,7 @@ export default function GoodwillPage({ session, onToast }) {
               )}
               {chores.filter(c => c.completed).length > 0 && (
                 <>
-                  <div style={{ fontSize:'0.8125rem', color:'#B9B4A8', fontWeight:'500', textTransform:'uppercase', letterSpacing:'0.5px', margin:'12px 0 4px' }}>{L('Fullførte', 'Completed')}</div>
+                  <div style={{ fontSize:'0.8125rem', color:'#4F463A', fontWeight:'500', textTransform:'uppercase', letterSpacing:'0.5px', margin:'12px 0 4px' }}>{L('Fullførte', 'Completed')}</div>
                   {chores.filter(c => c.completed).map(chore => (
                     <ChoreCard key={chore.id} chore={chore} session={session} members={members} completed />
                   ))}
@@ -220,21 +220,21 @@ export default function GoodwillPage({ session, onToast }) {
       {tab === 'log' && (
         <div>
           {goodwillLog.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'60px', color:'#B9B4A8' }}>
+            <div style={{ textAlign:'center', padding:'60px', color:'#4F463A' }}>
               <p>{L('Ingen oppgaver er gjort ennå.', 'No tasks have been done yet.')}</p>
             </div>
           ) : (
-            <div style={{ background:'#272A25', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius:'12px', overflow:'hidden' }}>
+            <div style={{ background:'#FCFCF9', border:'1px solid rgba(42, 29, 20, 0.14)', borderRadius:'12px', overflow:'hidden' }}>
               {goodwillLog.map((event, i) => (
-                <div key={event.id} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'14px 18px', borderBottom:i < goodwillLog.length-1?'1px solid rgba(242, 238, 230, 0.14)':'none' }}>
+                <div key={event.id} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'14px 18px', borderBottom:i < goodwillLog.length-1?'1px solid rgba(42, 29, 20, 0.14)':'none' }}>
                   <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:event.profiles?.avatar_color||'#EAE5DA', border:tc(event.profiles?.avatar_color||'#EAE5DA')==='#1F2326'?'1px solid #CFC8BA':'none', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', color:tc(event.profiles?.avatar_color||'#EAE5DA'), fontWeight:'500', flexShrink:0 }}>
                     {(event.profiles?.display_name||'?')[0].toUpperCase()}
                   </div>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:'0.875rem', color:'#F2EEE6' }}>
+                    <div style={{ fontSize:'0.875rem', color:'#2A1D14' }}>
                       <strong>{event.profiles?.display_name}</strong> — {logText(event.description)}
                     </div>
-                    <div style={{ fontSize:'0.75rem', color:'#B9B4A8', marginTop:'2px' }}>
+                    <div style={{ fontSize:'0.75rem', color:'#4F463A', marginTop:'2px' }}>
                       {new Date(event.created_at).toLocaleDateString(locale(), { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}
                     </div>
                   </div>
@@ -256,30 +256,30 @@ function ChoreCard({ chore, session, members, onClaim, onComplete, completed }) 
 
   return (
     <div style={{
-      background: completed?'#1F221E':'#272A25',
-      border:`1px solid ${isAssignedToMe?'rgba(242, 238, 230, 0.14)':'rgba(242, 238, 230, 0.14)'}`,
+      background: completed?'#F1F3EA':'#FCFCF9',
+      border:`1px solid ${isAssignedToMe?'rgba(42, 29, 20, 0.14)':'rgba(42, 29, 20, 0.14)'}`,
       borderRadius:'10px', padding:'16px 18px',
       opacity: completed?0.75:1,
     }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'12px', flexWrap:'wrap' }}>
         <div style={{ flex:1, minWidth:'200px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'4px' }}>
-            <span style={{ fontSize:'0.9375rem', color:'#F2EEE6', textDecoration:completed?'line-through':'none' }}>{chore.title}</span>
+            <span style={{ fontSize:'0.9375rem', color:'#2A1D14', textDecoration:completed?'line-through':'none' }}>{chore.title}</span>
           </div>
-          {chore.description && <div style={{ fontSize:'0.8125rem', color:'#F2EEE6', marginBottom:'8px' }}>{chore.description}</div>}
+          {chore.description && <div style={{ fontSize:'0.8125rem', color:'#2A1D14', marginBottom:'8px' }}>{chore.description}</div>}
           <div style={{ display:'flex', gap:'8px', alignItems:'center', flexWrap:'wrap' }}>
-            <span style={{ fontSize:'0.75rem', background:'#30342D', color:'#F2EEE6', padding:'2px 8px', borderRadius:'20px' }}>
+            <span style={{ fontSize:'0.75rem', background:'#EEF1E6', color:'#2A1D14', padding:'2px 8px', borderRadius:'20px' }}>
               {size.label} · {size.desc}
             </span>
-            <span style={{ fontSize:'0.75rem', color:'#F2EEE6' }}>{size.desc}</span>
+            <span style={{ fontSize:'0.75rem', color:'#2A1D14' }}>{size.desc}</span>
             {completed && chore.completed_by_profile && (
-              <span style={{ fontSize:'0.75rem', color:'#9DAA8C' }}>{L('Gjort av', 'Done by')} {chore.completed_by_profile.display_name}</span>
+              <span style={{ fontSize:'0.75rem', color:'#2F573E' }}>{L('Gjort av', 'Done by')} {chore.completed_by_profile.display_name}</span>
             )}
             {!completed && chore.assigned_to_profile && (
-              <span style={{ fontSize:'0.75rem', color:'#B9B4A8' }}>{L('Tatt av', 'Taken by')} {chore.assigned_to_profile.display_name}</span>
+              <span style={{ fontSize:'0.75rem', color:'#4F463A' }}>{L('Tatt av', 'Taken by')} {chore.assigned_to_profile.display_name}</span>
             )}
             {!completed && isUnassigned && (
-              <span style={{ fontSize:'0.75rem', color:'#B9B4A8', fontStyle:'italic' }}>{L('Ikke tatt ennå. Hvem som helst kan ta den.', 'Not taken yet. Anyone can take it.')}</span>
+              <span style={{ fontSize:'0.75rem', color:'#4F463A', fontStyle:'italic' }}>{L('Ikke tatt ennå. Hvem som helst kan ta den.', 'Not taken yet. Anyone can take it.')}</span>
             )}
           </div>
         </div>
@@ -287,12 +287,12 @@ function ChoreCard({ chore, session, members, onClaim, onComplete, completed }) 
         {!completed && (
           <div style={{ display:'flex', gap:'8px', flexShrink:0 }}>
             {isUnassigned && (
-              <button onClick={onClaim} style={{ padding:'8px 14px', background:'none', border:'1px solid rgba(242, 238, 230, 0.14)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', color:'#F2EEE6', fontFamily:'Karla, sans-serif' }}>
+              <button onClick={onClaim} style={{ padding:'8px 14px', background:'none', border:'1px solid rgba(42, 29, 20, 0.5)', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', color:'#2A1D14', fontFamily:'Karla, sans-serif' }}>
                 {L('Ta oppgaven', 'Take the task')}
               </button>
             )}
             {(isAssignedToMe || isUnassigned) && (
-              <button onClick={onComplete} style={{ padding:'8px 14px', background:'#F2EEE6', color:'#1F221E', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>
+              <button onClick={onComplete} style={{ padding:'8px 14px', background:'#24392A', color:'#F4F2EB', border:'none', borderRadius: '999px', cursor:'pointer', fontSize:'0.8125rem', fontFamily:'Karla, sans-serif' }}>
                 {L('Merk som gjort', 'Mark as done')}
               </button>
             )}

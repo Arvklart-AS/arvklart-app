@@ -49,37 +49,58 @@
   size-adjust:89.5%;
 }
 .ak{
-  --natt:#1F221E; --jord:#3A3129; --lin:#F2EEE6; --lin-dempet:#B9B4A8;
-  --mose:#9DAA8C; --messing-lys:#C79A6B;
-  --papir:#F5F2EB; --kalk:#EAE5DA; --blekk:#1F2326; --skifer:#575B5E;
-  --granskog:#2F4A43; --messing:#8A5A34; --strek:#CFC8BA; --rust:#9A3B2E;
-  
+  /* ---- råpaletten (designdemo v4, «materialinspirert») ----
+     Navnene er beholdt fra forrige versjon, så resten av arket og komponentene følger med:
+     «natt» er nå smaragd, «papir» er lys silke. Kontrast er målt for hvert par som brukes
+     (se docs/nettside-v4.md); ingen tekst under 4,5:1, også på det lyseste punktet i gradienten. */
+  --natt:#1B3527; --natt-dyp:#152C20; --smaragd:#2F573E; --jade:#3D6B4F; --sheen:#9CC7AA;
+  --lin:#F4F2EB; --lin-dempet:#E2DED2;
+  --mose:#E5D8B2; --messing-lys:#EDE4C9;
+  --papir:#ECF0E2; --silke-lys:#FAF9F3; --salvie:#D2DEBA; --kalk:#F4F0E7; --linflate:#EFE9DC;
+  --blekk:#2A1D14; --skifer:#4F463A;
+  --granskog:#24392A; --messing:#654527; --strek:#C9C8B8; --rust:#9A3B2E;
+  --jord:#152C20;
+
   --ground:var(--natt); --ink:var(--lin); --muted:var(--lin-dempet);
-  --rule:rgba(242,238,230,.14); --accent:var(--mose); --link:var(--lin);
-  --btn-bg:var(--lin); --btn-ink:var(--natt); --focus:var(--mose);
-  
+  --rule:rgba(244,242,235,.22); --accent:var(--mose); --link:var(--lin);
+  --btn-bg:var(--lin); --btn-ink:var(--natt-dyp); --btn-hover:#FFFFFF; --focus:var(--messing-lys);
+
   --serif:'Bodoni Moda','Bodoni reserve','Times New Roman',serif;
   --sans:'Karla','Karla reserve',Arial,sans-serif;
-  
+
+  /* ---- typografisk skala: fem trinn, brukt overalt (Andreas tilbakemelding om variasjon) ---- */
+  --fs-h1:clamp(2.3rem,1.25rem + 4.3vw,4.85rem);
+  --fs-h2:clamp(2rem,1.35rem + 2.3vw,3.2rem);
+  --fs-h3:clamp(1.4rem,1.15rem + .9vw,1.85rem);
+  --fs-h4:clamp(1.2rem,1.05rem + .45vw,1.45rem);
+  --fs-lead:clamp(1.125rem,1.04rem + .35vw,1.3rem);
+  --fs-small:1rem;
+  --fs-label:.8125rem;
+
+  /* ---- materialer: ren CSS, ingen bilder å laste, ingen bevegelse ---- */
+  /* Fint, stillestående korn (bare mørkning, maks ca. 6 %). data: er tillatt i img-src i CSP-en. */
+  --korn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .14 -.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --korn-lys:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .091 -.026'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Høyden på de asymmetriske overgangene */
+  --kurve:clamp(28px,4.4vw,68px);
+  --sec-pad:clamp(56px,6.4vw,100px);
+
   --logo:url(/nettsted/logo-maske.png);
   --maxw:1320px;
   --gut:clamp(20px,5vw,72px);
   --pad:max(var(--gut), calc((100% - var(--maxw)) / 2));
-  
-  --ease:cubic-bezier(.22,.61,.36,1);
-  --t-s:240ms; --t-m:420ms; --t-l:820ms;
 
-  /* driver — sluttilstand som standard (uten JS / redusert bevegelse) */
-  --lift:1;
-  --glow:0;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --t-s:200ms; --t-m:360ms; --t-l:640ms;
 }
 .ak *,.ak *::before,.ak *::after{
   box-sizing:border-box
 }
 .ak{
-  background:var(--natt);color:var(--lin);
+  background:var(--papir);color:var(--blekk);
   font-family:var(--sans);font-weight:400;
-  font-size:clamp(1rem,.97rem + .17vw,1.1rem);line-height:1.6;
+  /* 17 px på mobil, 18 px på PC: målgruppen er voksne og eldre */
+  font-size:clamp(1.0625rem,1rem + .2vw,1.125rem);line-height:1.65;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   /* .ak er en div, ikke <body>. overflow-x:hidden ville gjort den til en rulleflate og flyttet
      den klebrige headeren inn i den; clip klipper uten å lage rulleflate. */
@@ -118,29 +139,91 @@
 .ak .ground{
   position:relative;isolation:isolate;background:var(--ground)
 }
+/* Smaragd: hero, veiviser og bunntekst. Lysflekken i midten er dempet fra v4 (.88 → .5), så
+   dempet tekst holder 4,5:1 også der den er lysest. Foldene er stillestående. */
 .ak .g-natt{
   --ground:var(--natt);--ink:var(--lin);--muted:var(--lin-dempet);
-  --rule:rgba(242,238,230,.14);--accent:var(--mose);--link:var(--lin);
-  --btn-bg:var(--lin);--btn-ink:var(--natt);--focus:var(--mose);color:var(--lin)
+  --rule:rgba(244,242,235,.22);--accent:var(--mose);--link:var(--lin);
+  --btn-bg:var(--lin);--btn-ink:var(--natt-dyp);--btn-hover:#FFFFFF;--focus:var(--messing-lys);color:var(--lin);
+  background:
+    var(--korn),
+    radial-gradient(70% 60% at 50% 46%,rgba(54,100,74,.5),rgba(54,100,74,0)),
+    radial-gradient(140% 90% at 115% -10%,rgba(54,100,74,0) 46%,rgba(54,100,74,.45) 55%,rgba(54,100,74,0) 64%),
+    radial-gradient(120% 80% at -15% 115%,rgba(12,30,20,0) 44%,rgba(12,30,20,.5) 53%,rgba(12,30,20,0) 62%),
+    radial-gradient(70% 80% at 0% 0%,rgba(14,33,23,.7),rgba(14,33,23,0)),
+    radial-gradient(60% 70% at 100% 100%,rgba(14,33,23,.65),rgba(14,33,23,0)),
+    linear-gradient(160deg,#22402F 0%,#1B3527 55%,#152C20 100%),
+    var(--natt)
 }
+/* Lys silke. Lysflekkene ligger midt i seksjonen og toner helt ut før kanten, så to lyse
+   seksjoner etter hverandre møtes uten søm. */
 .ak .g-papir{
   --ground:var(--papir);--ink:var(--blekk);--muted:var(--skifer);
-  --rule:var(--strek);--accent:var(--granskog);--link:var(--messing);
-  --btn-bg:var(--granskog);--btn-ink:var(--papir);--focus:var(--granskog);color:var(--blekk)
+  --rule:rgba(42,29,20,.16);--accent:var(--jade);--link:var(--messing);
+  --btn-bg:var(--granskog);--btn-ink:var(--lin);--btn-hover:var(--smaragd);--focus:var(--smaragd);color:var(--blekk);
+  background:
+    var(--korn-lys),
+    radial-gradient(52% 40% at 16% 50%,rgba(250,249,243,.9),rgba(250,249,243,0)),
+    radial-gradient(44% 38% at 86% 54%,rgba(210,222,186,.6),rgba(210,222,186,0)),
+    var(--papir)
 }
+/* Varm lin: en rolig, beige flate for rytme mellom de silkegrønne. */
+.ak .g-lin{
+  --ground:var(--linflate);--ink:var(--blekk);--muted:var(--skifer);
+  --rule:rgba(42,29,20,.16);--accent:var(--messing);--link:var(--messing);
+  --btn-bg:var(--granskog);--btn-ink:var(--lin);--btn-hover:var(--smaragd);--focus:var(--smaragd);color:var(--blekk);
+  background:
+    var(--korn-lys),
+    radial-gradient(50% 42% at 82% 48%,rgba(250,247,238,.85),rgba(250,247,238,0)),
+    var(--linflate)
+}
+/* g-jord var en brun flate; nå den dypeste smaragden, roligere enn heroen (som bunnteksten) */
 .ak .g-jord{
-  --ground:var(--jord);--ink:var(--lin);--muted:var(--lin-dempet);
-  --rule:rgba(242,238,230,.16);--accent:var(--mose);--link:var(--lin);
-  --btn-bg:var(--lin);--btn-ink:var(--jord);--focus:var(--mose);color:var(--lin)
+  --ground:var(--natt-dyp);--ink:var(--lin);--muted:var(--lin-dempet);
+  --rule:rgba(244,242,235,.2);--accent:var(--mose);--link:var(--lin);
+  --btn-bg:var(--lin);--btn-ink:var(--natt-dyp);--btn-hover:#FFFFFF;--focus:var(--messing-lys);color:var(--lin);
+  background:
+    var(--korn),
+    radial-gradient(80% 90% at 12% 0%,rgba(38,70,52,.55),rgba(38,70,52,0)),
+    linear-gradient(175deg,#1B3527 0%,#152C20 55%,#10251A 100%),
+    var(--natt-dyp)
 }
 .ak .wrap{
   padding-inline:var(--pad);position:relative;z-index:2
 }
 .ak .sec{
-  padding-block:clamp(60px,7vw,112px)
+  padding-block:calc(var(--sec-pad) + var(--inn,0px)) calc(var(--sec-pad) + var(--ut,0px))
 }
 .ak .sec--tight{
-  padding-top:clamp(36px,4.2vw,66px)
+  padding-top:calc(clamp(40px,4.4vw,68px) + var(--inn,0px))
+}
+/* ---- myke, asymmetriske overganger ----
+   Den mørke flaten legges over naboen og maskeres med en bred kurve, så naboens lyse silke vises
+   gjennom uten skjøt. Naboen får like mye ekstra luft (--inn/--ut), så innholdet ikke dekkes.
+   Ingen animasjon. Uten støtte for mask blir overgangen rett, ellers likt. */
+.ak .kurve-ned,.ak .kurve-begge{
+  position:relative;z-index:3
+}
+.ak .kurve-ned{
+  --ut:var(--kurve);margin-bottom:calc(-1 * var(--kurve));
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--kurve) + 2px) no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V38C1340 60 1200 96 1000 96C700 96 360 18 0 10Z'/%3E%3C/svg%3E") bottom/100% var(--kurve) no-repeat;
+          mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--kurve) + 2px) no-repeat,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V38C1340 60 1200 96 1000 96C700 96 360 18 0 10Z'/%3E%3C/svg%3E") bottom/100% var(--kurve) no-repeat
+}
+.ak .kurve-begge{
+  --inn:var(--kurve);--ut:var(--kurve);margin-block:calc(-1 * var(--kurve));
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100V64C150 80 300 92 440 92C760 92 1100 40 1440 12V100Z'/%3E%3C/svg%3E") top/100% var(--kurve) no-repeat,
+    linear-gradient(#000 0 0) center/100% calc(100% - 2 * var(--kurve) + 4px) no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V56C1180 80 900 92 700 90C440 88 220 50 0 24Z'/%3E%3C/svg%3E") bottom/100% var(--kurve) no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100V64C150 80 300 92 440 92C760 92 1100 40 1440 12V100Z'/%3E%3C/svg%3E") top/100% var(--kurve) no-repeat,
+    linear-gradient(#000 0 0) center/100% calc(100% - 2 * var(--kurve) + 4px) no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1440V56C1180 80 900 92 700 90C440 88 220 50 0 24Z'/%3E%3C/svg%3E") bottom/100% var(--kurve) no-repeat
+}
+/* naboene får plassen kurven tar */
+.ak .kurve-ned + .ground,.ak .kurve-begge + .ground{
+  --inn:var(--kurve)
+}
+.ak .ground:has(+ .kurve-begge){
+  --ut:var(--kurve)
 }
 .ak .rules{
   position:absolute;inset:0;z-index:0;pointer-events:none
@@ -148,7 +231,7 @@
 /* Rutenettstrekene står bare i lyset. På de mørke flatene (g-natt, g-jord) og i overgangen
    (.cross) ble de stående som grå striper gjennom hele seksjonen. Dette skjuler bare
    hjelpestrekene – hårstreker og kanter bruker også --rule og er urørt. */
-.ak .g-natt .rules,.ak .g-jord .rules,.ak .cross .rules{
+.ak .rules{
   display:none
 }
 .ak .rules::before,.ak .rules::after{
@@ -170,22 +253,22 @@
 }
 /* ---- typografi ---- */
 .ak h1{
-  font-size:clamp(2.15rem,1.1rem + 4.6vw,5.1rem);line-height:1.03;letter-spacing:-.025em
+  font-size:var(--fs-h1);line-height:1.04;letter-spacing:-.025em;text-wrap:balance
 }
 .ak h2{
-  font-size:clamp(1.85rem,1.1rem + 3vw,3.6rem);line-height:1.08;letter-spacing:-.02em
+  font-size:var(--fs-h2);line-height:1.1;letter-spacing:-.02em;text-wrap:balance
 }
 .ak h3{
-  font-size:clamp(1.4rem,1.05rem + 1.4vw,2.1rem);line-height:1.15;letter-spacing:-.015em
+  font-size:var(--fs-h3);line-height:1.18;letter-spacing:-.015em;text-wrap:balance
 }
 .ak .lead{
-  font-size:clamp(1.06rem,.98rem + .42vw,1.35rem);line-height:1.55;color:var(--muted)
+  font-size:var(--fs-lead);line-height:1.6;color:var(--muted)
 }
 .ak .body{
   color:var(--muted);max-width:60ch
 }
 .ak .micro{
-  font-size:1rem;color:var(--muted)
+  font-size:var(--fs-small);color:var(--muted)
 }
 .ak .big{
   font-family:var(--serif);font-size:clamp(1.25rem,1rem + 1.1vw,1.9rem);
@@ -193,10 +276,10 @@
 }
 .ak .overline{
   display:flex;align-items:center;gap:.9em;margin:0;
-  font-family:var(--sans);font-size:.78rem;font-weight:600;line-height:1.4;
-  letter-spacing:.22em;text-transform:uppercase;color:var(--messing-lys)
+  font-family:var(--sans);font-size:var(--fs-label);font-weight:600;line-height:1.45;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--messing-lys)
 }
-.ak .g-papir .overline{
+.ak .g-papir .overline,.ak .g-lin .overline{
   color:var(--messing)
 }
 .ak .overline::before{
@@ -206,34 +289,27 @@
   justify-content:center
 }
 .ak .label{
-  display:block;font-family:var(--sans);font-size:.76rem;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--accent)
+  display:block;font-family:var(--sans);font-size:var(--fs-label);font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent)
 }
 /* ---- knapper og lenker ---- */
 .ak .btn{
   position:relative;display:inline-flex;align-items:center;justify-content:center;
-  min-height:52px;padding:.85em 2.1em;border-radius:999px;border:1px solid transparent;
+  min-height:54px;padding:.85em 2.1em;border-radius:999px;border:1px solid transparent;
   background:var(--btn-bg);color:var(--btn-ink);
-  font-family:var(--sans);font-size:1.02rem;font-weight:600;letter-spacing:.005em;
-  text-decoration:none;overflow:hidden;isolation:isolate;
-  transition:transform var(--t-s) var(--ease), box-shadow var(--t-m) var(--ease), filter var(--t-s) var(--ease);
+  font-family:var(--sans);font-size:1.0625rem;font-weight:600;letter-spacing:.005em;line-height:1.2;
+  text-decoration:none;white-space:nowrap;
+  transition:background-color var(--t-s) ease,color var(--t-s) ease,box-shadow var(--t-m) var(--ease)
 }
-.ak .btn::after{
-  content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;
-  background:radial-gradient(120% 180% at 50% 120%, rgba(255,255,255,.55), transparent 62%);
-  opacity:0;transition:opacity var(--t-m) var(--ease)
-}
-.ak .g-natt .btn::after,.ak .g-jord .btn::after{
-  background:radial-gradient(120% 180% at 50% 120%, rgba(157,170,140,.75), transparent 64%)
-}
+/* Tydelig, men rolig: fargen skifter, knappen flytter seg ikke */
 .ak .btn:hover{
-  transform:translateY(-3px);box-shadow:0 10px 30px -12px rgba(0,0,0,.55)
-}
-.ak .btn:hover::after{
-  opacity:1
+  background:var(--btn-hover);box-shadow:0 10px 24px -16px rgba(10,24,16,.55)
 }
 .ak .btn:active{
-  transform:translateY(-1px)
+  transform:translateY(1px)
+}
+.ak .g-natt .btn,.ak .g-jord .btn{
+  border-color:rgba(255,255,255,.35)
 }
 .ak .btn--sek{
   background:transparent;color:var(--ink);border-color:var(--rule)
@@ -254,12 +330,12 @@
   display:inline-block;
 }
 .ak .ul:hover{
-  background-size:100% 2px;transform:translateY(-2px)
+  background-size:100% 2px
 }
 .ak .g-natt .ul:hover,.ak .g-jord .ul:hover{
   color:#fff
 }
-.ak .g-papir .ul:hover{
+.ak .g-papir .ul:hover,.ak .g-lin .ul:hover{
   color:var(--blekk)
 }
 .ak .ul--sub{
@@ -295,7 +371,7 @@
 }
 .ak .skip{
   position:absolute;left:12px;top:-200px;z-index:999;padding:14px 20px;border-radius:2px;
-  background:var(--lin);color:var(--natt);font-weight:600;text-decoration:none;
+  background:var(--lin);color:var(--natt-dyp);font-weight:600;text-decoration:none;
   transition:top var(--t-s) var(--ease)
 }
 .ak .skip:focus{
@@ -304,9 +380,11 @@
 /* ============================================================
    HEADER
    ============================================================ */
+/* Fast smaragd, også over heroen: forutsigbar, og ingen fargebytte mens man ruller */
 .ak .hdr{
-  position:sticky;top:0;z-index:50;background:var(--natt);
-  border-bottom:1px solid rgba(242,238,230,.1)
+  position:sticky;top:0;z-index:50;background:rgba(21,44,32,.97);color:var(--lin);
+  border-bottom:1px solid rgba(244,242,235,.1);
+  --btn-bg:var(--lin);--btn-ink:var(--natt-dyp);--btn-hover:#FFFFFF;--focus:var(--messing-lys)
 }
 .ak .hdr__in{
   display:flex;align-items:center;gap:clamp(16px,3vw,44px);
@@ -324,7 +402,7 @@
   mask:var(--logo) no-repeat center/contain
 }
 .ak .brand:hover{
-  color:var(--mose);transform:translateY(-2px)
+  color:var(--messing-lys)
 }
 @media (max-width:420px){
   .ak .brand__mark{
@@ -335,7 +413,7 @@
   display:flex;align-items:center;gap:clamp(14px,2vw,30px);margin-left:auto
 }
 .ak .nav a{
-  font-size:.9rem;color:var(--lin-dempet);text-decoration:none;
+  font-size:1rem;color:var(--lin-dempet);text-decoration:none;
   min-height:44px;display:inline-flex;align-items:center;
   background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;
   background-repeat:no-repeat;background-position:0 calc(50% + .85em);
@@ -374,10 +452,10 @@
     display:none
   }
   .ak .menu>summary:hover{
-    border-color:var(--mose);transform:translateY(-2px)
+    border-color:var(--messing-lys)
   }
   .ak .menu__panel{
-    position:absolute;left:0;right:0;top:100%;background:var(--natt);
+    position:absolute;left:0;right:0;top:100%;background:var(--natt-dyp);
     border-bottom:1px solid rgba(242,238,230,.14);padding:8px var(--pad) 22px
   }
   .ak .menu__panel a{
@@ -386,10 +464,10 @@
     border-bottom:1px solid rgba(242,238,230,.1)
   }
   .ak .menu__panel a:hover{
-    color:var(--mose)
+    color:var(--messing-lys)
   }
   .ak .menu__panel a[aria-current="page"]{
-    color:var(--mose)
+    color:var(--messing-lys)
   }
   .ak .hdr .btn{
     order:3;min-height:44px;padding:.55em 1.25em;font-size:.92rem
@@ -409,7 +487,7 @@
    besøkende ser med én gang at de står et annet sted enn forsiden.
    ============================================================ */
 .ak .phero{
-  padding-block:clamp(44px,6vw,92px) clamp(36px,4.6vw,70px);position:relative;overflow:hidden
+  padding-block:clamp(44px,6vw,92px) calc(clamp(40px,5vw,76px) + var(--ut,0px));position:relative;overflow:hidden
 }
 .ak .phero__in{
   display:grid;gap:clamp(16px,2vw,26px);max-width:24ch
@@ -433,7 +511,7 @@
   transition:background-size var(--t-m) var(--ease),color var(--t-s) var(--ease)
 }
 .ak .crumb a:hover{
-  color:var(--lin);background-size:100% 1px
+  color:var(--ink);background-size:100% 1px
 }
 /* Bare skilletegnet dempes. Sidens eget navn er en opplysning og
 må holde kontrastkravet. */
@@ -441,7 +519,7 @@ må holde kontrastkravet. */
   opacity:.5
 }
 .ak .crumb span[aria-current]{
-  color:var(--lin)
+  color:var(--ink)
 }
 .ak .phero__cta{
   display:flex;align-items:center;gap:clamp(16px,2.6vw,32px);flex-wrap:wrap;
@@ -479,11 +557,11 @@ må holde kontrastkravet. */
   padding-top:.35em;min-width:2.2ch;transition:opacity var(--t-s) var(--ease)
 }
 .ak .row__t{
-  font-family:var(--serif);font-size:clamp(1.15rem,.95rem + .85vw,1.65rem);
-  line-height:1.2;letter-spacing:-.01em;color:var(--ink)
+  font-family:var(--serif);font-size:var(--fs-h4);
+  line-height:1.22;letter-spacing:-.01em;color:var(--ink)
 }
 .ak .row__d{
-  color:var(--muted);max-width:52ch;font-size:1rem
+  color:var(--muted);max-width:52ch;font-size:var(--fs-small)
 }
 /* bildetekst */
 .ak .cap{
@@ -493,36 +571,44 @@ må holde kontrastkravet. */
   color:var(--accent)
 }
 .ak .cap i{
-  font-family:var(--serif);font-style:italic;font-size:1.02rem;line-height:1.45;color:var(--muted)
+  font-family:var(--serif);font-style:italic;font-size:1.0625rem;line-height:1.45;color:var(--muted)
 }
 /* rammer rundt produktutsnitt */
 .ak .shotfig{
   margin:0;display:grid;gap:14px;align-content:start;justify-items:start
 }
+/* ---- rammene rundt produktbildene (Julies tilbakemelding) ----
+   Rammen er et lite «appvindu»: en smal smaragdlist øverst, som topplinjen i appen, og ellers en tynn kant og en
+   myk skygge. Appen har lyse arbeidsflater under en smaragd topplinje (docs/app-lys.md), så rammen speiler
+   produktet i stedet for å pynte på det. Bildene er ekte utsnitt fra demoen og ikke redigert. */
+.ak{
+  --ramme:
+    radial-gradient(120% 90% at 0% 0%,rgba(54,100,74,.55),rgba(54,100,74,0) 60%),
+    linear-gradient(160deg,#22402F,#1B3527 60%,#152C20);
+  --ramme-skygge:0 30px 60px -38px rgba(16,37,26,.45),0 8px 18px -12px rgba(16,37,26,.25);
+}
 .ak .phoneframe{
-  border:1px solid rgba(242,238,230,.26);border-radius:22px;padding:5px;background:rgba(0,0,0,.18);
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+  border:1px solid rgba(244,242,235,.22);border-radius:26px;padding:7px;
+  background:var(--ramme);box-shadow:var(--ramme-skygge)
 }
 .ak .phoneframe img{
-  border-radius:17px;height:var(--ph,none);object-fit:cover;object-position:top center;
+  border-radius:19px;height:var(--ph,none);object-fit:cover;object-position:top center;
   -webkit-mask:linear-gradient(to bottom,#000 86%,transparent);
   mask:linear-gradient(to bottom,#000 86%,transparent)
 }
-.ak .g-papir .phoneframe{
-  border-color:var(--strek);background:var(--kalk)
+.ak .g-natt .phoneframe,.ak .g-jord .phoneframe{
+  background:rgba(0,0,0,.18);box-shadow:none
 }
-.ak .shotfig:hover .phoneframe{
-  transform:translateY(-5px);border-color:var(--accent)
+.ak .deskframe,.ak .sh__f{
+  position:relative;overflow:hidden;padding:0;
+  border:1px solid rgba(42,29,20,.14);border-top:clamp(8px,.7vw,11px) solid #1B3527;border-radius:12px;
+  background:#F1F3EA;box-shadow:var(--ramme-skygge)
 }
-.ak .deskframe{
-  border:1px solid var(--rule);border-radius:2px;padding:8px;background:rgba(242,238,230,.05);
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
+.ak .deskframe img,.ak .sh__f img{
+  border-radius:0;width:100%
 }
-.ak .g-papir .deskframe{
-  background:var(--kalk);border-color:var(--strek)
-}
-.ak .shotfig:hover .deskframe{
-  transform:translateY(-5px);border-color:var(--accent)
+.ak .g-natt .deskframe,.ak .g-jord .deskframe{
+  border-color:rgba(244,242,235,.22);background:rgba(0,0,0,.18);box-shadow:none
 }
 /* sitat / merknad med strek i margen */
 .ak .note{
@@ -538,13 +624,13 @@ må holde kontrastkravet. */
 .ak .who--koord{
   color:var(--messing-lys)
 }
-.ak .g-papir .who--koord{
+.ak .g-papir .who--koord,.ak .g-lin .who--koord{
   color:var(--messing)
 }
 .ak .who--arv{
   color:var(--mose)
 }
-.ak .g-papir .who--arv{
+.ak .g-papir .who--arv,.ak .g-lin .who--arv{
   color:var(--granskog)
 }
 .ak .who--alle{
@@ -566,20 +652,28 @@ må holde kontrastkravet. */
   display:flex;align-items:center;gap:clamp(16px,2.6vw,32px);flex-wrap:wrap;justify-content:center
 }
 .ak .foot{
-  border-top:1px solid rgba(242,238,230,.12);padding-block:clamp(40px,5vw,66px)
+  padding-block:clamp(56px,6vw,90px) clamp(40px,4.4vw,60px)
+}
+/* Bunnteksten: roligere og mørkere smaragd enn heroen, så heroen forblir den spesielle */
+.ak .foot.g-natt{
+  background:
+    var(--korn),
+    radial-gradient(80% 90% at 12% 0%,rgba(38,70,52,.55),rgba(38,70,52,0)),
+    linear-gradient(175deg,#1B3527 0%,#152C20 55%,#10251A 100%),
+    var(--natt-dyp)
 }
 .ak .foot__in{
   display:grid;gap:clamp(22px,3vw,34px)
 }
 .ak .foot__t{
-  font-family:var(--serif);font-size:clamp(1.1rem,.95rem + .6vw,1.45rem);
-  line-height:1.4;color:var(--lin);max-width:44ch
+  font-family:var(--serif);font-size:var(--fs-h3);
+  line-height:1.3;letter-spacing:-.015em;color:var(--lin);max-width:26ch
 }
 .ak .foot__links{
   display:flex;flex-wrap:wrap;gap:.2em clamp(16px,2vw,28px);align-items:center
 }
 .ak .foot__links a{
-  color:var(--lin-dempet);text-decoration:none;font-size:.95rem;
+  color:var(--lin-dempet);text-decoration:none;font-size:1rem;
   min-height:44px;display:inline-flex;align-items:center;flex:none;white-space:nowrap;
   transition:color var(--t-s) var(--ease)
 }
@@ -590,7 +684,7 @@ må holde kontrastkravet. */
   color:var(--lin)
 }
 .ak .foot__note{
-  color:rgba(185,180,168,.72);font-size:.85rem;max-width:68ch
+  color:var(--lin-dempet);font-size:.9375rem;max-width:68ch
 }
 .ak .g-papir .utkast{
   color:var(--messing);border-color:rgba(138,90,52,.45)
@@ -599,13 +693,13 @@ må holde kontrastkravet. */
   .ak *,.ak *::before,.ak *::after{
     animation:none !important;transition-duration:1ms !important
   }
-  .ak .btn:hover,.ak .row:hover,.ak .ul:hover,.ak .brand:hover,.ak .menu>summary:hover,.ak .shotfig:hover .phoneframe,.ak .shotfig:hover .deskframe{
+  .ak .btn:active{
     transform:none
   }
 }
 /* selskapsopplysninger i bunnteksten */
 .ak .foot__org{
-  color:var(--lin-dempet);font-size:.9rem;letter-spacing:.01em
+  color:var(--lin-dempet);font-size:.9375rem;letter-spacing:.01em
 }
 /* ============================================================
    SIDEEGEN KOMPOSISJON
@@ -624,7 +718,7 @@ må holde kontrastkravet. */
   justify-self:start;
   font-family:var(--serif);font-optical-sizing:none;
   font-size:clamp(1.45rem,1rem + 2.3vw,3rem);line-height:1.1;letter-spacing:-.02em;
-  color:var(--lin);text-decoration:none;display:inline-block;word-break:break-word;
+  color:var(--ink);text-decoration:none;display:inline-block;word-break:break-word;
   background-image:linear-gradient(currentColor,currentColor);
   background-size:100% 1px;background-repeat:no-repeat;
   background-position:0 calc(100% - .16em);padding-bottom:.2em;
@@ -632,10 +726,10 @@ må holde kontrastkravet. */
   transform var(--t-s) var(--ease)
 }
 .ak .adr__e:hover{
-  background-size:100% 2px;color:#fff;transform:translateY(-2px)
+  background-size:100% 2px;color:var(--link)
 }
 .ak .adr__m{
-  color:var(--lin-dempet);font-size:.98rem;max-width:46ch
+  color:var(--muted);font-size:var(--fs-small);max-width:46ch
 }
 /* ---- to veier inn, samme innboks ---- */
 .ak .veier{
@@ -644,7 +738,7 @@ må holde kontrastkravet. */
   margin-top:clamp(32px,4vw,56px)
 }
 .ak .vei{
-  background:var(--papir);padding:clamp(24px,2.8vw,40px);
+  background:var(--silke-lys);padding:clamp(24px,2.8vw,40px);
   display:grid;gap:clamp(12px,1.5vw,18px);align-content:start
 }
 .ak .vei h3{
@@ -707,21 +801,8 @@ det folk ellers ville sendt en e-post om. */
    §1 HERO
    ============================================================ */
 .ak .hero{
-  min-height:calc(86svh - 74px);display:grid;align-items:center;
-  padding-block:clamp(48px,7vw,90px) clamp(26px,4vw,40px);overflow:hidden
-}
-/* Lampa skrus opp én gang når siden åpnes, og blir så stående. Siden faller
-til ro etter under to sekunder. Livet ligger i overgangen og i det som
-svarer når man peker — ikke i en dekorativ puls som aldri stopper. */
-.ak .hero__glow{
-  position:absolute;z-index:0;left:50%;top:44%;width:min(150vw,1600px);aspect-ratio:1.45;
-  background:radial-gradient(ellipse at center, rgba(199,154,107,.22), rgba(157,170,140,.11) 36%, transparent 66%);
-  pointer-events:none;will-change:transform,opacity;
-  animation:ak-lampe 1200ms var(--ease) both
-}
-@keyframes ak-lampe{
-  from{transform:translate(-50%,-50%) translateY(26px) scale(.9);opacity:0}
-  to  {transform:translate(-50%,-50%) translateY(0) scale(1);opacity:1}
+  min-height:calc(84svh - 74px);display:grid;align-items:center;
+  padding-block:clamp(48px,7vw,96px) calc(clamp(40px,5vw,72px) + var(--kurve));overflow:hidden
 }
 .ak .hero__in{
   display:grid;justify-items:center;text-align:center;gap:clamp(18px,2.4vw,30px);
@@ -790,7 +871,7 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
 .ak .hero{
   /* Fallback for nettlesere uten color-mix() (Safari under 16.2): samme blanding, fast verdi */
   --ordfarge:#D7BA9A;
-  --ordfarge:color-mix(in srgb, var(--messing-lys) 62%, var(--lin))
+  --ordfarge:color-mix(in srgb, #C79A6B 62%, #F2EEE6)
 }
 .ak .ordslot__i{
   color:var(--ordfarge)
@@ -823,10 +904,10 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
 }
 .ak .hero__micro{
   display:inline-flex;align-items:center;gap:.6em;color:var(--lin-dempet);
-  font-size:1rem;text-align:left;flex-wrap:wrap;justify-content:center
+  font-size:var(--fs-small);text-align:left;flex-wrap:wrap;justify-content:center
 }
 .ak .hero__micro > svg{
-  flex:0 0 auto;color:var(--mose)
+  flex:0 0 auto;color:var(--sheen)
 }
 /* ---- pause/start for ordskiftet (WCAG 2.2.2) ----
    Knappen står alltid i HTML-en, men er usynlig til «.ak-js» er satt. Da flytter ikke heroen seg
@@ -837,14 +918,14 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
   display:inline-flex;align-items:center;gap:.5em;flex:0 0 auto;
   min-height:44px;padding:0 .1em;margin-left:.2em;
   background:none;border:0;cursor:pointer;
-  font-family:var(--sans);font-size:.95rem;font-weight:500;color:var(--lin-dempet);
+  font-family:var(--sans);font-size:1rem;font-weight:500;color:var(--lin-dempet);
   background-image:linear-gradient(currentColor,currentColor);
   background-size:0% 1px;background-repeat:no-repeat;background-position:0 calc(50% + .8em);
   transition:background-size var(--t-m) var(--ease),color var(--t-s) var(--ease);
 }
 .ak.ak-js .ordpause{visibility:visible}
 .ak .ordpause:hover{color:var(--lin);background-size:100% 1px}
-.ak .ordpause__i{display:inline-flex;align-items:center;color:var(--mose)}
+.ak .ordpause__i{display:inline-flex;align-items:center;color:var(--sheen)}
 @media (prefers-reduced-motion: reduce){
   .ak .ordpause{display:none}
 }
@@ -867,11 +948,18 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
   .ak .hero__cta{
     justify-content:flex-start;gap:20px;width:100%
   }
+  /* ikonet og teksten holder sammen; pauseknappen kan bryte til egen linje */
+  .ak .hero__micro{
+    justify-content:flex-start;align-items:flex-start
+  }
+  .ak .hero__micro > span{
+    flex:1 1 0;min-width:12ch
+  }
+  .ak .hero__micro > svg{
+    margin-top:.2em
+  }
   .ak .hero .btn{
     flex:1 1 auto;min-width:min(100%,220px)
-  }
-  .ak .hero__glow{
-    top:30%
   }
 }
 @media (max-width:420px){
@@ -883,140 +971,57 @@ overskriften lys og peker mot den varme lyskjeglen bak. */
   }
 }
 /* ============================================================
-   SIGNATUR — overgangen fra mørke til lys
+   PRODUKTFILMEN — i lyset rett under heroen
+   Den scrolldrevne mørk→lys-overgangen (--lift, rAF-løkke) er tatt bort: den var i praksis en
+   parallakseeffekt. Filmen står nå stille i en smaragdramme, som de andre produktbildene.
+   Plakaten er fortsatt LCP-elementet og lastes ivrig; <video> settes inn først ved trykk.
    ============================================================ */
-/* Signaturen kjører på én variabel, --lift, satt på .cross av én rAF-løkke.
-Alt som beveger seg er transform eller opacity, slik at nettleseren slipper
-å regne ut layout eller male om flater per bilde. Mørket er en egen heldekkende
-flate som skyves opp; bildetekstens lysgrense er den samme flaten inne i rammen. */
-.ak .cross{
-  position:relative;
-  --edgeY:calc(68svh - var(--lift) * 64svh);
-  --frameTop:4svh; --frameH:62svh; --fpad:clamp(6px,.7vw,10px);
-  /* toppen av selve skjermbildet, rammelinje og luft medregnet, slik at
-  lysgrensen inne i rammen ligger på nøyaktig samme linje som ute på siden */
-  --winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 1px + var(--fpad));
-  /* 4svh topp + 62svh ramme + 6svh luft under. Seksjonen hadde 86svh da bildeteksten sto
-     under rammen; uten den ble det 180 px dødt rom. */
-  height:72svh;
-  /* bildeteksten lander alltid i lyset */
-  --ink:var(--blekk); --muted:var(--skifer); --accent:var(--granskog);
-  --rule:rgba(128,126,116,.3);
+.ak .filmsone{
+  padding-block:calc(clamp(40px,5vw,72px) + var(--inn,0px)) clamp(24px,3vw,44px)
 }
-.ak .cross__bg{
-  position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--papir)
+.ak .filmsone__fig{
+  margin:0 auto;max-width:min(1100px,100%)
 }
-.ak .cross__dark{
-  position:absolute;left:0;right:0;top:0;height:300svh;background:var(--natt);
-  transform:translateY(calc(var(--edgeY) - 300svh));will-change:transform
-}
-.ak .cross__line{
-  position:absolute;left:0;right:0;top:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(157,170,140,.75) 14%,rgba(157,170,140,.75) 86%,transparent);
-  transform:translateY(var(--edgeY));will-change:transform
-}
-.ak .cross__fig{
-  position:absolute;z-index:2;left:0;right:0;top:var(--frameTop);
-  display:grid;justify-items:center;margin:0;padding-inline:var(--pad)
-}
-/* ------------------------------------------------------------------
-PRODUKTFILMEN
-Rammen er høydestyrt på PC, som enhetsgruppen var: høyden kommer fra
---frameH, og bredden følger av 16:9. På mobil må det snus — 4:5 med
-høyden fra --frameH ville blitt 473 px bredt på en 390 px skjerm — så
-der er bredden 100 % og høyden følger av forholdet.
-
-aspect-ratio settes på rammen i begge tilfeller, så plassen er tatt før
-plakaten er lastet og siden ikke hopper (CLS).
-
-Løftet (translate) er det samme som enhetsgruppen hadde, så overgangen
-mot lyset oppfører seg uendret.
------------------------------------------------------------------- */
 .ak .film{
-  /* max-width er taket på høyden, uttrykt i bredde: 4:5 av full bredde ville blitt 1103 px høyt
-     på en 980x900-skjerm, altså høyere enn vinduet. 76svh * 4/5 holder den innenfor.
-     Kant og luft ligger innenfor målene (box-sizing: border-box), så aspect-ratio og --frameH
-     stemmer selv om rammen har ramme. */
-  position:relative;width:100%;max-width:min(1140px,calc(76svh * 4 / 5));aspect-ratio:4/5;
-  translate:0 calc((1 - var(--lift)) * 2.4svh);
-  border:1px solid var(--strek);border-radius:4px;padding:var(--fpad);
-  background:var(--kalk);
-  box-shadow:0 26px 56px -44px rgba(31,35,38,.5)
+  position:relative;width:100%;aspect-ratio:4/5;margin-inline:auto;
+  /* på mobil: aldri høyere enn vinduet */
+  max-width:calc(80svh * 4 / 5);
+  border:1px solid rgba(21,44,32,.5);border-radius:18px;padding:clamp(7px,.8vw,11px);
+  background:var(--ramme);box-shadow:var(--ramme-skygge)
 }
-/* Rammen krysser lyset sammen med siden: mørk så lenge --lift < 1, lys når overgangen er ferdig.
-   Fallback uten color-mix trengs ikke – dette er en opacity, ikke en fargeblanding. */
-.ak .film::before{
-  content:'';position:absolute;inset:-1px;z-index:0;border-radius:inherit;
-  background:var(--natt);border:1px solid rgba(242,238,230,.24);
-  opacity:calc(1 - var(--lift));pointer-events:none
+@media (min-width:981px){
+  .ak .film{
+    aspect-ratio:16/9;max-width:min(100%,calc((80svh - 74px) * 16 / 9))
+  }
 }
 .ak .film__vindu{
   position:relative;z-index:1;width:100%;height:100%;overflow:hidden;
-  border-radius:2px;background:var(--papir)
+  border-radius:9px;background:#1E201D
 }
 .ak .film__media{
   display:block;width:100%;height:100%;object-fit:cover
 }
-/* SLØRET. Uten dette skjærer lysgrensen tvers over plakaten. Med det treffer grensen inne i
-   rammen nøyaktig samme linje som ute på siden – det er hele grunnen til at --winTop finnes
-   (se kommentaren i .cross). Samme uttrykk som enhetsgruppen hadde før filmen overtok. */
-.ak .film__slor{
-  position:absolute;left:0;right:0;top:0;height:300svh;background:var(--natt);opacity:.8;
-  transform:translateY(calc(var(--edgeY) - var(--winTop) - 300svh));
-  will-change:transform;pointer-events:none
-}
-.ak .film__slor::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:rgba(157,170,140,.6)
-}
-@media (min-width:981px){
-  .ak .film{
-    aspect-ratio:16/9;height:var(--frameH);width:auto;max-width:min(100%,1140px)
-  }
-}
-/* Under bruddpunktet er rammen tykkere og hjørnene rundere, som enhetsrammen var. Kanten er
-   2 px her, og --winTop i .cross regner med nettopp 2px + --fpad under 980 px. */
-@media (max-width:980px){
-  .ak .film{
-    border-width:2px;border-radius:16px
-  }
-  .ak .film__vindu{
-    border-radius:11px
-  }
-}
-/* Avspillingsknappen: en ekte knapp oppå plakaten, midt i rammen. Lys pille med mørkt,
-   rundt spillikon, som i designet. Fokusringen er tydelig mot den lyse pillen. */
+/* Avspillingsknappen: en ekte knapp oppå plakaten, midt i rammen. */
 .ak .film__btn{
-  /* z-index 2: .film__vindu har 1 og lager en stablingskontekst, så knappen ville ellers bli
-     malt under vinduet og være usynlig. */
   position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:2;
   display:inline-flex;align-items:center;gap:clamp(10px,1vw,14px);
-  padding:clamp(9px,.9vw,13px) clamp(20px,1.8vw,28px) clamp(9px,.9vw,13px) clamp(9px,.8vw,12px);
-  border:0;border-radius:999px;cursor:pointer;
-  background:#F5F2EB;color:#1F2326;
-  font-family:var(--sans);font-size:clamp(1rem,.95rem + .35vw,1.3rem);font-weight:500;
-  box-shadow:0 6px 22px -8px rgba(20,24,20,.45);
-  white-space:nowrap;
-  transition:box-shadow var(--t-m) var(--ease),transform var(--t-s) var(--ease)
+  min-height:56px;padding:6px clamp(22px,1.8vw,28px) 6px 7px;
+  border:1px solid rgba(42,29,20,.14);border-radius:999px;cursor:pointer;
+  background:#FFFDF8;color:var(--blekk);
+  font-family:var(--sans);font-size:clamp(1.0625rem,1rem + .3vw,1.25rem);font-weight:600;
+  box-shadow:0 14px 30px -18px rgba(0,0,0,.6);white-space:nowrap;
+  transition:background-color var(--t-s) ease
 }
 .ak .film__btn:hover{
-  box-shadow:0 12px 34px -10px rgba(20,24,20,.6);transform:translateY(-1px)
+  background:#fff
 }
 .ak .film__btn:focus-visible{
-  outline:3px solid var(--granskog);outline-offset:3px
+  outline:3px solid var(--messing-lys);outline-offset:3px
 }
 .ak .film__ikon{
   display:inline-flex;align-items:center;justify-content:center;
-  width:clamp(38px,3.2vw,46px);height:clamp(38px,3.2vw,46px);
-  border-radius:50%;background:#1F2326;color:#F5F2EB;flex:none
-}
-@media (prefers-reduced-motion: reduce){
-  .ak .film__btn{
-    transition:none
-  }
-  .ak .film__btn:hover{
-    transform:none
-  }
+  width:clamp(42px,3.4vw,48px);height:clamp(42px,3.4vw,48px);
+  border-radius:50%;background:var(--granskog);color:var(--lin);flex:none
 }
 .ak .cap--c{
   justify-items:center;text-align:center;margin-inline:auto
@@ -1033,13 +1038,6 @@ mot lyset oppfører seg uendret.
   }
 }
 @media (max-width:980px){
-  .ak .cross{
-    --edgeY:calc(86svh - var(--lift) * 80svh);--frameTop:6svh;--frameH:70svh;--fpad:7px;--winTop:calc(var(--frameTop) + (1 - var(--lift)) * 2.4svh + 2px + var(--fpad));
-    /* Under bruddpunktet er filmen breddestyrt (4:5 av tilgjengelig bredde), ikke høydestyrt,
-       så høyden regnes ut i stedet for å settes i svh: topp + rammens høyde + luft. --pad er
-       --gut her (maxw-grenen slår aldri inn så smalt), derfor det samme uttrykket. */
-    height:calc(6svh + min((100vw - 2 * clamp(20px,5vw,72px)) * 1.25, 76svh) + 4svh)
-  }
   .ak .cap{
     max-width:none
   }
@@ -1050,88 +1048,11 @@ mot lyset oppfører seg uendret.
 .ak .s2__head{
   display:grid;gap:clamp(14px,1.6vw,22px);max-width:62ch
 }
-.ak .ki .overline{
-  color:var(--messing-lys)
-}
-.ak .g-papir .shotfig:hover .phoneframe{
-  border-color:var(--granskog)
-}
-.ak .quotes .rows>li{
-  border-color:rgba(242,238,230,.16)
-}
-.ak .quotes .row{
-  padding-block:clamp(14px,1.5vw,18px)
-}
-.ak .quotes .row__d{
-  color:var(--lin-dempet);font-family:var(--serif);font-style:italic;font-size:1.02rem;max-width:62ch
-}
-/* Radioknappen dekker hele raden sin i stedet for å være ett usynlig punkt.
-Da havner fokusringen rundt raden den gjelder, og ingen tabulatorstopp er usynlig.
-pointer-events er av, så etiketten håndterer pekeren og hover virker som før. */
-.ak .tabs .rows>li{
-  position:relative;transition:none
-}
-.ak .tabs .row{
-  cursor:pointer;width:100%;text-align:left;padding-right:1em
-}
-.ak .tabs .row__n{
-  opacity:.82
-}
-.ak .tabs .row__t{
-  color:var(--muted);transition:color var(--t-s) var(--ease)
-}
-.ak .tabs .row__d{
-  transition:color var(--t-s) var(--ease)
-}
-.ak .tabs .row:hover{
-  transform:translateY(-2px)
-}
-.ak .tabs .row:hover::before{
-  width:100%
-}
-.ak .tabs .row:hover .row__n{
-  opacity:1
-}
-.ak .tabs .row:hover .row__t{
-  color:var(--accent)
-}
 .ak .faq details>summary:hover .faq__n{
   opacity:1
 }
 .ak .faq details>summary:hover .faq__q{
   color:var(--accent)
-}
-.ak .tabshots .shotfig{
-  grid-area:1/1;opacity:0;visibility:hidden;
-  translate:0 14px;transition:opacity var(--t-m) var(--ease),translate var(--t-m) var(--ease)
-}
-/* standard, også uten :has() */
-.ak .tabshots .deskframe{
-  border:1px solid var(--strek);border-radius:2px;padding:8px;background:var(--kalk);
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
-}
-.ak .tabshots .shotfig:hover .deskframe{
-  transform:translateY(-5px);border-color:var(--granskog)
-}
-.ak .tabs .rows>li:has(input:checked) .row::before{
-  width:100%
-}
-.ak .tabs .rows>li:has(input:checked) .row__n{
-  opacity:1
-}
-.ak .tabs .rows>li:has(input:checked) .row{
-  transform:translateY(-2px)
-}
-.ak .tabs .rows>li:has(input:checked) .row__t,.ak .tabs .rows>li:has(input:checked) .row__d{
-  color:var(--ink)
-}
-.ak .tabs .rows>li:has(input:checked) .row:hover .row__t{
-  color:var(--accent)
-}
-@media (max-width:980px){
-  .ak .tabs .rows{
-    order:2
-  }
 }
 /* ============================================================
    §4 / §7 — tekst + telefon
@@ -1196,48 +1117,42 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
    ============================================================ */
 .ak .team{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:1px;background:var(--rule);border-block:1px solid var(--rule);
-  margin-top:clamp(40px,5vw,72px)
-}
-.ak .team li{
-  background:var(--natt);padding:clamp(18px,2vw,28px) clamp(14px,1.6vw,24px)
-}
-.ak .portrait{
-  aspect-ratio:4/5;max-width:190px;background:var(--jord);
-  border:1px dashed rgba(242,238,230,.26);
-  border-radius:2px;display:grid;place-items:center;margin-bottom:16px;
-  color:var(--lin-dempet);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase
+  gap:clamp(20px,2.4vw,32px);margin-top:clamp(32px,4vw,56px)
 }
 .ak .team__n{
-  font-family:var(--serif);font-size:clamp(1.1rem,1rem + .35vw,1.3rem);line-height:1.22;
-  color:var(--lin);text-wrap:balance
+  font-family:var(--serif);font-size:var(--fs-h4);line-height:1.22;
+  color:var(--ink);text-wrap:balance
 }
 .ak .team__r{
-  font-size:.95rem;line-height:1.4;color:var(--lin-dempet);margin-top:.25em
+  font-size:var(--fs-small);line-height:1.45;color:var(--muted);margin-top:.3em
 }
 .ak .team__links{
-  display:flex;gap:clamp(18px,2.5vw,32px);flex-wrap:wrap;margin-top:clamp(28px,3.5vw,46px)
+  display:flex;gap:clamp(18px,2.5vw,32px);flex-wrap:wrap;margin-top:clamp(24px,3vw,40px)
 }
 @media (max-width:860px){
   .ak .team{
-    grid-template-columns:repeat(2,minmax(0,1fr))
-  }
-  /* navn og rolle skal staa paa linje med hverandre selv naar ett navn brekker */
-  .ak .team__n{
-    min-height:2.44em
-  }
-  .ak .team__r{
-    min-height:2.8em
+    grid-template-columns:repeat(2,minmax(0,1fr));row-gap:28px
   }
 }
-@media (max-width:620px){
-  .ak .portrait{
-    aspect-ratio:1/1;max-width:none;margin-bottom:12px
-  }
+/* Seksjonsoverskrift under en overlinje: samme luft overalt i stedet for inline-stiler */
+.ak .h2-sek{
+  margin:clamp(12px,1.4vw,18px) 0 clamp(16px,2vw,24px);max-width:18ch
 }
 /* ============================================================
    §6 — spørsmål og svar
+   På brede skjermer: overskriften til venstre, spørsmålene til høyre (som v4)
    ============================================================ */
+.ak .faq-oppsett{
+  display:grid;gap:clamp(8px,2vw,24px)
+}
+@media (min-width:981px){
+  .ak .faq-oppsett{
+    grid-template-columns:minmax(0,.75fr) minmax(0,1.5fr);gap:clamp(32px,5vw,88px);align-items:start
+  }
+  .ak .faq-oppsett .faq{
+    margin-top:0
+  }
+}
 .ak .faq{
   margin-top:clamp(36px,4.5vw,64px);max-width:1000px
 }
@@ -1250,8 +1165,7 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 .ak .faq details>summary{
   list-style:none;cursor:pointer;position:relative;
   display:grid;grid-template-columns:auto 1fr auto;gap:.4em clamp(18px,2.4vw,34px);
-  align-items:center;padding:clamp(20px,2.4vw,30px) 0;
-  transition:transform var(--t-m) var(--ease)
+  align-items:center;padding:clamp(20px,2.2vw,28px) 0
 }
 .ak .faq details>summary::-webkit-details-marker{
   display:none
@@ -1259,9 +1173,6 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 .ak .faq details>summary::before{
   content:'';position:absolute;left:0;top:0;height:1px;width:0;
   background:var(--accent);transition:width var(--t-l) var(--ease)
-}
-.ak .faq details>summary:hover{
-  transform:translateY(-2px)
 }
 .ak .faq details>summary:hover::before,.ak .faq details[open]>summary::before{
   width:100%
@@ -1273,7 +1184,7 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   opacity:1
 }
 .ak .faq__q{
-  font-family:var(--serif);font-size:clamp(1.15rem,.95rem + .85vw,1.65rem);
+  font-family:var(--serif);font-size:var(--fs-h4);
   line-height:1.25;letter-spacing:-.01em;color:var(--ink)
 }
 .ak .faq__i{
@@ -1301,191 +1212,125 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   }
 }
 /* ============================================================
-   PRODUKTREISEN — fire steg, én gjenstand hele veien
-   Bryteren er radioknapper og :has(). Den virker uten JavaScript;
-   «Neste steg» er bare et tillegg for den som heller vil klikke framover.
+   PROSESSEN — fire steg, alle synlige på én skjerm (Andreas tilbakemelding)
+   Erstatter fanene, som skjulte tre av fire steg bak et klikk. Hvert steg har ett ekte
+   skjermbilde, én overskrift og to korte setninger. Detaljene står på «Slik fungerer det».
+   Ingen JavaScript, ingen bevegelse.
    ============================================================ */
-.ak .reise{
-  margin-top:clamp(40px,5vw,74px)
+.ak .prosess__hode{
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);gap:clamp(16px,4vw,72px);align-items:end
 }
-.ak .rail{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 clamp(12px,1.5vw,24px)
+.ak .prosess__hode h2{
+  margin-top:clamp(12px,1.4vw,18px)
 }
-.ak .rail>li{
-  position:relative
+.ak .prosess__hode .lead{
+  max-width:46ch
 }
-.ak .rail input{
-  position:absolute;inset:0;margin:0;appearance:none;background:none;border:0;
-  color:transparent;font-size:0;pointer-events:none
+.ak .prosess{
+  position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(16px,2vw,28px);margin-top:clamp(24px,2.6vw,40px)
 }
-.ak .rail input:focus-visible{
-  outline:2px solid var(--focus);outline-offset:-3px;border-radius:2px
+/* Linjen som binder stegene sammen, gjennom numrene */
+.ak .prosess::before{
+  content:'';position:absolute;left:20px;right:20px;top:20px;height:1px;
+  background:linear-gradient(90deg,var(--jade),var(--messing));opacity:.55
 }
-.ak .rail__b{
-  display:grid;grid-template-columns:auto 1fr;gap:.2em .75em;align-items:baseline;
-  border-top:1px solid var(--rule);padding:clamp(16px,1.8vw,22px) 0 clamp(14px,1.6vw,18px);
-  min-height:64px;cursor:pointer;position:relative;
-  transition:transform var(--t-m) var(--ease)
+.ak .prosess>li{
+  position:relative;display:grid;gap:12px;align-content:start
 }
-.ak .rail__b::before{
-  content:'';position:absolute;left:0;top:0;height:2px;width:0;background:var(--accent);
-  transition:width var(--t-l) var(--ease)
+.ak .prosess__n{
+  position:relative;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;
+  background:var(--granskog);color:var(--lin);
+  font-family:var(--serif);font-size:1.25rem;line-height:1;font-optical-sizing:none;
+  box-shadow:0 0 0 6px var(--papir)
 }
-.ak .rail__n{
-  font-family:var(--serif);font-size:1rem;color:var(--accent);opacity:.82;
-  transition:opacity var(--t-s) var(--ease)
+.ak .prosess h3{
+  font-size:var(--fs-h4);line-height:1.22;margin-top:4px
 }
-.ak .rail__t{
-  font-family:var(--serif);font-size:clamp(1.02rem,.9rem + .5vw,1.3rem);line-height:1.2;
-  color:var(--muted);transition:color var(--t-s) var(--ease)
-}
-.ak .rail__b:hover{
-  transform:translateY(-2px)
-}
-.ak .rail__b:hover::before{
-  width:100%
-}
-.ak .rail__b:hover .rail__n{
-  opacity:1
-}
-.ak .rail__b:hover .rail__t{
-  color:var(--accent)
-}
-.ak .reise:has(#r1:checked) li:nth-child(1) .rail__b::before,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__b::before,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__b::before,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__b::before{
-  width:100%
-}
-.ak .reise:has(#r1:checked) li:nth-child(1) .rail__n,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__n,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__n,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__n{
-  opacity:1
-}
-.ak .reise:has(#r1:checked) li:nth-child(1) .rail__t,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__t,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__t,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__t{
-  color:var(--ink)
-}
-.ak .reise:has(#r1:checked) li:nth-child(1) .rail__b:hover .rail__t,.ak .reise:has(#r2:checked) li:nth-child(2) .rail__b:hover .rail__t,.ak .reise:has(#r3:checked) li:nth-child(3) .rail__b:hover .rail__t,.ak .reise:has(#r4:checked) li:nth-child(4) .rail__b:hover .rail__t{
-  color:var(--accent)
-}
-.ak .stage{
-  margin-top:clamp(30px,3.6vw,52px)
-}
-.ak .st{
-  display:none;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);
-  gap:clamp(26px,3.6vw,64px);align-items:start
-}
-.ak .stage .s1{
-  display:grid
-}
-/* standard, også uten :has() */
-.ak .reise:has(#r2:checked) .s1,.ak .reise:has(#r3:checked) .s1,.ak .reise:has(#r4:checked) .s1{
-  display:none
-}
-.ak .reise:has(#r1:checked) .s1,.ak .reise:has(#r2:checked) .s2,.ak .reise:has(#r3:checked) .s3,.ak .reise:has(#r4:checked) .s4{
-  display:grid;animation:ak-stegfram 420ms var(--ease) both
-}
-.ak .quotes-int .row{
-  padding-block:clamp(11px,1.2vw,15px)
-}
-.ak .quotes-int .row__d{
-  font-family:var(--serif);font-style:italic;font-size:1rem;max-width:54ch
-}
-@keyframes ak-stegfram{
-  from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}
-}
-.ak .st__txt{
-  display:grid;gap:clamp(13px,1.5vw,20px);align-content:start
-}
-.ak .st__nr{
-  font-family:var(--sans);font-size:.78rem;font-weight:600;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--accent)
-}
-.ak .st__txt h3{
-  color:var(--ink);max-width:17ch
-}
-.ak .st__txt p{
-  color:var(--muted);max-width:52ch
-}
-.ak .st__next{
-  display:flex;align-items:flex-start;gap:.6em;border-top:1px solid var(--rule);
-  padding-top:clamp(13px,1.5vw,18px);margin-top:clamp(4px,.6vw,8px);
-  font-size:1rem;color:var(--muted)
-}
-.ak .st__next svg{
-  flex:0 0 auto;margin-top:.35em;color:var(--accent)
-}
-.ak .st__shots{
-  display:grid;gap:clamp(14px,1.8vw,24px)
-}
-.ak .st__shots--duo{
-  grid-template-columns:minmax(0,300px) minmax(0,1fr);align-items:start
-}
-.ak .st__shots--pair{
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start
-}
-.ak .sh{
-  margin:0;display:grid;gap:12px;align-content:start;justify-items:start
-}
-.ak .sh__f{
-  border:1px solid var(--strek);border-radius:2px;padding:7px;background:var(--kalk);
-  transition:transform var(--t-m) var(--ease),border-color var(--t-m) var(--ease)
-}
-.ak .sh:hover .sh__f{
-  transform:translateY(-4px);border-color:var(--granskog)
-}
-.ak .sh__f img{
-  width:100%
-}
-.ak .sh--foto .sh__f{
-  background:var(--papir);max-width:300px
-}
-.ak .sh--sim .sh__f{
-  border-style:dashed
-}
-.ak .reise__nav{
-  display:flex;align-items:center;gap:clamp(14px,2vw,24px);flex-wrap:wrap;
-  margin-top:clamp(26px,3vw,42px)
-}
-.ak .nostep{
-  display:none
-}
-.ak.ak-js .nostep{
-  display:inline-flex
-}
-.ak .btn--sm{
-  min-height:50px;padding:.7em 1.6em;font-size:1rem
-}
-@media (max-width:1180px){
-  .ak .rail{
-    grid-template-columns:repeat(3,minmax(0,1fr))
+/* lik høyde på titlene, så tekstene starter på samme linje i alle fire kolonner */
+@media (min-width:1101px){
+  .ak .prosess h3{
+    min-height:2.44em
   }
 }
-@media (max-width:980px){
-  .ak .rail{
-    grid-template-columns:repeat(2,minmax(0,1fr))
+.ak .prosess p{
+  color:var(--muted);font-size:var(--fs-small);line-height:1.55;max-width:34ch
+}
+.ak .prosess__bilde{
+  margin:4px 0 6px
+}
+.ak .prosess__bilde .sh__f{
+  border-radius:10px
+}
+.ak .prosess__bilde img{
+  aspect-ratio:16/9;object-fit:cover;object-position:left top
+}
+.ak .prosess + .cap{
+  display:block;max-width:none;margin-top:clamp(14px,1.6vw,20px)
+}
+.ak .prosess + .cap .label{
+  display:inline;margin-right:.8em
+}
+.ak .prosess + .cap i{
+  font-size:.9375rem
+}
+.ak .prosess__fot{
+  display:flex;align-items:center;justify-content:space-between;gap:12px 32px;flex-wrap:wrap;
+  margin-top:clamp(14px,1.6vw,22px);padding-top:clamp(14px,1.6vw,20px);border-top:1px solid var(--rule)
+}
+.ak .prosess__fot p{
+  color:var(--muted);font-size:var(--fs-small);max-width:60ch
+}
+@media (max-width:1100px){
+  .ak .prosess{
+    grid-template-columns:repeat(2,minmax(0,1fr));row-gap:clamp(28px,4vw,44px)
   }
-  .ak .st{
-    grid-template-columns:1fr;gap:26px
-  }
-  .ak .st__shots{
-    order:2
-  }
-  .ak .st__shots--duo{
-    grid-template-columns:1fr;justify-items:start
+  .ak .prosess::before{
+    display:none
   }
 }
-@media (max-width:560px){
-  .ak .st__shots--pair{
-    grid-template-columns:1fr
+@media (max-width:820px){
+  .ak .prosess__hode{
+    grid-template-columns:1fr;align-items:start
   }
 }
-/* portretter: ekte bilder i stedet for plassholdere */
+/* Mobil: én kolonne, bildet lite til venstre for teksten, så alle fire får plass uten lang rulling */
+@media (max-width:600px){
+  .ak .prosess{
+    grid-template-columns:1fr;row-gap:0
+  }
+  .ak .prosess>li{
+    grid-template-columns:40px minmax(0,1fr);column-gap:16px;row-gap:6px;
+    padding-block:18px;border-top:1px solid var(--rule)
+  }
+  .ak .prosess>li:last-child{
+    border-bottom:1px solid var(--rule)
+  }
+  .ak .prosess__n{
+    grid-row:1/3
+  }
+  .ak .prosess h3,.ak .prosess p,.ak .prosess__bilde{
+    grid-column:2
+  }
+  .ak .prosess h3{
+    margin-top:8px
+  }
+  .ak .prosess__bilde{
+    max-width:260px;order:5;margin:8px 0 0
+  }
+}
+/* portretter: ekte bilder, myke hjørner som i v4 */
 .ak .portrait--foto{
-  border:none;padding:0;overflow:hidden;background:var(--jord);
-  aspect-ratio:4/5;max-width:190px;border-radius:2px;margin-bottom:16px;
-  transition:transform var(--t-m) var(--ease)
+  overflow:hidden;background:var(--salvie);
+  aspect-ratio:4/5;max-width:220px;border-radius:14px;margin-bottom:16px
 }
 .ak .portrait--foto img{
   width:100%;height:100%;object-fit:cover
 }
-.ak .team li:hover .portrait--foto{
-  transform:translateY(-4px)
+@media (max-width:620px){
+  .ak .portrait--foto{
+    max-width:none
+  }
 }
 /* ============================================================
    FAST DEMOKNAPP PÅ MOBIL
@@ -1496,10 +1341,10 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 .ak .dock{
   position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
   padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom));
-  background:rgba(31,34,30,.94);
+  background:rgba(21,44,32,.96);
   /* Safari under 18 kjenner bare den prefiksede varianten */
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  border-top:1px solid rgba(242,238,230,.16);
+  border-top:1px solid rgba(244,242,235,.16);
   transform:translateY(102%);transition:transform var(--t-m) var(--ease)
 }
 .ak .dock[data-vis="1"]{
@@ -1516,7 +1361,7 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 }
 .ak .dock .btn{
   flex:none;min-height:50px;padding:.6em 1.4em;font-size:1rem;
-  background:var(--lin);color:var(--natt)
+  background:var(--lin);color:var(--natt-dyp)
 }
 @media (max-width:980px){
   .ak.ak-js .dock{
@@ -1527,15 +1372,6 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
   .ak .dock{
     transition:none
   }
-  .ak .hero__glow{
-    transform:translate(-50%,-50%);opacity:1
-  }
-  .ak .st{
-    animation:none !important
-  }
-  .ak .btn:hover,.ak .row:hover,.ak .faq details>summary:hover,.ak .ul:hover,.ak .brand:hover,.ak .rail__b:hover,.ak .sh:hover .sh__f,.ak .team li:hover .portrait--foto,.ak .shotfig:hover .phoneframe,.ak .menu>summary:hover{
-    transform:none
-  }
 }
 /* ============================================================
    SIDEEGEN KOMPOSISJON — «Slik fungerer det»
@@ -1545,9 +1381,6 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
    utdyper ligger i ett <details>-felt per del, så hoveddelen
    kan leses uten ekstra klikk.
    ============================================================ */
-.ak .phero--slik{
-  border-bottom:1px solid rgba(242,238,230,.1)
-}
 /* ---- filmen i sidetoppen ----
    Sidetoppen får to kolonner: teksten til venstre, filmen til høyre. Teksten står først i
    markeringen, så under bruddpunktet legges de under hverandre med overskriften øverst.
@@ -1592,6 +1425,25 @@ pointer-events er av, så etiketten håndterer pekeren og hover virker som før.
 }
 .ak .del__shot{
   margin-top:clamp(28px,3.4vw,48px);max-width:900px
+}
+/* To kolonner på brede skjermer: teksten og utdypingen til venstre, hovedbildet til høyre i
+   omtrent egen størrelse (bildene er 620–680 px; i én kolonne ble de skalert opp til 900 px og
+   ble både uskarpe og høye). Delen med det brede filterbåndet og delen med trinnvisningen står
+   som før, i én kolonne. Uten :has() blir alt én kolonne, som før. */
+@media (min-width:1024px){
+  .ak .del:has(> figure.del__shot:not(.del__shot--bred)){
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
+    grid-template-rows:repeat(5,auto) 1fr;column-gap:clamp(36px,5vw,84px);align-items:start
+  }
+  .ak .del:has(> figure.del__shot:not(.del__shot--bred)) > *{
+    grid-column:1
+  }
+  .ak .del:has(> figure.del__shot:not(.del__shot--bred)) > figure.del__shot:first-of-type{
+    grid-column:2;grid-row:1/-1;margin-top:0;max-width:680px;justify-self:end;width:100%
+  }
+  .ak .del:has(> figure.del__shot:not(.del__shot--bred)) > figure.del__shot:not(:first-of-type){
+    max-width:440px
+  }
 }
 .ak .del__shot--bred{
   max-width:1100px
@@ -1775,36 +1627,26 @@ Da hopper ikke siden når man bytter trinn, og ingen av dem blir liggende i et t
    ved siden av, som i en programbok.
    ============================================================ */
 /* ---- sidetopp med portrettstripe ---- */
-.ak .phero--om{
-  padding-bottom:0;overflow:visible
-}
+
 /* ---- teamkortene ---- */
 .ak .folk{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:1px;background:var(--rule);border:1px solid var(--rule);
-  margin-top:clamp(34px,4.4vw,62px)
-}
-.ak .folk li{
-  background:var(--papir);padding:clamp(20px,2.2vw,30px) clamp(16px,1.8vw,26px)
+  gap:clamp(20px,2.4vw,32px);margin-top:clamp(28px,3.6vw,52px)
 }
 .ak .folk img{
-  width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:2px;margin-bottom:clamp(14px,1.8vw,20px)
+  width:100%;max-width:240px;aspect-ratio:4/5;object-fit:cover;border-radius:14px;margin-bottom:clamp(12px,1.6vw,18px);
+  background:var(--salvie)
 }
 .ak .folk__n{
-  font-family:var(--serif);font-size:clamp(1.15rem,1rem + .5vw,1.4rem);
-  line-height:1.2;color:var(--ink);font-optical-sizing:none
+  font-family:var(--serif);font-size:var(--fs-h4);
+  line-height:1.22;color:var(--ink);font-optical-sizing:none
 }
 .ak .folk__r{
-  font-size:.95rem;color:var(--muted);margin-top:.3em
+  font-size:var(--fs-small);color:var(--muted);margin-top:.3em
 }
 @media (max-width:860px){
   .ak .folk{
-    grid-template-columns:repeat(2,minmax(0,1fr))
-  }
-}
-@media (max-width:420px){
-  .ak .folk{
-    grid-template-columns:1fr
+    grid-template-columns:repeat(2,minmax(0,1fr));row-gap:28px
   }
 }
 /* ---- hvorfor: tekst til venstre, avgrensningen som en marginalie ---- */

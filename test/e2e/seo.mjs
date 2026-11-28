@@ -67,7 +67,7 @@ await check('Uten JavaScript: forsiden viser overskrift, tekst og lenker', async
   const page = await ctx.newPage()
   await page.goto(`${BASE}/`)
   assert(await h1Name(page) === H1_NO, `overskriften vises ikke: ${await h1Name(page)}`)
-  assert(await page.getByText('Se tingene og hvem som ønsker dem').isVisible(), 'teksten vises ikke')
+  assert(await page.getByText('Slik fordeler dere innboet').isVisible(), 'teksten vises ikke')
   // «Kontakt» står både i hovedmenyen og i bunnmenyen
   assert(await page.getByRole('link', { name: 'Kontakt', exact: true }).count() === 2, 'lenken til Kontakt mangler i hovedmenyen eller bunnmenyen')
   for (const [path, h1] of [['/kontakt', 'Hva kan vi hjelpe deg med?'], ['/slik-fungerer-det', 'Slik fordeler dere innbo med Arvklart'], ['/om-oss', 'Teamet bak Arvklart']]) {

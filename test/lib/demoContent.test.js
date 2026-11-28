@@ -96,9 +96,9 @@ describe('demoinnholdet', () => {
     // Tallene om eksempelboet står to steder på de offentlige sidene og må stemme med demoen
     assert.match(read('src/pages/HowItWorksPage.jsx'), /3 arvinger og 10 gjenstander/)
     assert.match(read('src/pages/ContactPage.jsx'), /tre arvinger og ti gjenstander/)
-    // Forsiden og produktreisen illustrerer demoen med skjermbilder. Teksten rundt dem skal ikke
+    // Forsiden og prosessen (Prosess.jsx) illustrerer demoen med skjermbilder. Teksten rundt dem skal ikke
     // påstå en ferdig fordeling, og ikke nevne noe nullstillingen fjerner eller som ikke finnes.
-    for (const f of ['src/pages/LandingPage.jsx', 'src/site/Journey.jsx']) {
+    for (const f of ['src/pages/LandingPage.jsx', 'src/site/Prosess.jsx']) {
       assert.doesNotMatch(read(f), /Tildelt|ble enige|eiketresbord|Erik/, `${f}: viser noe nullstillingen fjerner eller som ikke finnes i demoen`)
     }
     // Hvert produktutsnitt er merket som skjermbilde (redelighetskravet i integrasjonspakken)

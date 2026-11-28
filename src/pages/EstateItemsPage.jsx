@@ -9,7 +9,7 @@ import { removeImages, itemImageUrls } from '../lib/images'
 import { dispositionLabel } from '../lib/disposition'
 import { categoryLabel } from '../lib/categories'
 import { C } from '../lib/estateTheme'
-import { darkCss } from '../lib/estateThemeCss'
+import { boCss } from '../lib/estateThemeCss'
 import { L } from '../lib/lang'
 import { Modal } from '../components/UI'
 import ReasonEditor from '../components/ReasonEditor'
@@ -84,8 +84,8 @@ export default function EstateItemsPage({ session, onToast, isDemo }) {
   }
 
   return (
-    <div className="bo-mork">
-      <style>{darkCss}</style>
+    <div className="bo-flate">
+      <style>{boCss}</style>
       <div className="bo-side bred">
         <div className="bo-topplinje">
           <Link to={`/estate/${id}`} className="bo-lenke">{L('← Til oversikten', '← To the overview')}</Link>
@@ -238,9 +238,10 @@ function Analytics({ items, categories }) {
 
   const b = getStatusBreakdown(items)
   const status = [
-    { key: 'assigned', label: L('Tildelt', 'Assigned'), n: b.assigned, color: C.mose },
-    { key: 'contested', label: L('Ettertraktet', 'Contested'), n: b.contested, color: C.messing },
-    { key: 'single', label: L('Én vil ha', 'One wants it'), n: b.single, color: C.linDempet },
+    // Fire tydelig ulike toner (mørk grønn, rav, grågrønn, lys med kant), og tallet står alltid i teksten ved siden av
+    { key: 'assigned', label: L('Tildelt', 'Assigned'), n: b.assigned, color: C.jade },
+    { key: 'contested', label: L('Ettertraktet', 'Contested'), n: b.contested, color: '#B07338' },
+    { key: 'single', label: L('Én vil ha', 'One wants it'), n: b.single, color: '#8FA396' },
     { key: 'none', label: L('Ingen vil ha', 'No one wants it'), n: b.none, color: C.flateHoy },
   ]
 
@@ -275,8 +276,8 @@ function Analytics({ items, categories }) {
 
 function Message({ children }) {
   return (
-    <div className="bo-mork">
-      <style>{darkCss}</style>
+    <div className="bo-flate">
+      <style>{boCss}</style>
       <p role="status" className="bo-dempet" style={{ padding: '80px 16px', textAlign: 'center' }}>{children}</p>
     </div>
   )

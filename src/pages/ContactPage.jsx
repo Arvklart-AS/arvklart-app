@@ -53,7 +53,7 @@ export default function ContactPage({ loggedIn = false }) {
   return (
     <SiteLayout current="/kontakt" demo={demo} loggedIn={loggedIn}>
       <PageHero crumb={L('Kontakt', 'Contact')} overline={L('Kontakt', 'Contact')}
-        h1={L(<>Hva kan vi hjelpe deg <em>med</em>?</>, <>What can we help you <em>with</em>?</>)}
+        h1={L(<>Hva kan vi hjelpe deg med?</>, <>What can we help you with?</>)}
         lead={L(
           'Lurer du på om Arvklart passer for familien deres, eller ønsker du å prøve løsningen med eget bo? Send oss en e-post.',
           'Wondering whether Arvklart suits your family, or would you like to try it with your own estate? Send us an email.',
@@ -71,14 +71,13 @@ export default function ContactPage({ loggedIn = false }) {
 
       {/* ============ §1 TO VEIER INN ============ */}
       <section className="ground g-papir sec" aria-labelledby="h2-1">
-        <div className="rules" aria-hidden="true" />
         <div className="wrap">
           <p className="overline">{L('To grunner til å skrive', 'Two reasons to write')}</p>
-          <h2 id="h2-1" style={{ margin: 'clamp(14px,1.6vw,22px) 0 clamp(16px,2vw,26px)', maxWidth: '18ch' }}>
-            {L(<>Samme innboks, <em>ulikt</em> emne</>, <>Same inbox, <em>different</em> subject</>)}</h2>
+          <h2 id="h2-1" className="h2-sek">
+            {L('Hva gjelder henvendelsen?', 'What is your message about?')}</h2>
           <p className="body">{L(
-            'Begge valgene går til den samme adressen. Emnet er fylt ut på forhånd, så du slipper å forklare hva det gjelder to ganger.',
-            'Both choices go to the same address. The subject is filled in for you, so you do not have to explain twice what it is about.',
+            'Begge knappene åpner en e-post til samme adresse, med emnet ferdig utfylt.',
+            'Both buttons open an email to the same address, with the subject already filled in.',
           )}</p>
 
           <div className="veier">
@@ -103,14 +102,13 @@ export default function ContactPage({ loggedIn = false }) {
 
       {/* ============ §2 FØR DU SKRIVER ============ */}
       <section className="ground g-papir sec" aria-labelledby="h2-3">
-        <div className="rules" aria-hidden="true" />
         <div className="wrap">
           <p className="overline">{L('Kanskje raskere enn et svar', 'Perhaps quicker than a reply')}</p>
-          <h2 id="h2-3" style={{ margin: 'clamp(14px,1.6vw,22px) 0 clamp(16px,2vw,26px)', maxWidth: '19ch' }}>
-            {L(<>Tre steder du finner svar <em>med en gang</em></>, <>Three places you find answers <em>straight away</em></>)}</h2>
+          <h2 id="h2-3" className="h2-sek">
+            {L('Kanskje svaret finnes allerede', 'The answer may already be here')}</h2>
           <p className="body">{L(
-            'Noen spørsmål er det raskere å se svaret på selv enn å vente på en e-post fra oss.',
-            'For some questions it is quicker to see the answer yourself than to wait for an email from us.',
+            'Her finner du svar uten å vente på oss.',
+            'Here you can find answers without waiting for us.',
           )}</p>
 
           <ul className="foer">
@@ -146,18 +144,17 @@ export default function ContactPage({ loggedIn = false }) {
       </section>
 
       {/* ============ §3 AVSLUTNING ============ */}
-      <section className="ground g-natt sec" aria-labelledby="h2-4">
-        <div className="rules" aria-hidden="true"><i /></div>
+      <section className="ground g-lin sec" aria-labelledby="h2-4">
         <div className="wrap">
           <div className="end">
             <p className="overline overline--c">{L('Hvem vi er', 'Who we are')}</p>
             <h2 id="h2-4">{L(
-              <>Du skriver til de samme fire som har <em>bygget</em> det</>,
-              <>You are writing to the same four who <em>built</em> it</>,
+              'Det er vi fire som svarer',
+              'The four of us answer',
             )}</h2>
             <p className="body">{L(
-              'Fire personer står bak Arvklart. Det er de samme som leser e-posten din.',
-              'Four people are behind Arvklart. They are the same ones who read your email.',
+              'E-posten din leses av de fire som har laget Arvklart.',
+              'Your email is read by the four people who made Arvklart.',
             )}</p>
             <p className="end__cta">
               <a className="btn" href="/om-oss">{L('Møt teamet', 'Meet the team')}</a>

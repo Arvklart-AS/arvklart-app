@@ -39,7 +39,7 @@ const TRINN = () => [
       'Svaret registreres på deg. Du kan skrive hvorfor gjenstanden betyr noe for deg, men du må ikke.',
       'The answer is registered to you. You can write why the item matters to you, but you do not have to.',
     ),
-    bilde: { src: 'j-svar.webp', w: 900, h: 141, zoom: 1.5 },
+    bilde: { src: 'j-svar.webp', w: 900, h: 97, zoom: 1.5, bg: '#FCFCF9' },
     alt: L(
       'Skjermbilde fra demoen: knappene «Registrer interesse» og «Ikke interessert» på oljemaleriets side.',
       'Screenshot from the demo (Norwegian interface): the «Registrer interesse» and «Ikke interessert» buttons on the painting’s page.',
@@ -54,10 +54,10 @@ const TRINN = () => [
       'Gjenstanden merkes «2 vil ha» i galleriet, med navnene på dem som har svart. Filteret «Ettertraktede» samler alle slike gjenstander.',
       'The item is marked «2 vil ha» (2 want it) in the gallery, with the names of those who answered. The «Ettertraktede» (contested) filter gathers every item like it.',
     ),
-    bilde: { src: 'f-flere.webp', w: 640, h: 360, zoom: 1.4 },
+    bilde: { src: 'f-flere.webp', w: 640, h: 464, zoom: 1.4, bg: '#F1F3EA' },
     alt: L(
-      'Skjermbilde fra demoen: to gjenstandskort merket «2 vil ha» — oljemaleriet og familiealbumet — med navnene Lars Hansen og Kari Hansen under.',
-      'Screenshot from the demo (Norwegian interface): two item cards marked «2 vil ha» (2 want it) — the oil painting and the family album — with the names Lars Hansen and Kari Hansen below.',
+      'Skjermbilde fra demoen: to gjenstandskort merket «2 vil ha» — Bestemors gyngestol og oljemaleriet — med navnene Lars Hansen og Kari Hansen under.',
+      'Screenshot from the demo (Norwegian interface): two item cards marked «2 vil ha» (2 want it) — grandmother’s rocking chair and the oil painting — with the names Lars Hansen and Kari Hansen below.',
     ),
     cap: L('Merket står på kortet, sammen med hvem som har svart.', 'The mark sits on the card, together with who has answered.'),
   },
@@ -69,7 +69,7 @@ const TRINN = () => [
       'Arvklart ber dere snakke sammen først, og viser begrunnelsene ved siden av hverandre i stedet for i hver sin samtale. Hver av dere kan trekke sitt eget ønske.',
       'Arvklart asks you to talk it over first, and shows the explanations next to each other instead of in separate conversations. Each of you can withdraw your own wish.',
     ),
-    bilde: { src: 'j-onsker.webp', w: 1060, h: 454, zoom: 2.1 },
+    bilde: { src: 'j-onsker.webp', w: 1060, h: 434, zoom: 2.1, bg: '#FCFCF9' },
     alt: L(
       'Skjermbilde fra demoen: «Flere ønsker denne (2)» med teksten «Snakk sammen først» og begrunnelsene fra Lars Hansen og Kari Hansen.',
       'Screenshot from the demo (Norwegian interface): «Flere ønsker denne (2)» (Several want this) with the text «Snakk sammen først» (Talk it over first) and the explanations from Lars Hansen and Kari Hansen.',
@@ -84,7 +84,7 @@ const TRINN = () => [
       'Ingen metode starter av seg selv. Administrator gjennomfører den valgte metoden, og resultatet er et forslag dere kan justere før det registreres.',
       'No method starts on its own. The administrator carries out the chosen method, and the result is a proposal you can adjust before it is registered.',
     ),
-    bilde: { src: 'p-metoder.webp', w: 680, h: 469, zoom: 1.4 },
+    bilde: { src: 'p-metoder.webp', w: 680, h: 467, zoom: 1.4, bg: '#F1F3EA' },
     alt: L(
       'Skjermbilde fra demoen: valget mellom Loddtrekning, Vekslende runder og Jevn verdifordeling.',
       'Screenshot from the demo (Norwegian interface): the choice between Loddtrekning (lottery), Vekslende runder (alternating rounds) and Jevn verdifordeling (even value split).',
@@ -124,9 +124,8 @@ function Utdyp({ tittel, children }) {
 // En hoveddel: nummer, overskrift, én kort forklaring, og det som hører til under.
 function Del({ n, id, overline, h2, lead, children }) {
   return (
-    <section className={`ground ${n % 2 ? 'g-papir' : 'g-natt'} sec`} aria-labelledby={id}>
-      <div className="rules" aria-hidden="true">{n % 2 ? null : <i />}</div>
-      <div className="wrap">
+    <section className={`ground ${n % 2 ? 'g-papir' : 'g-lin'} sec`} aria-labelledby={id}>
+      <div className="wrap del">
         <p className="overline">{overline}</p>
         <h2 id={id} className="del__h">
           {/* Tallet og teksten må være hvert sitt element: en bar tekstnode og <em> ville blitt
@@ -149,7 +148,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
     <SiteLayout current="/slik-fungerer-det" demo={demo} loggedIn={loggedIn}>
       <PageHero className="phero--slik" crumb={L('Slik fungerer det', 'How it works')}
         overline={L('Slik fungerer det', 'How it works')}
-        h1={L(<>Slik fordeler dere innbo med <em>Arvklart</em></>, <>How you share out a home with <em>Arvklart</em></>)}
+        h1={L(<>Slik fordeler dere innbo med Arvklart</>, <>How you share out a home with Arvklart</>)}
         lead={L(
           'Fire deler, fra de første bildene til en fordeling dere kan dokumentere. Vi følger ett oljemaleri fra eksempelboet hele veien.',
           'Four parts, from the first photos to a division you can document. We follow one oil painting from the example estate all the way.',
@@ -186,14 +185,14 @@ export default function HowItWorksPage({ loggedIn = false }) {
 
       {/* ============ DEL 1 ============ */}
       <Del n={1} id="h2-1" overline={L('Del 1 av 4', 'Part 1 of 4')}
-        h2={L(<>Samle <em>gjenstandene</em></>, <>Gather the <em>items</em></>)}
+        h2={L(<>Samle gjenstandene</>, <>Gather the items</>)}
         lead={L(
           'Alle som er med i boet kan legge inn, ikke bare den som opprettet det. Ta et bilde, se over opplysningene og lagre. Kategorier og søk gjør at dere finner igjen én bestemt ting senere.',
           'Everyone taking part can add items, not just whoever created the estate. Take a photo, check the details and save. Categories and search make it possible to find one particular thing again later.',
         )}>
         <figure className="shotfig del__shot">
           <div className="deskframe" style={{ '--zoom': 1.5 }}>
-            <Img lazy src="i-legg-til.webp" w={640} h={344}
+            <Img lazy src="i-legg-til.webp" w={640} h={364}
               alt={L('Skjermbilde fra demoen: skjemaet «Legg til gjenstand» med «Bilder (valgfri, maks 5)», knappene «Ta bilder» og «Velg bilder», og feltet «Navn på gjenstand».',
                 'Screenshot from the demo (Norwegian interface): the «Legg til gjenstand» (Add item) form with «Bilder (valgfri, maks 5)» (photos, optional, max 5), the «Ta bilder» (Take photos) and «Velg bilder» (Choose photos) buttons, and the «Navn på gjenstand» (Item name) field.')} />
           </div>
@@ -231,7 +230,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
           </div>
           <figure className="shotfig utdyp__shot">
             <div className="deskframe" style={{ '--zoom': 2.0 }}>
-              <Img lazy src="j-verdi.webp" w={900} h={440}
+              <Img lazy src="j-verdi.webp" w={900} h={450}
                 alt={L('Skjermbilde fra demoen: oljemaleriets side med «Fordelingsverdi (foreslått) 4 000 kr — fra AI-anslaget» og forklaringen under.',
                   'Screenshot from the demo (Norwegian interface): the painting’s page with «Fordelingsverdi (foreslått) 4 000 kr» (proposed distribution value, from the AI estimate) and the explanation below.')} />
             </div>
@@ -242,14 +241,14 @@ export default function HowItWorksPage({ loggedIn = false }) {
 
       {/* ============ DEL 2 ============ */}
       <Del n={2} id="h2-2" overline={L('Del 2 av 4', 'Part 2 of 4')}
-        h2={L(<>Inviter familien og <em>se ønskene</em></>, <>Invite the family and <em>see the wishes</em></>)}
+        h2={L(<>Inviter familien og se ønskene</>, <>Invite the family and see the wishes</>)}
         lead={L(
           'Du registrerer navn og e-postadresse. Arvklart lager en invitasjonsmelding med en lenke, som du sender videre selv. Den som er invitert logger inn med den samme e-postadressen og svarer på én gjenstand av gangen.',
           'You register names and email addresses. Arvklart writes an invitation message with a link, which you send on yourself. The person invited logs in with that same email address and answers one item at a time.',
         )}>
         <figure className="shotfig del__shot del__shot--bred">
           <div className="deskframe" style={{ '--zoom': 1.7 }}>
-            <Img lazy src="f-filtre.webp" w={1320} h={84}
+            <Img lazy src="f-filtre.webp" w={1320} h={70}
               alt={L('Skjermbilde fra demoen: verktøylinjen over galleriet med søkefeltet, valget «Alle gjenstander (10)», «Alle kategorier» og byttet mellom Bilder og Analyse.',
                 'Screenshot from the demo (Norwegian interface): the toolbar above the gallery with the search field, the «Alle gjenstander (10)» (all items) choice, «Alle kategorier» (all categories) and the switch between Bilder (pictures) and Analyse (analysis).')} />
           </div>
@@ -295,7 +294,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
 
       {/* ============ DEL 3 ============ */}
       <Del n={3} id="h2-3" overline={L('Del 3 av 4', 'Part 3 of 4')}
-        h2={L(<>Finn en <em>fordeling</em></>, <>Find a <em>division</em></>)}
+        h2={L(<>Finn en fordeling</>, <>Find a division</>)}
         lead={L(
           'To av de tre arvingene ønsker seg oljemaleriet. Her er de fire trinnene, slik de ser ut i løsningen. Velg et trinn for å se det.',
           'Two of the three heirs want the oil painting. Here are the four steps, as they look in the tool. Choose a step to see it.',
@@ -317,7 +316,8 @@ export default function HowItWorksPage({ loggedIn = false }) {
             {trinn.map((t, i) => (
               <div className={`trinn__steg s${i + 1}`} key={t.id}>
                 <figure className="shotfig">
-                  <div className="deskframe" style={{ '--zoom': t.bilde.zoom }}>
+                  {/* bg: flaten bildet er tatt fra (kort eller side), så det glir inn i den faste rammehøyden */}
+                  <div className="deskframe" style={{ '--zoom': t.bilde.zoom, background: t.bilde.bg }}>
                     <Img lazy src={t.bilde.src} w={t.bilde.w} h={t.bilde.h} alt={t.alt} />
                   </div>
                   <Cap>{t.cap}</Cap>
@@ -360,14 +360,14 @@ export default function HowItWorksPage({ loggedIn = false }) {
 
       {/* ============ DEL 4 ============ */}
       <Del n={4} id="h2-4" overline={L('Del 4 av 4', 'Part 4 of 4')}
-        h2={L(<>Se og <em>dokumenter</em> resultatet</>, <>See and <em>document</em> the result</>)}
+        h2={L(<>Se og dokumenter resultatet</>, <>See and document the result</>)}
         lead={L(
-          'Tildelingene står registrert i boet, med hvem som får hva. Dere kan hente ut fordelingen som PDF underveis, og det som ikke er avklart står oppført som uavklart i stedet for å utelates.',
-          'The allocations are registered in the estate, with who gets what. You can take the division out as a PDF along the way, and whatever is not settled is listed as unsettled rather than left out.',
+          'Boet viser hvem som får hva. Dere kan laste ned fordelingen som PDF underveis. Det som ikke er avklart, står for seg, så ingenting faller ut.',
+          'The estate shows who gets what. You can download the division as a PDF along the way. Anything not yet settled is listed separately, so nothing falls out.',
         )}>
         <figure className="shotfig del__shot del__shot--smal">
           <div className="deskframe" style={{ '--zoom': 1.6 }}>
-            <Img lazy src="m-fordeling.webp" w={620} h={525}
+            <Img lazy src="m-fordeling.webp" w={620} h={575}
               alt={L('Skjermbilde fra demoen: siden «Fordelingen» med teksten om at alt er foreløpig til alle har godkjent, og knappen «Last ned utkast (PDF)».',
                 'Screenshot from the demo (Norwegian interface): the «Fordelingen» (The distribution) page with the text saying everything is provisional until everyone has approved, and the «Last ned utkast (PDF)» button.')} />
           </div>
@@ -413,7 +413,7 @@ export default function HowItWorksPage({ loggedIn = false }) {
           </div>
           <figure className="shotfig utdyp__shot">
             <div className="deskframe" style={{ '--zoom': 1.6 }}>
-              <Img lazy src="m-godkjenning.webp" w={620} h={405}
+              <Img lazy src="m-godkjenning.webp" w={620} h={432}
                 alt={L('Skjermbilde fra demoen: avsnittet «Godkjenning», som sier at godkjenningen registreres med innloggingen din og at Arvklart ikke verifiserer identitet med BankID.',
                   'Screenshot from the demo (Norwegian interface): the «Godkjenning» (Approval) section, stating that the approval is registered with your login and that Arvklart does not verify identity with BankID.')} />
             </div>
@@ -423,12 +423,11 @@ export default function HowItWorksPage({ loggedIn = false }) {
       </Del>
 
       {/* ============ SAMMENHENGEN ============ */}
-      <section className="ground g-jord sec sec--tight" aria-labelledby="h2-5">
-        <div className="rules" aria-hidden="true"><i /></div>
+      <section className="ground g-jord sec kurve-begge" aria-labelledby="h2-5">
         <div className="wrap">
           <p className="overline">{L('Sammenhengen', 'The wider picture')}</p>
-          <h2 id="h2-5" style={{ margin: 'clamp(14px,1.6vw,22px) 0 clamp(16px,2vw,26px)', maxWidth: '18ch' }}>
-            {L(<>En del av <em>arveoppgjøret</em></>, <>One part of the <em>estate settlement</em></>)}</h2>
+          <h2 id="h2-5" className="h2-sek">
+            {L(<>En del av arveoppgjøret</>, <>One part of the estate settlement</>)}</h2>
           <p className="body">{L(
             'Arvklart hjelper med oversikten over og fordelingen av innbo og løsøre. Tjenesten avgjør ikke arverett og erstatter ikke juridisk rådgivning. Veiviseren gir en bredere oversikt over arveprosessen og viser videre til relevante ressurser.',
             'Arvklart helps with the overview and the sharing out of household contents and personal belongings. The service does not determine inheritance rights under Norwegian law, and it does not replace legal advice. The guide gives a broader overview of the Norwegian inheritance process and points on to relevant resources.',
@@ -444,24 +443,22 @@ export default function HowItWorksPage({ loggedIn = false }) {
 
       {/* ============ VIDERE ============ */}
       <section className="ground g-papir sec" aria-labelledby="h2-6">
-        <div className="rules" aria-hidden="true" />
         <div className="wrap">
           <div className="end">
             <p className="overline overline--c">{L('Prøv det selv', 'Try it yourself')}</p>
             <h2 id="h2-6">{L(
-              <>Den raskeste måten å forstå dette på er å <em>klikke</em> i det</>,
-              <>The quickest way to understand this is to <em>click</em> around in it</>,
+              'Prøv eksempelboet selv',
+              'Try the example estate yourself',
             )}</h2>
             <p className="body">{L(
-              'Eksempelboet har 3 arvinger og 10 gjenstander. Du kan utforske gjenstandene, vise interesse og se fordelingsmetodene uten å registrere deg.',
-              'The example estate has 3 heirs and 10 items. You can explore the items, register interest and look at the distribution methods without signing up.',
+              'Se gjenstandene, vis interesse og prøv fordelingsmåtene, uten å registrere deg.',
+              'Look at the items, register interest and try the ways to divide, without signing up.',
             )}</p>
             <p className="end__cta">
               <DemoCta demo={demo} />
               <a className="ul ul--sub" href="/kontakt">{L('Spør oss om noe', 'Ask us something')}</a>
             </p>
             <DemoError demo={demo} center />
-            <p className="micro">{L('Ingen registrering. Du utforsker et offentlig eksempelbo.', 'No sign-up. You explore a public example estate.')}</p>
           </div>
         </div>
       </section>

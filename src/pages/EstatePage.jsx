@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useEstateData } from '../hooks/useEstateData'
 import { buildRemainingSteps } from '../lib/estateProgress'
 import { overviewCounts, recommendation, overviewGroups } from '../lib/estateOverview'
-import { darkCss } from '../lib/estateThemeCss'
+import { boCss } from '../lib/estateThemeCss'
 import { L, locale } from '../lib/lang'
 import { APP_HOME } from '../lib/routes'
 
@@ -31,8 +31,8 @@ export default function EstatePage({ session, isDemo }) {
   const progress = counts.total ? Math.round(counts.assigned / counts.total * 100) : 0
 
   return (
-    <div className="bo-mork">
-      <style>{darkCss}</style>
+    <div className="bo-flate">
+      <style>{boCss}</style>
       <div className="bo-side">
         {/* Demoen har bare ett bo, og kan ikke administreres (notForDemo i App.jsx) */}
         {!isDemo && (
@@ -140,8 +140,8 @@ function useOpenGroups(estateId) {
 
 function Message({ children }) {
   return (
-    <div className="bo-mork">
-      <style>{darkCss}</style>
+    <div className="bo-flate">
+      <style>{boCss}</style>
       <p role="status" className="bo-dempet" style={{ padding: '80px 16px', textAlign: 'center' }}>{children}</p>
     </div>
   )
