@@ -77,7 +77,7 @@ Mobil: én kolonne, nummer til venstre, lite bilde under teksten.
 **«Slik fungerer det»** er strammet inn uten å fjerne innhold: delene med ett hovedbilde står i to
 kolonner over 1024 px (tekst og utdyping til venstre, bildet til høyre i omtrent egen størrelse).
 Før ble 620–680 px store skjermbilder skalert opp til 900 px — uskarpt og høyt. Siden er
-**6 175 px** høy på 1440 px (var 7 551). Forsiden er **6 184 px** (var 6 646; v4 var 8 293).
+**5 947 px** høy på 1440 px (var 7 551). Forsiden er **5 959 px** (var 6 646; v4 var 8 293).
 
 ## 3. Julies tilbakemelding: demobildene
 
